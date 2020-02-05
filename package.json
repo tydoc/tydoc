@@ -1,0 +1,14 @@
+{
+  "name": "jsdoc-extractor",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^13.1.4",
+    "ts-morph": "^6.0.2",
+    "typescript": "^3.7.4"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^1.0.0-pre.44"
+  }
+}

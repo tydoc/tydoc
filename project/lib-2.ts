@@ -1,0 +1,6 @@
+/**
+ * lalala
+ */
+export function cFunction() {
+
+}
