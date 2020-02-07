@@ -36,7 +36,7 @@
     ],
     "globals": {
       "ts-jest": {
-        "tsConfig": "tsconfig.test.json",
+        "tsConfig": "test/tsconfig.json",
         "diagnostics": {
           "ignoreCodes": [
             151001

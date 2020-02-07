@@ -7,5 +7,5 @@
     "rootDir": "src",
     "lib": ["ESNext", "DOM"]
   },
-  "exclude": ["test"]
+  "include": ["src"]
 }

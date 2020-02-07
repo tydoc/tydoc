@@ -3,9 +3,7 @@
     "strict": true,
     "moduleResolution": "node",
     "target": "ESNext",
-    "outDir": "dist",
-    "rootDir": ".",
+    "rootDir": "..",
     "lib": ["ESNext", "DOM"]
-  },
-  "include": ["src", "test"]
+  }
 }
