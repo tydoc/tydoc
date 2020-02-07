@@ -1,6 +1,16 @@
 import '../src'
 const ctx = createContext()
 
+it('extracts docs', () => {
+  expect(
+    ctx.extractDocsAndTypesFromModuleAtPath(
+      `
+        export function a() {}
+      `
+    )
+  ).toMatchSnapshot()
+})
+
 describe('jsdoc', () => {
   it('is null when no jsDoc is present', () => {
     expect(

@@ -1,5 +1,66 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`extracts docs 1`] = `
+Array [
+  Object {
+    "jsDoc": null,
+    "kind": "variable",
+    "location": Object {
+      "fileLine": 1,
+      "filePath": "__dynamic__",
+    },
+    "name": "a",
+    "type": Object {
+      "properties": Array [
+        Object {
+          "name": "toString",
+          "type": Object {
+            "properties": Array [],
+            "text": "any",
+          },
+        },
+        Object {
+          "name": "toFixed",
+          "type": Object {
+            "properties": Array [],
+            "text": "any",
+          },
+        },
+        Object {
+          "name": "toExponential",
+          "type": Object {
+            "properties": Array [],
+            "text": "any",
+          },
+        },
+        Object {
+          "name": "toPrecision",
+          "type": Object {
+            "properties": Array [],
+            "text": "any",
+          },
+        },
+        Object {
+          "name": "valueOf",
+          "type": Object {
+            "properties": Array [],
+            "text": "any",
+          },
+        },
+        Object {
+          "name": "toLocaleString",
+          "type": Object {
+            "properties": Array [],
+            "text": "any",
+          },
+        },
+      ],
+      "text": "1",
+    },
+  },
+]
+`;
+
 exports[`jsdoc extracts doc from a variable statement 1`] = `
 Object {
   "source": "/**
