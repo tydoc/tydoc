@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`jsdoc extracts doc from a variable statement 1`] = `
+Object {
+  "source": "/**
+ * primary
+ */",
+}
+`;
+
+exports[`jsdoc splits multiple jsDoc blocks by primary and additional (closest to code is primary) 1`] = `
+Object {
+  "additional": Array [
+    Object {
+      "source": "/**
+ * additional 2
+ */",
+    },
+    Object {
+      "source": "/**
+ * additional 1
+ */",
+    },
+  ],
+  "primary": Object {
+    "source": "/**
+ * primary
+ */",
+  },
+}
+`;
+
+exports[`jsdoc whitespace and comments between multiple jsDoc blocks are ignored 1`] = `
+Object {
+  "additional": Array [
+    Object {
+      "source": "/**
+ * additional 2
+ */",
+    },
+    Object {
+      "source": "/**
+ * additional 1
+ */",
+    },
+  ],
+  "primary": Object {
+    "source": "/**
+ * primary
+ */",
+  },
+}
+`;

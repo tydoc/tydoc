@@ -1,3 +1,4 @@
+import '../src'
 const ctx = createContext()
 
 describe('jsdoc', () => {
@@ -5,7 +6,7 @@ describe('jsdoc', () => {
     expect(
       ctx.extractDocsAndTypesFromModuleAtPath(
         `
-          export const a = 1
+          export function a() {}
         `
       )[0].jsDoc
     ).toBeNull()
@@ -18,7 +19,7 @@ describe('jsdoc', () => {
           /**
            * primary
            */
-          export const a = 1
+          export function a() {}
         `
       )[0].jsDoc!.primary
     ).toMatchSnapshot()
@@ -37,7 +38,7 @@ describe('jsdoc', () => {
           /**
            * primary
            */
-          export const a = 1
+          export function a() {}
         `
       )[0].jsDoc
     ).toMatchSnapshot()
@@ -62,7 +63,7 @@ describe('jsdoc', () => {
           /**
            * primary
            */
-          export const a = 1
+          export function a() {}
         `
       )[0].jsDoc
     ).toMatchSnapshot()
