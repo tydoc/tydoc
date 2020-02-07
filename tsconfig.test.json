@@ -4,8 +4,8 @@
     "moduleResolution": "node",
     "target": "ESNext",
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "lib": ["ESNext", "DOM"]
   },
-  "exclude": ["test"]
+  "include": ["src", "test"]
 }

@@ -33,6 +33,16 @@
     "preset": "ts-jest",
     "setupFiles": [
       "./test/_setup.ts"
-    ]
+    ],
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.test.json",
+        "diagnostics": {
+          "ignoreCodes": [
+            151001
+          ]
+        }
+      }
+    }
   }
 }
