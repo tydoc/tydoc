@@ -1,49 +1,43 @@
-import { join } from "path";
 import {
-  Project,
-  SourceFile,
   ExportedDeclarations,
   FunctionDeclaration,
-  VariableDeclaration,
+  Project,
+  SourceFile,
   ts,
-  Type
-} from "ts-morph";
+  Type,
+  VariableDeclaration
+} from 'ts-morph'
 
 export function extractDocsAndTypesFromEntrypoint() {
-  const entryPoint =
-    "/Users/flavian/projects/prisma/graphql-santa/src/index.ts";
-  const project = new Project({ addFilesFromTsConfig: true });
+  const entryPoint = '/Users/flavian/projects/prisma/graphql-santa/src/index.ts'
+  const project = new Project({ addFilesFromTsConfig: true })
 
-  project.addSourceFileAtPathIfExists(entryPoint);
+  project.addSourceFileAtPathIfExists(entryPoint)
 
-  const file = project.getSourceFile(entryPoint);
+  const file = project.getSourceFile(entryPoint)
 
-  
   return extractExportDeclarations(file)
 }
 
 function extractExportDeclarations(file: SourceFile) {
-  const exportedDeclarations = file.getExportedDeclarations();
-  const output = [];
+  const exportedDeclarations = file.getExportedDeclarations()
+  const output = []
 
   for (const [name, declarations] of exportedDeclarations) {
-    output.push(extractDeclarations(name, declarations[0]));
+    output.push(extractDeclarations(name, declarations[0]))
   }
 
-  return output;
+  return output
 }
 
-function extractDeclarations(
-  name: string,
-  declaration: ExportedDeclarations
-) {
-  const sourceFile = declaration.getSourceFile();
-  const filePath = sourceFile.getFilePath();
-  const line = declaration.getStartLineNumber();
+function extractDeclarations(name: string, declaration: ExportedDeclarations) {
+  const sourceFile = declaration.getSourceFile()
+  const filePath = sourceFile.getFilePath()
+  const line = declaration.getStartLineNumber()
 
   if (declaration instanceof FunctionDeclaration) {
     return {
-      kind: "function",
+      kind: 'function',
       name,
       filePath,
       line,
@@ -55,18 +49,18 @@ function extractDeclarations(
         ),
       jsDoc: declaration.getJsDocs().map(doc => doc.getFullText()),
       type: declaration.getReturnType().getText()
-    };
+    }
   }
 
   if (declaration instanceof VariableDeclaration) {
     return {
-      kind: "variable",
+      kind: 'variable',
       name,
       filePath,
       line,
       type: extractTypeMetadata(declaration.getInitializer().getType()),
       jsDoc: undefined // TODO: Extract jsdoc from variable statement
-    };
+    }
   }
 
   return null
@@ -81,15 +75,13 @@ function extractTypeMetadata(type: Type<ts.Type>) {
       name: p.getName(),
       type: extractTypeMetadata(p.getDeclaredType())
     }))
-  };
+  }
 }
 
-const out = extractDocsAndTypesFromEntrypoint();
+const out = extractDocsAndTypesFromEntrypoint()
 
 out[0] //?
- out[0].type.properties //?
-
-
+out[0].type.properties //?
 
 // const project = new Project()
 // const file = project.createSourceFile("test.ts", `const result = import("typescript");`);

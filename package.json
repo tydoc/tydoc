@@ -1,14 +1,24 @@
 {
   "name": "jsdoc-extractor",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.0.0",
+  "main": "dist/index.js",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "clean": "rm -rf dist"
+  },
   "dependencies": {
     "@types/node": "^13.1.4",
     "ts-morph": "^6.0.2",
     "typescript": "^3.7.4"
   },
   "devDependencies": {
+    "prettier": "^1.19.1",
     "ts-node-dev": "^1.0.0-pre.44"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
   }
 }

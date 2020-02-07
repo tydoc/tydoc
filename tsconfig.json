@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "target": "ESNext",
+    "outDir": "dist",
+    "rootDir": "src",
     "lib": ["ESNext", "DOM"]
-  },
-  "include": ["project"]
+  }
 }

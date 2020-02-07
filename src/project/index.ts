@@ -2,7 +2,7 @@ export * from './lib'
 export { cFunction } from './lib-2'
 
 interface App {
-  server: () => any,
+  server: () => any
   inputObjectType: () => any
 }
 
