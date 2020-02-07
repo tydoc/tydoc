@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "dev:test": "jest --watch",
+    "test": "jest"
   },
   "dependencies": {
     "@types/node": "^13.1.4",
@@ -14,11 +16,23 @@
     "typescript": "^3.7.4"
   },
   "devDependencies": {
+    "@types/jest": "^25.1.2",
+    "@types/prettier": "^1.19.0",
+    "fs-jetpack": "^2.2.3",
+    "jest": "^25.1.0",
     "prettier": "^1.19.1",
+    "ts-jest": "^25.2.0",
     "ts-node-dev": "^1.0.0-pre.44"
   },
   "prettier": {
     "semi": false,
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
   }
 }
