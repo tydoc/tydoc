@@ -2,7 +2,7 @@ const ctx = createContext()
 
 it('extracts docs', () => {
   expect(
-    ctx.extractDocsFromModuleAtPath(
+    ctx.given(
       `
         export const a = 1
       `
@@ -11,7 +11,7 @@ it('extracts docs', () => {
 })
 
 it('extracts the type name', () => {
-  const result = ctx.extractVariables(
+  const result = ctx.givenVariables(
     `
       export const a = 1
       export const b:number = 1
@@ -30,7 +30,7 @@ it('extracts the type name', () => {
 describe('jsdoc', () => {
   it('is null when no jsDoc is present', () => {
     expect(
-      ctx.extractDocsFromModuleAtPath(
+      ctx.given(
         `
           export const a = 1
         `
@@ -40,7 +40,7 @@ describe('jsdoc', () => {
 
   it('extracts doc from a variable statement', () => {
     expect(
-      ctx.extractDocsFromModuleAtPath(
+      ctx.given(
         `
           /**
            * primary
@@ -53,7 +53,7 @@ describe('jsdoc', () => {
 
   it('splits multiple jsDoc blocks by primary and additional (closest to code is primary)', () => {
     expect(
-      ctx.extractDocsFromModuleAtPath(
+      ctx.given(
         `
           /**
            * additional 2
@@ -72,7 +72,7 @@ describe('jsdoc', () => {
 
   it('whitespace and comments between multiple jsDoc blocks are ignored', () => {
     expect(
-      ctx.extractDocsFromModuleAtPath(
+      ctx.given(
         `
           /**
            * additional 2

@@ -15,7 +15,7 @@ export function extractDocsFromModuleAtPath(filePath: string) {
   return extractDocsAndTypesFromSourceFile(source)
 }
 
-function extractDocsAndTypesFromSourceFile(sourceFile: tsm.SourceFile) {
+export function extractDocsAndTypesFromSourceFile(sourceFile: tsm.SourceFile) {
   const exs = sourceFile.getExportedDeclarations()
 
   const docs = []

@@ -9,7 +9,7 @@ Array [
     "printed": "a = 1",
     "sourceLocation": Object {
       "fileLine": 1,
-      "filePath": "__dynamic__",
+      "filePath": "/test.ts",
     },
     "type": Object {
       "name": "1",

@@ -13,7 +13,7 @@ Array [
     },
     "sourceLocation": Object {
       "fileLine": 1,
-      "filePath": "__dynamic__",
+      "filePath": "/test.ts",
     },
   },
   Object {
@@ -34,7 +34,7 @@ Array [
     },
     "sourceLocation": Object {
       "fileLine": 2,
-      "filePath": "__dynamic__",
+      "filePath": "/test.ts",
     },
   },
   Object {
@@ -55,7 +55,7 @@ Array [
     },
     "sourceLocation": Object {
       "fileLine": 3,
-      "filePath": "__dynamic__",
+      "filePath": "/test.ts",
     },
   },
 ]

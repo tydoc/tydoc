@@ -1,36 +1,28 @@
-import * as fsjp from 'fs-jetpack'
 import * as Prettier from 'prettier'
+import * as tsm from 'ts-morph'
 import * as jsde from '../src'
 
 function createContextt() {
-  const fs = fsjp.cwd(
-    '/tmp/' +
-      Math.random()
-        .toString()
-        .slice(2)
-  )
+  const project = new tsm.Project({
+    addFilesFromTsConfig: false,
+    useInMemoryFileSystem: true,
+    skipLoadingLibFiles: true,
+  })
 
-  function extractDocsFromModuleAtPath(
-    source: string
-  ): ReturnType<typeof jsde.extractDocsFromModuleAtPath> {
-    const filePath = fs.path('testFile.ts')
-    fs.write(filePath, Prettier.format(source, { parser: 'typescript' }))
-    const result = jsde.extractDocsFromModuleAtPath(filePath)
-    return JSON.parse(
-      JSON.stringify(result).replace(
-        /filePath":"[^"]*"/g,
-        'filePath":"__dynamic__"'
-      )
-    )
-  }
-
-  return {
-    fs,
-    extractDocsFromModuleAtPath,
-    extractVariables(source: string) {
-      return extractDocsFromModuleAtPath(source) as jsde.DocVariable[]
+  const api = {
+    given(source: string) {
+      const sourceFormatted = Prettier.format(source, { parser: 'typescript' })
+      const sourceFile = project.createSourceFile('test.ts', sourceFormatted, {
+        overwrite: true,
+      })
+      return jsde.extractDocsAndTypesFromSourceFile(sourceFile)
+    },
+    givenVariables(source: string) {
+      return api.given(source) as jsde.DocVariable[]
     },
   }
+
+  return api
 }
 
 declare global {

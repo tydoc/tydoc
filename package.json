@@ -17,7 +17,8 @@
     "dev": "tsc -w",
     "clean": "rm -rf dist",
     "dev:test": "jest --watch",
-    "test": "jest"
+    "test": "jest",
+    "test:dev": "yarn -s dev:test"
   },
   "dependencies": {
     "@oclif/command": "^1.5.19",
@@ -32,7 +33,6 @@
     "@oclif/dev-cli": "^1.22.2",
     "@types/jest": "^25.1.2",
     "@types/prettier": "^1.19.0",
-    "fs-jetpack": "^2.2.3",
     "jest": "^25.1.0",
     "prettier": "^1.19.1",
     "ts-jest": "^25.2.0",
