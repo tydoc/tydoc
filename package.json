@@ -34,6 +34,9 @@
     "@types/jest": "^25.1.2",
     "@types/prettier": "^1.19.0",
     "jest": "^25.1.0",
+    "jest-watch-suspend": "^1.1.2",
+    "jest-watch-toggle-config": "^1.0.2",
+    "jest-watch-typeahead": "^0.4.2",
     "prettier": "^1.19.1",
     "ts-jest": "^25.2.0",
     "ts-node-dev": "^1.0.0-pre.44"
@@ -45,6 +48,12 @@
   },
   "jest": {
     "preset": "ts-jest",
+    "watchPlugins": [
+      "jest-watch-suspend",
+      "jest-watch-typeahead/filename",
+      "jest-watch-typeahead/testname",
+      ["jest-watch-toggle-config", { "setting": "verbose" }]
+    ],
     "setupFiles": [
       "./test/_setup.ts"
     ],
