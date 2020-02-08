@@ -1,21 +1,35 @@
 {
-  "name": "jsdoc-extractor",
+  "name": "docs",
   "version": "0.0.0",
   "main": "dist/index.js",
   "license": "MIT",
+  "bin": {
+    "doc": "dist/cli/main.js"
+  },
+  "files": [
+    "dist",
+    "/oclif.manifest.json"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build:oclif": "oclif-dev manifest",
+    "build:ts": "tsc",
+    "build": "yarn -s build:oclif && yarn -s build:ts",
     "dev": "tsc -w",
     "clean": "rm -rf dist",
     "dev:test": "jest --watch",
     "test": "jest"
   },
   "dependencies": {
+    "@oclif/command": "^1.5.19",
+    "@oclif/config": "^1.14.0",
+    "@oclif/plugin-help": "^2.2.3",
     "@types/node": "^13.1.4",
+    "globby": "^11.0.0",
     "ts-morph": "^6.0.2",
     "typescript": "^3.7.4"
   },
   "devDependencies": {
+    "@oclif/dev-cli": "^1.22.2",
     "@types/jest": "^25.1.2",
     "@types/prettier": "^1.19.0",
     "fs-jetpack": "^2.2.3",
@@ -44,5 +58,12 @@
         }
       }
     }
+  },
+  "oclif": {
+    "commands": "./dist/cli/commands",
+    "bin": "doc",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
   }
 }
