@@ -1,9 +1,8 @@
-import '../src'
 const ctx = createContext()
 
 it('extracts docs', () => {
   expect(
-    ctx.extractDocsAndTypesFromModuleAtPath(
+    ctx.extractDocsFromModuleAtPath(
       `
         export const a = 1
       `
@@ -11,10 +10,27 @@ it('extracts docs', () => {
   ).toMatchSnapshot()
 })
 
+it('extracts the type name', () => {
+  const result = ctx.extractVariables(
+    `
+      export const a = 1
+      export const b:number = 1
+      export let c = 1
+      export const d = 'foo'
+      export let e = 'foo'
+    `
+  )
+  expect(result.shift()!.type.name).toEqual('1')
+  expect(result.shift()!.type.name).toEqual('number')
+  expect(result.shift()!.type.name).toEqual('number')
+  expect(result.shift()!.type.name).toEqual('"foo"')
+  expect(result.shift()!.type.name).toEqual('string')
+})
+
 describe('jsdoc', () => {
   it('is null when no jsDoc is present', () => {
     expect(
-      ctx.extractDocsAndTypesFromModuleAtPath(
+      ctx.extractDocsFromModuleAtPath(
         `
           export const a = 1
         `
@@ -24,7 +40,7 @@ describe('jsdoc', () => {
 
   it('extracts doc from a variable statement', () => {
     expect(
-      ctx.extractDocsAndTypesFromModuleAtPath(
+      ctx.extractDocsFromModuleAtPath(
         `
           /**
            * primary
@@ -37,7 +53,7 @@ describe('jsdoc', () => {
 
   it('splits multiple jsDoc blocks by primary and additional (closest to code is primary)', () => {
     expect(
-      ctx.extractDocsAndTypesFromModuleAtPath(
+      ctx.extractDocsFromModuleAtPath(
         `
           /**
            * additional 2
@@ -56,7 +72,7 @@ describe('jsdoc', () => {
 
   it('whitespace and comments between multiple jsDoc blocks are ignored', () => {
     expect(
-      ctx.extractDocsAndTypesFromModuleAtPath(
+      ctx.extractDocsFromModuleAtPath(
         `
           /**
            * additional 2

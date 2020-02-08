@@ -5,14 +5,57 @@ Array [
   Object {
     "jsDoc": null,
     "kind": "function",
-    "location": Object {
-      "fileLine": 1,
-      "filePath": "__dynamic__",
-    },
     "name": "a",
+    "printed": "export function a() { }",
     "signature": Object {
       "parameters": Array [],
       "return": "void",
+    },
+    "sourceLocation": Object {
+      "fileLine": 1,
+      "filePath": "__dynamic__",
+    },
+  },
+  Object {
+    "jsDoc": null,
+    "kind": "function",
+    "name": "b",
+    "printed": "export function b(a: boolean) { }",
+    "signature": Object {
+      "parameters": Array [
+        Object {
+          "name": "a",
+          "type": Object {
+            "name": "boolean",
+          },
+        },
+      ],
+      "return": "void",
+    },
+    "sourceLocation": Object {
+      "fileLine": 2,
+      "filePath": "__dynamic__",
+    },
+  },
+  Object {
+    "jsDoc": null,
+    "kind": "function",
+    "name": "c",
+    "printed": "export function c(a: string): number { }",
+    "signature": Object {
+      "parameters": Array [
+        Object {
+          "name": "a",
+          "type": Object {
+            "name": "string",
+          },
+        },
+      ],
+      "return": "number",
+    },
+    "sourceLocation": Object {
+      "fileLine": 3,
+      "filePath": "__dynamic__",
     },
   },
 ]

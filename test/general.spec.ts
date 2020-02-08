@@ -2,12 +2,12 @@ import '../src'
 const ctx = createContext()
 
 it('extracts nothing if the module is empty', () => {
-  expect(ctx.extractDocsAndTypesFromModuleAtPath('')).toMatchSnapshot()
+  expect(ctx.extractDocsFromModuleAtPath('')).toMatchSnapshot()
 })
 
 it('extracts nothing if the module has no exports', () => {
   expect(
-    ctx.extractDocsAndTypesFromModuleAtPath(`
+    ctx.extractDocsFromModuleAtPath(`
       function a() {}
       const b = 2
     `)

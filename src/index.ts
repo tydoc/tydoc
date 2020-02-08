@@ -1,7 +1,7 @@
 import * as tsm from 'ts-morph'
 import { inspect } from 'util'
 
-export function extractDocsAndTypesFromModuleAtPath(filePath: string) {
+export function extractDocsFromModuleAtPath(filePath: string) {
   const project = new tsm.Project({ addFilesFromTsConfig: true })
 
   project.addSourceFileAtPathIfExists(filePath)
@@ -20,7 +20,7 @@ function extractDocsAndTypesFromSourceFile(sourceFile: tsm.SourceFile) {
 
   const docs = []
   for (const [name, declarations] of exs) {
-    docs.push(extractDocsAndTypesFromDeclaration(name, declarations[0]))
+    docs.push(extractDocsFromDeclaration(name, declarations[0]))
   }
 
   return docs
@@ -51,16 +51,22 @@ interface JSDocContent {
   additional: JSDocBlock[]
 }
 
+type TypeData = {
+  name: string
+}
+
 interface DocBase {
   name: string
   jsDoc: null | JSDocContent
-  location: {
+  printed: string
+  t?: any
+  sourceLocation: {
     filePath: string
     fileLine: number
   }
 }
 
-interface DocFunction extends DocBase {
+export interface DocFunction extends DocBase {
   kind: 'function'
   signature: {
     parameters: any[]
@@ -68,14 +74,14 @@ interface DocFunction extends DocBase {
   }
 }
 
-interface DocVariable extends DocBase {
+export interface DocVariable extends DocBase {
   kind: 'variable'
-  type: any
+  type: TypeData
 }
 
 type DocItem = DocFunction | DocVariable
 
-function extractDocsAndTypesFromDeclaration(
+function extractDocsFromDeclaration(
   name: string,
   declaration: tsm.ExportedDeclarations
 ): DocItem {
@@ -87,16 +93,17 @@ function extractDocsAndTypesFromDeclaration(
     return {
       kind: 'function',
       name,
+      printed: declaration.print(),
       signature: {
-        parameters: declaration
-          .getParameters()
-          .map(
-            p => `name: ${p.getName()} - type: ${extractTypeData(p.getType())}`
-          ),
+        parameters: declaration.getParameters().map(
+          // p => `name: ${p.getName()} - type:
+          // ${extractTypeData(p.getType())}`
+          p => ({ name: p.getName(), type: getTypeData(p.getType()) })
+        ),
         return: declaration.getReturnType().getText(),
       },
       jsDoc: getJSDocContent(declaration),
-      location: {
+      sourceLocation: {
         filePath,
         fileLine,
       },
@@ -107,16 +114,20 @@ function extractDocsAndTypesFromDeclaration(
     // A variable declaration is within a variable declaration list is inside a
     // variable statement. JSDoc lives at the variable statement level.
     const ctx = declaration.getParent().getParent()
-    const initializer = declaration.getInitializer()
     if (ctx instanceof tsm.VariableStatement) {
-      // todo when would this be undefined?
-      const type = initializer && initializer.getType()
+      const typeName = declaration.getType().getText()
+      // const initializer = declaration.getInitializer()
+      // const type = initializer && initializer.getType()
       return {
         kind: 'variable',
         name,
-        type: type && extractTypeData(type),
+        // type: type && extractTypeData(type),
+        type: {
+          name: typeName,
+        },
+        printed: declaration.print(),
         jsDoc: getJSDocContent(ctx),
-        location: {
+        sourceLocation: {
           filePath,
           fileLine,
         },
@@ -143,29 +154,37 @@ function getJSDocContent(node: tsm.JSDocableNode): null | JSDocContent {
   return { primary: jsDocs.pop()!, additional: jsDocs }
 }
 
-type TypeMetaData = {
-  text: string
-  properties: {
-    name: string
-    type: any // todo TypeMetaData
-  }[]
-}
-
-function extractTypeData(type: tsm.Type<tsm.ts.Type>): TypeMetaData {
-  const properties = type.getApparentProperties()
-
+function getTypeData(type: tsm.Type): TypeData {
   return {
-    text: type.getText(),
-    properties: properties.map(p => ({
-      name: p.getName(),
-      type: extractTypeData(p.getDeclaredType()),
-    })),
+    name: type.getText(),
   }
 }
 
-// const docs = extractDocsAndTypesFromModuleAtPath(
+// type TypeMetaData = {
+//   text: string
+//   properties: {
+//     name: string
+//     type: any // todo TypeMetaData
+//   }[]
+// }
+
+// function extractTypeData(type: tsm.Type<tsm.ts.Type>): TypeMetaData {
+//   const properties = type.getApparentProperties()
+//   return {
+//     text: type.getText(),
+//     properties: properties.map(p => ({
+//       name: p.getName(),
+//       type: extractTypeData(p.getDeclaredType()),
+//     })),
+//   }
+// }
+
+// const docs = extractDocsFromModuleAtPath(
 //   '/Users/jasonkuhrt/projects/nexus/nexus-future/src/index.ts'
 // )
 
-// docs //?+
-// inspect(docs, { depth: null }) //?
+// show(docs) //?+
+
+// function show(x: any) {
+//   return inspect(x, { depth: null })
+// }

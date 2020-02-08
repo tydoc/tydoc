@@ -9,20 +9,26 @@ function createContextt() {
         .toString()
         .slice(2)
   )
+
+  function extractDocsFromModuleAtPath(
+    source: string
+  ): ReturnType<typeof jsde.extractDocsFromModuleAtPath> {
+    const filePath = fs.path('testFile.ts')
+    fs.write(filePath, Prettier.format(source, { parser: 'typescript' }))
+    const result = jsde.extractDocsFromModuleAtPath(filePath)
+    return JSON.parse(
+      JSON.stringify(result).replace(
+        /filePath":"[^"]*"/g,
+        'filePath":"__dynamic__"'
+      )
+    )
+  }
+
   return {
     fs,
-    extractDocsAndTypesFromModuleAtPath: (
-      source: string
-    ): ReturnType<typeof jsde.extractDocsAndTypesFromModuleAtPath> => {
-      const filePath = fs.path('testFile.ts')
-      fs.write(filePath, Prettier.format(source, { parser: 'typescript' }))
-      const result = jsde.extractDocsAndTypesFromModuleAtPath(filePath)
-      return JSON.parse(
-        JSON.stringify(result).replace(
-          /filePath":"[^"]*"/g,
-          'filePath":"__dynamic__"'
-        )
-      )
+    extractDocsFromModuleAtPath,
+    extractVariables(source: string) {
+      return extractDocsFromModuleAtPath(source) as jsde.DocVariable[]
     },
   }
 }

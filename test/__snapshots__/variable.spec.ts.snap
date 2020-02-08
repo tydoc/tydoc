@@ -5,57 +5,14 @@ Array [
   Object {
     "jsDoc": null,
     "kind": "variable",
-    "location": Object {
+    "name": "a",
+    "printed": "a = 1",
+    "sourceLocation": Object {
       "fileLine": 1,
       "filePath": "__dynamic__",
     },
-    "name": "a",
     "type": Object {
-      "properties": Array [
-        Object {
-          "name": "toString",
-          "type": Object {
-            "properties": Array [],
-            "text": "any",
-          },
-        },
-        Object {
-          "name": "toFixed",
-          "type": Object {
-            "properties": Array [],
-            "text": "any",
-          },
-        },
-        Object {
-          "name": "toExponential",
-          "type": Object {
-            "properties": Array [],
-            "text": "any",
-          },
-        },
-        Object {
-          "name": "toPrecision",
-          "type": Object {
-            "properties": Array [],
-            "text": "any",
-          },
-        },
-        Object {
-          "name": "valueOf",
-          "type": Object {
-            "properties": Array [],
-            "text": "any",
-          },
-        },
-        Object {
-          "name": "toLocaleString",
-          "type": Object {
-            "properties": Array [],
-            "text": "any",
-          },
-        },
-      ],
-      "text": "1",
+      "name": "1",
     },
   },
 ]
