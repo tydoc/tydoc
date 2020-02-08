@@ -1,4 +1,0 @@
-/**
- * lalala
- */
-export function cFunction() {}
