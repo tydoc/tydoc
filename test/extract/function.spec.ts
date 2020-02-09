@@ -1,4 +1,4 @@
-import '../src'
+import '../../src/extract'
 const ctx = createContext()
 
 it('extracts docs', () => {

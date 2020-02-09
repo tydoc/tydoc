@@ -2,6 +2,7 @@
 
 exports[`extracts docs 1`] = `
 Object {
+  "hybrids": Array [],
   "length": 1,
   "terms": Array [
     Object {
@@ -19,7 +20,6 @@ Object {
       },
     },
   ],
-  "terms_and_types": Array [],
   "types": Array [],
 }
 `;

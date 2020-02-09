@@ -12,7 +12,9 @@ Object {
       "name": "a",
       "signature": Object {
         "parameters": Array [],
-        "return": "void",
+        "return": Object {
+          "name": "void",
+        },
       },
       "sourceLocation": Object {
         "fileLine": 1,
@@ -34,7 +36,9 @@ Object {
             },
           },
         ],
-        "return": "void",
+        "return": Object {
+          "name": "void",
+        },
       },
       "sourceLocation": Object {
         "fileLine": 2,
@@ -56,7 +60,9 @@ Object {
             },
           },
         ],
-        "return": "number",
+        "return": Object {
+          "name": "number",
+        },
       },
       "sourceLocation": Object {
         "fileLine": 3,

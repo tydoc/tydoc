@@ -10,6 +10,9 @@ function createContextt() {
   })
 
   const api = {
+    markdown(source: string) {
+      return jsde.renderMarkdown(api.given(source))
+    },
     given(source: string) {
       const sourceFormatted = Prettier.format(source, { parser: 'typescript' })
       const sourceFile = project.createSourceFile('test.ts', sourceFormatted, {
@@ -21,7 +24,8 @@ function createContextt() {
       return api.given(source) as {
         terms: jsde.DocVariable[]
         types: any
-        terms_and_types: any
+        hybrids: any
+        length: number
       }
     },
   }
