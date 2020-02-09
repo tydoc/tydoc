@@ -71,6 +71,14 @@ interface TypeData {
   name: string
 }
 
+// todo separate concepts exported vs not exported
+// term
+// exported term
+// type
+// exported type
+// hybrid
+// exported hybrid
+
 interface DocBase {
   name: string
   jsDoc: null | JSDocContent
@@ -87,11 +95,15 @@ interface DocBase {
   }
 }
 
+type SignatureData = {
+  parameters: { name: string; type: TypeData }[]
+  return: TypeData
+}
+
 export interface DocFunction extends DocBase {
   kind: 'function'
-  signature: {
-    parameters: { name: string; type: TypeData }[]
-    return: TypeData
+  signature: SignatureData & {
+    text: string
   }
 }
 
@@ -146,58 +158,9 @@ function extractDocsFromDeclaration(
   dec: tsm.ExportedDeclarations
 ): DocItem {
   if (dec instanceof tsm.FunctionDeclaration) {
-    return {
-      kind: 'function',
-      languageLevel: 'term',
-      name,
-      text: dec.getText(false),
-      signature: {
-        parameters: dec.getParameters().map(
-          // p => `name: ${p.getName()} - type:
-          // ${extractTypeData(p.getType())}`
-          p => ({ name: p.getName(), type: getTypeData(p.getType()) })
-        ),
-        return: getTypeData(dec.getReturnType()),
-      },
-      jsDoc: getJSDocContent(dec),
-      ...extractCommonDocDataFromDeclaration(dec),
-    }
-  }
-
-  if (dec instanceof tsm.VariableDeclaration) {
-    // A variable declaration is within a variable declaration list is inside a
-    // variable statement. JSDoc lives at the variable statement level.
-    const ctx = dec.getParent().getParent()
-    if (ctx instanceof tsm.VariableStatement) {
-      // If the variable is pointing to a function we will treat it like as if
-      // it were a function declaration.
-      const initializer = dec.getInitializer()
-      if (
-        initializer &&
-        (initializer instanceof tsm.ArrowFunction ||
-          initializer instanceof tsm.FunctionExpression)
-      ) {
-        const docs = extractDocsFromFunction(initializer) as DocFunction
-        docs.jsDoc = getJSDocContent(ctx)
-        docs.name = docs.name || name
-        return docs
-      }
-
-      // const type = initializer && initializer.getType()
-      const typeName = dec.getType().getText()
-      return {
-        kind: 'variable',
-        languageLevel: 'term',
-        name,
-        // type: type && extractTypeData(type),
-        type: {
-          name: typeName,
-        },
-        text: dec.getText(false),
-        jsDoc: getJSDocContent(ctx),
-        ...extractCommonDocDataFromDeclaration(dec),
-      }
-    }
+    const docs = extractDocsFromFunction(dec) as DocFunction
+    docs.name = name
+    return docs
   }
 
   if (dec instanceof tsm.TypeAliasDeclaration) {
@@ -207,6 +170,43 @@ function extractDocsFromDeclaration(
       name,
       text: dec.getText(false),
       jsDoc: getJSDocContent(dec),
+      ...extractCommonDocDataFromDeclaration(dec),
+    }
+  }
+
+  if (dec instanceof tsm.VariableDeclaration) {
+    // If the variable is pointing to a function we will treat it like as if
+    // it were a function declaration.
+    const initializer = dec.getInitializer()
+    if (initializer) {
+      if (
+        initializer instanceof tsm.ArrowFunction ||
+        initializer instanceof tsm.FunctionExpression
+      ) {
+        const docs = extractDocsFromFunction(initializer) as DocFunction
+        docs.name = name
+        return docs
+      }
+    }
+
+    // jsDoc lives at var statement level
+    const statement = dec.getParent().getParent()
+    const jsDoc =
+      statement instanceof tsm.VariableStatement
+        ? getJSDocContent(statement)
+        : null
+    const typeName = dec.getType().getText()
+
+    return {
+      kind: 'variable',
+      languageLevel: 'term',
+      name,
+      // type: type && extractTypeData(type),
+      type: {
+        name: typeName,
+      },
+      text: dec.getText(false),
+      jsDoc,
       ...extractCommonDocDataFromDeclaration(dec),
     }
   }
@@ -241,25 +241,77 @@ function extractCommonDocDataFromDeclaration(dec: tsm.ExportedDeclarations) {
  * be the exported one not the maybe-present explicit function expression name.
  */
 function extractDocsFromFunction(
-  node: tsm.ArrowFunction | tsm.FunctionExpression
-): Omit<DocFunction, 'name' | 'jsDoc'> {
+  node: tsm.ArrowFunction | tsm.FunctionExpression | tsm.FunctionDeclaration
+): Omit<DocFunction, 'name'> {
   // todo anything useful we can by revealing explicitly named function expressions?
   // let maybeName = ''
   // if (dec instanceof tsm.FunctionExpression) {
-  //   maybeName = dec.getName() || ''
+  //   maybeName = dec.getName() ?? ''
   // }
-  return {
+
+  let jsDoc = null
+  if (node instanceof tsm.FunctionDeclaration) {
+    jsDoc = getJSDocContent(node)
+  } else {
+    // An ArrowFunction or FunctionExpression can be within an exported
+    // variable. jsDoc lives at the variable statement level. Try to find it.
+    //
+    // The ast scenario supported here is:
+    //    var statement > var dec list > var dec > (arrow func|func exp)
+    //
+    const maybeVarDec = node
+      .getParent()
+      .getParent()
+      ?.getParent()
+    if (maybeVarDec instanceof tsm.VariableDeclaration) {
+      jsDoc = getJSDocContent(node)
+    }
+  }
+
+  const signatureData = {
+    parameters: node
+      .getParameters()
+      .map(p => ({ name: p.getName(), type: getTypeData(p.getType()) })),
+    return: getTypeData(node.getReturnType()),
+  }
+
+  const doc = {
     kind: 'function',
     languageLevel: 'term',
     text: node.getText(false),
     signature: {
-      parameters: node
-        .getParameters()
-        .map(p => ({ name: p.getName(), type: getTypeData(p.getType()) })),
-      return: getTypeData(node.getReturnType()),
+      // todo bespoke, there are tools available in TS api to get signatures.
+      // Check if they offer better solution. We use them for example in the
+      // Nexus addToContext API. Check it out for reference.
+      ...signatureData,
+      text: renderSignature(signatureData),
     },
+    jsDoc,
     ...extractCommonDocDataFromDeclaration(node),
+  } as Omit<DocFunction, 'name'>
+
+  return doc
+}
+
+/**
+ * Render signature for the given signature data.
+ */
+function renderSignature(sig: SignatureData): string {
+  let s = ''
+
+  s += '('
+  if (sig.parameters.length > 0) {
+    s += sig.parameters
+      .map(p => {
+        return p.name + ':' + p.type.name
+      })
+      .join(', ')
   }
+  s += ')'
+
+  s += ` => ${sig.return.name}`
+
+  return s
 }
 
 /**

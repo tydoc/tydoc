@@ -1,4 +1,4 @@
-import { DocFunction, Docs } from './extract'
+import { Docs } from './extract'
 
 /**
  * Render docs as Markdown.
@@ -10,7 +10,7 @@ export function render(docs: Docs): string {
     .map(term => {
       let s = `#### ${term.name}\n\n`
       if (term.kind === 'function') {
-        s += markdownCodeBlock(renderSignature(term), 'ts')
+        s += markdownCodeBlock(term.signature.text, 'ts')
       }
       return s
     })
@@ -18,27 +18,6 @@ export function render(docs: Docs): string {
 
   md += '\n'
   return md
-}
-
-/**
- * Render signature markdown for the given function doc.
- */
-function renderSignature(f: DocFunction): string {
-  let s = ''
-
-  s += '('
-  if (f.signature.parameters.length > 0) {
-    s += f.signature.parameters
-      .map(p => {
-        return p.name + ':' + p.type.name
-      })
-      .join(', ')
-  }
-  s += ')'
-
-  s += ` => ${f.signature.return.name}`
-
-  return s
 }
 
 /**
