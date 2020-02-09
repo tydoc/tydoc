@@ -1,5 +1,8 @@
 import { DocFunction, Docs } from './extract'
 
+/**
+ * Render docs as Markdown.
+ */
 export function render(docs: Docs): string {
   let md = ''
 

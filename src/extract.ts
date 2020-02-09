@@ -2,9 +2,49 @@ import * as tsm from 'ts-morph'
 import { inspect } from 'util'
 import { casesHandled } from './utils'
 
+/**
+ * The root of documentation data.
+ */
+export interface Docs {
+  terms: DocItem[]
+  types: DocItem[]
+  hybrids: DocItem[]
+  length: number
+}
+
+/**
+ * Create a new set of docs.
+ */
+function createDocs(): Docs {
+  return {
+    terms: [],
+    hybrids: [],
+    types: [],
+    length: 0,
+  }
+}
+
+/**
+ * Add a doc item to docs.
+ */
+function addDoc(docs: Docs, doc: DocItem): Docs {
+  docs[
+    doc.languageLevel === 'term'
+      ? 'terms'
+      : doc.languageLevel === 'type'
+      ? 'types'
+      : doc.languageLevel === 'hybrid'
+      ? 'hybrids'
+      : casesHandled(doc.languageLevel)
+  ].push(doc)
+  docs.length++
+  return docs
+}
+
 interface JSDocBlock {
   source: string
 }
+
 /**
  * It is possible for multiple jsDoc blocks to appear in succession. When
  * source code is authored that way, the jsDoc blocks _after_ the one closest
@@ -27,7 +67,7 @@ interface JSDocContent {
   additional: JSDocBlock[]
 }
 
-type TypeData = {
+interface TypeData {
   name: string
 }
 
@@ -88,7 +128,7 @@ export function extractDocsFromModuleAtPath(filePath: string) {
  */
 export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
   const exs = sourceFile.getExportedDeclarations()
-  const docs = createEmptyDocs()
+  const docs = createDocs()
 
   for (const [name, declarations] of exs) {
     const doc = extractDocsFromDeclaration(name, declarations[0])
@@ -98,19 +138,9 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
   return docs
 }
 
-function extractCommonDocDataFromDeclaration(dec: tsm.ExportedDeclarations) {
-  const sourceFile = dec.getSourceFile()
-  const filePath = sourceFile.getFilePath()
-  const fileLine = dec.getStartLineNumber()
-  const commonDocData = {
-    sourceLocation: {
-      filePath,
-      fileLine,
-    },
-  }
-  return commonDocData
-}
-
+/**
+ * Extracts docs from the given declaration.
+ */
 function extractDocsFromDeclaration(
   name: string,
   dec: tsm.ExportedDeclarations
@@ -190,6 +220,22 @@ function extractDocsFromDeclaration(
 }
 
 /**
+ * Extract doc data that is common to all doc items from the given declaration.
+ */
+function extractCommonDocDataFromDeclaration(dec: tsm.ExportedDeclarations) {
+  const sourceFile = dec.getSourceFile()
+  const filePath = sourceFile.getFilePath()
+  const fileLine = dec.getStartLineNumber()
+  const commonDocData = {
+    sourceLocation: {
+      filePath,
+      fileLine,
+    },
+  }
+  return commonDocData
+}
+
+/**
  * Extract docs from the given Function like node. This does not quite return
  * full doc data because jsDoc is kept on variable declarations and name should
  * be the exported one not the maybe-present explicit function expression name.
@@ -252,33 +298,3 @@ function getTypeData(type: tsm.Type): TypeData {
 //     })),
 //   }
 // }
-
-export type Docs = {
-  terms: DocItem[]
-  types: DocItem[]
-  hybrids: DocItem[]
-  length: number
-}
-
-function createEmptyDocs(): Docs {
-  return {
-    terms: [],
-    hybrids: [],
-    types: [],
-    length: 0,
-  }
-}
-
-function addDoc(docs: Docs, doc: DocItem): Docs {
-  docs[
-    doc.languageLevel === 'term'
-      ? 'terms'
-      : doc.languageLevel === 'type'
-      ? 'types'
-      : doc.languageLevel === 'hybrid'
-      ? 'hybrids'
-      : casesHandled(doc.languageLevel)
-  ].push(doc)
-  docs.length++
-  return docs
-}
