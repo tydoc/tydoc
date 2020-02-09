@@ -59,6 +59,12 @@ interface DocBase {
   name: string
   jsDoc: null | JSDocContent
   printed: string
+  /**
+   * This is about if the item is from the JavaScript language or the TypeScript
+   * type system. "term" refers to JavaScript values. "type" refers to
+   * TypeSript type. Some constructs span both levels, such as classes.
+   */
+  languageLevel: 'term' | 'type' | 'term_and_type'
   t?: any
   sourceLocation: {
     filePath: string
@@ -79,7 +85,11 @@ export interface DocVariable extends DocBase {
   type: TypeData
 }
 
-type DocItem = DocFunction | DocVariable
+export interface DocTypeAlias extends DocBase {
+  kind: 'typeAlias'
+}
+
+type DocItem = DocFunction | DocVariable | DocTypeAlias
 
 function extractDocsFromDeclaration(
   name: string,
@@ -88,10 +98,17 @@ function extractDocsFromDeclaration(
   const sourceFile = declaration.getSourceFile()
   const filePath = sourceFile.getFilePath()
   const fileLine = declaration.getStartLineNumber()
+  const commonDocData = {
+    sourceLocation: {
+      filePath,
+      fileLine,
+    },
+  }
 
   if (declaration instanceof tsm.FunctionDeclaration) {
     return {
       kind: 'function',
+      languageLevel: 'term',
       name,
       printed: declaration.print(),
       signature: {
@@ -103,10 +120,7 @@ function extractDocsFromDeclaration(
         return: declaration.getReturnType().getText(),
       },
       jsDoc: getJSDocContent(declaration),
-      sourceLocation: {
-        filePath,
-        fileLine,
-      },
+      ...commonDocData,
     }
   }
 
@@ -120,6 +134,7 @@ function extractDocsFromDeclaration(
       // const type = initializer && initializer.getType()
       return {
         kind: 'variable',
+        languageLevel: 'term',
         name,
         // type: type && extractTypeData(type),
         type: {
@@ -127,16 +142,27 @@ function extractDocsFromDeclaration(
         },
         printed: declaration.print(),
         jsDoc: getJSDocContent(ctx),
-        sourceLocation: {
-          filePath,
-          fileLine,
-        },
+        ...commonDocData,
       }
     }
   }
 
+  if (declaration instanceof tsm.TypeAliasDeclaration) {
+    return {
+      kind: 'typeAlias',
+      languageLevel: 'type',
+      name,
+      printed: declaration.print(),
+      jsDoc: getJSDocContent(declaration),
+      ...commonDocData,
+    }
+  }
+
+  // todo
+  // casesHandled(declaration)
+
   throw new Error(
-    `unknown kind of declaration or declaration scenario ${inspect(
+    `unknown kind of declaration or declaration scenario\n\n${inspect(
       declaration
     )}`
   )

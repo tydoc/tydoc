@@ -5,6 +5,7 @@ Array [
   Object {
     "jsDoc": null,
     "kind": "function",
+    "languageLevel": "term",
     "name": "a",
     "printed": "export function a() { }",
     "signature": Object {
@@ -19,6 +20,7 @@ Array [
   Object {
     "jsDoc": null,
     "kind": "function",
+    "languageLevel": "term",
     "name": "b",
     "printed": "export function b(a: boolean) { }",
     "signature": Object {
@@ -40,6 +42,7 @@ Array [
   Object {
     "jsDoc": null,
     "kind": "function",
+    "languageLevel": "term",
     "name": "c",
     "printed": "export function c(a: string): number { }",
     "signature": Object {

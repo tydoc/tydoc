@@ -52,7 +52,15 @@
       "jest-watch-suspend",
       "jest-watch-typeahead/filename",
       "jest-watch-typeahead/testname",
-      ["jest-watch-toggle-config", { "setting": "verbose" }]
+      [
+        "jest-watch-toggle-config",
+        {
+          "setting": "verbose"
+        }
+      ]
+    ],
+    "watchPathIgnorePatterns": [
+      "<rootDir>/dist/"
     ],
     "setupFiles": [
       "./test/_setup.ts"
