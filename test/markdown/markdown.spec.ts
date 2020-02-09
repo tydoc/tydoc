@@ -9,6 +9,8 @@ it('renders markdown', () => {
        */
       export function foo(a:string, b:number) {}
       export function bar() {}
+      export const toto = () => {}
+      export const fofo = function fofo2() {}
   `)
   ).toMatchInlineSnapshot(`
     "#### foo
@@ -16,11 +18,24 @@ it('renders markdown', () => {
     \`\`\`ts
     (a:string, b:number) => void
     \`\`\`
-    
+
     #### bar
 
     \`\`\`ts
     () => void
-    \`\`\`"
+    \`\`\`
+
+    #### toto
+
+    \`\`\`ts
+    () => void
+    \`\`\`
+
+    #### fofo
+
+    \`\`\`ts
+    () => void
+    \`\`\`
+    "
   `)
 })

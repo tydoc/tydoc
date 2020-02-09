@@ -13,6 +13,30 @@ it('extracts docs', () => {
   ).toMatchSnapshot()
 })
 
+it('treats a variable declaration initialized to a function as a function', () => {
+  expect(
+    ctx.given(`
+      export const foo = function () {}
+    `)
+  ).toMatchSnapshot()
+})
+
+it('treats a variable declaration initialized to an arrow function as a function', () => {
+  expect(
+    ctx.given(`
+      export const foo = () => {}
+    `)
+  ).toMatchSnapshot()
+})
+
+it('if function expression given name different than variable, is ignored', () => {
+  expect(
+    ctx.given(`
+      export const foo = function foo2 () {}
+    `).terms[0].name
+  ).toEqual('foo')
+})
+
 describe('jsdoc', () => {
   it('is null when no jsDoc is present', () => {
     expect(

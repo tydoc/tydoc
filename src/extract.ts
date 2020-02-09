@@ -98,47 +98,63 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
   return docs
 }
 
-function extractDocsFromDeclaration(
-  name: string,
-  declaration: tsm.ExportedDeclarations
-): DocItem {
-  const sourceFile = declaration.getSourceFile()
+function extractCommonDocDataFromDeclaration(dec: tsm.ExportedDeclarations) {
+  const sourceFile = dec.getSourceFile()
   const filePath = sourceFile.getFilePath()
-  const fileLine = declaration.getStartLineNumber()
+  const fileLine = dec.getStartLineNumber()
   const commonDocData = {
     sourceLocation: {
       filePath,
       fileLine,
     },
   }
+  return commonDocData
+}
 
-  if (declaration instanceof tsm.FunctionDeclaration) {
+function extractDocsFromDeclaration(
+  name: string,
+  dec: tsm.ExportedDeclarations
+): DocItem {
+  if (dec instanceof tsm.FunctionDeclaration) {
     return {
       kind: 'function',
       languageLevel: 'term',
       name,
-      text: declaration.getText(false),
+      text: dec.getText(false),
       signature: {
-        parameters: declaration.getParameters().map(
+        parameters: dec.getParameters().map(
           // p => `name: ${p.getName()} - type:
           // ${extractTypeData(p.getType())}`
           p => ({ name: p.getName(), type: getTypeData(p.getType()) })
         ),
-        return: getTypeData(declaration.getReturnType()),
+        return: getTypeData(dec.getReturnType()),
       },
-      jsDoc: getJSDocContent(declaration),
-      ...commonDocData,
+      jsDoc: getJSDocContent(dec),
+      ...extractCommonDocDataFromDeclaration(dec),
     }
   }
 
-  if (declaration instanceof tsm.VariableDeclaration) {
+  if (dec instanceof tsm.VariableDeclaration) {
     // A variable declaration is within a variable declaration list is inside a
     // variable statement. JSDoc lives at the variable statement level.
-    const ctx = declaration.getParent().getParent()
+    const ctx = dec.getParent().getParent()
     if (ctx instanceof tsm.VariableStatement) {
-      const typeName = declaration.getType().getText()
-      // const initializer = declaration.getInitializer()
+      // If the variable is pointing to a function we will treat it like as if
+      // it were a function declaration.
+      const initializer = dec.getInitializer()
+      if (
+        initializer &&
+        (initializer instanceof tsm.ArrowFunction ||
+          initializer instanceof tsm.FunctionExpression)
+      ) {
+        const docs = extractDocsFromFunction(initializer) as DocFunction
+        docs.jsDoc = getJSDocContent(ctx)
+        docs.name = docs.name || name
+        return docs
+      }
+
       // const type = initializer && initializer.getType()
+      const typeName = dec.getType().getText()
       return {
         kind: 'variable',
         languageLevel: 'term',
@@ -147,21 +163,21 @@ function extractDocsFromDeclaration(
         type: {
           name: typeName,
         },
-        text: declaration.getText(false),
+        text: dec.getText(false),
         jsDoc: getJSDocContent(ctx),
-        ...commonDocData,
+        ...extractCommonDocDataFromDeclaration(dec),
       }
     }
   }
 
-  if (declaration instanceof tsm.TypeAliasDeclaration) {
+  if (dec instanceof tsm.TypeAliasDeclaration) {
     return {
       kind: 'typeAlias',
       languageLevel: 'type',
       name,
-      text: declaration.getText(false),
-      jsDoc: getJSDocContent(declaration),
-      ...commonDocData,
+      text: dec.getText(false),
+      jsDoc: getJSDocContent(dec),
+      ...extractCommonDocDataFromDeclaration(dec),
     }
   }
 
@@ -169,10 +185,35 @@ function extractDocsFromDeclaration(
   // casesHandled(declaration)
 
   throw new Error(
-    `unknown kind of declaration or declaration scenario\n\n${inspect(
-      declaration
-    )}`
+    `unknown kind of declaration or declaration scenario\n\n${inspect(dec)}`
   )
+}
+
+/**
+ * Extract docs from the given Function like node. This does not quite return
+ * full doc data because jsDoc is kept on variable declarations and name should
+ * be the exported one not the maybe-present explicit function expression name.
+ */
+function extractDocsFromFunction(
+  node: tsm.ArrowFunction | tsm.FunctionExpression
+): Omit<DocFunction, 'name' | 'jsDoc'> {
+  // todo anything useful we can by revealing explicitly named function expressions?
+  // let maybeName = ''
+  // if (dec instanceof tsm.FunctionExpression) {
+  //   maybeName = dec.getName() || ''
+  // }
+  return {
+    kind: 'function',
+    languageLevel: 'term',
+    text: node.getText(false),
+    signature: {
+      parameters: node
+        .getParameters()
+        .map(p => ({ name: p.getName(), type: getTypeData(p.getType()) })),
+      return: getTypeData(node.getReturnType()),
+    },
+    ...extractCommonDocDataFromDeclaration(node),
+  }
 }
 
 /**
@@ -211,10 +252,6 @@ function getTypeData(type: tsm.Type): TypeData {
 //     })),
 //   }
 // }
-
-// const docs = extractDocsFromModuleAtPath(
-//   '/Users/jasonkuhrt/projects/nexus/nexus-future/src/index.ts'
-// )
 
 export type Docs = {
   terms: DocItem[]

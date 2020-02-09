@@ -126,3 +126,57 @@ Object {
   },
 }
 `;
+
+exports[`treats a variable declaration initialized to a function as a function 1`] = `
+Object {
+  "hybrids": Array [],
+  "length": 1,
+  "terms": Array [
+    Object {
+      "jsDoc": null,
+      "kind": "function",
+      "languageLevel": "term",
+      "name": "foo",
+      "signature": Object {
+        "parameters": Array [],
+        "return": Object {
+          "name": "void",
+        },
+      },
+      "sourceLocation": Object {
+        "fileLine": 1,
+        "filePath": "/test.ts",
+      },
+      "text": "function() {}",
+    },
+  ],
+  "types": Array [],
+}
+`;
+
+exports[`treats a variable declaration initialized to an arrow function as a function 1`] = `
+Object {
+  "hybrids": Array [],
+  "length": 1,
+  "terms": Array [
+    Object {
+      "jsDoc": null,
+      "kind": "function",
+      "languageLevel": "term",
+      "name": "foo",
+      "signature": Object {
+        "parameters": Array [],
+        "return": Object {
+          "name": "void",
+        },
+      },
+      "sourceLocation": Object {
+        "fileLine": 1,
+        "filePath": "/test.ts",
+      },
+      "text": "() => {}",
+    },
+  ],
+  "types": Array [],
+}
+`;

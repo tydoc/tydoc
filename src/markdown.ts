@@ -13,6 +13,7 @@ export function render(docs: Docs): string {
     })
     .join('\n\n')
 
+  md += '\n'
   return md
 }
 
