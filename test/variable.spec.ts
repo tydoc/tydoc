@@ -20,11 +20,13 @@ it('extracts the type name', () => {
       export let e = 'foo'
     `
   )
-  expect(result.shift()!.type.name).toEqual('1')
-  expect(result.shift()!.type.name).toEqual('number')
-  expect(result.shift()!.type.name).toEqual('number')
-  expect(result.shift()!.type.name).toEqual('"foo"')
-  expect(result.shift()!.type.name).toEqual('string')
+  expect(result.terms.map(d => d.type.name)).toEqual([
+    '1',
+    'number',
+    'number',
+    '"foo"',
+    'string',
+  ])
 })
 
 describe('jsdoc', () => {
@@ -34,7 +36,7 @@ describe('jsdoc', () => {
         `
           export const a = 1
         `
-      )[0].jsDoc
+      ).terms[0].jsDoc
     ).toBeNull()
   })
 
@@ -47,7 +49,7 @@ describe('jsdoc', () => {
            */
           export const a = 1
         `
-      )[0].jsDoc!.primary
+      ).terms[0].jsDoc!.primary
     ).toMatchSnapshot()
   })
 
@@ -66,7 +68,7 @@ describe('jsdoc', () => {
            */
           export const a = 1
         `
-      )[0].jsDoc
+      ).terms[0].jsDoc
     ).toMatchSnapshot()
   })
 
@@ -91,7 +93,7 @@ describe('jsdoc', () => {
            */
           export const a = 1
         `
-      )[0].jsDoc
+      ).terms[0].jsDoc
     ).toMatchSnapshot()
   })
 

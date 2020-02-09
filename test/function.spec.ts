@@ -20,7 +20,7 @@ describe('jsdoc', () => {
         `
           export function a() {}
         `
-      )[0].jsDoc
+      ).terms[0].jsDoc
     ).toBeNull()
   })
 
@@ -33,7 +33,7 @@ describe('jsdoc', () => {
            */
           export function a() {}
         `
-      )[0].jsDoc!.primary
+      ).terms[0].jsDoc!.primary
     ).toMatchSnapshot()
   })
 
@@ -52,7 +52,7 @@ describe('jsdoc', () => {
            */
           export function a() {}
         `
-      )[0].jsDoc
+      ).terms[0].jsDoc
     ).toMatchSnapshot()
   })
 
@@ -77,7 +77,7 @@ describe('jsdoc', () => {
            */
           export function a() {}
         `
-      )[0].jsDoc
+      ).terms[0].jsDoc
     ).toMatchSnapshot()
   })
 

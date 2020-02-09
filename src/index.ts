@@ -1,30 +1,6 @@
 import * as tsm from 'ts-morph'
 import { inspect } from 'util'
-
-export function extractDocsFromModuleAtPath(filePath: string) {
-  const project = new tsm.Project({ addFilesFromTsConfig: true })
-
-  project.addSourceFileAtPathIfExists(filePath)
-
-  const source = project.getSourceFile(filePath)
-
-  if (!source) {
-    throw new Error(`No file at ${filePath}`)
-  }
-
-  return extractDocsAndTypesFromSourceFile(source)
-}
-
-export function extractDocsAndTypesFromSourceFile(sourceFile: tsm.SourceFile) {
-  const exs = sourceFile.getExportedDeclarations()
-
-  const docs = []
-  for (const [name, declarations] of exs) {
-    docs.push(extractDocsFromDeclaration(name, declarations[0]))
-  }
-
-  return docs
-}
+import { casesHandled } from './utils'
 
 interface JSDocBlock {
   source: string
@@ -64,8 +40,7 @@ interface DocBase {
    * type system. "term" refers to JavaScript values. "type" refers to
    * TypeSript type. Some constructs span both levels, such as classes.
    */
-  languageLevel: 'term' | 'type' | 'term_and_type'
-  t?: any
+  languageLevel: 'term' | 'type' | 'hybrid'
   sourceLocation: {
     filePath: string
     fileLine: number
@@ -90,6 +65,45 @@ export interface DocTypeAlias extends DocBase {
 }
 
 type DocItem = DocFunction | DocVariable | DocTypeAlias
+
+type Docs = {
+  terms: DocItem[]
+  types: DocItem[]
+  hybrids: DocItem[]
+  length: number
+}
+
+/**
+ * Extract docs from the module found at the given file path.
+ */
+export function extractDocsFromModuleAtPath(filePath: string) {
+  const project = new tsm.Project({ addFilesFromTsConfig: true })
+
+  project.addSourceFileAtPathIfExists(filePath)
+
+  const source = project.getSourceFile(filePath)
+
+  if (!source) {
+    throw new Error(`No file at ${filePath}`)
+  }
+
+  return extractDocsFromModule(source)
+}
+
+/**
+ * Extract docs from the given module.
+ */
+export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
+  const exs = sourceFile.getExportedDeclarations()
+  const docs = createEmptyDocs()
+
+  for (const [name, declarations] of exs) {
+    const doc = extractDocsFromDeclaration(name, declarations[0])
+    addDoc(docs, doc)
+  }
+
+  return docs
+}
 
 function extractDocsFromDeclaration(
   name: string,
@@ -214,3 +228,26 @@ function getTypeData(type: tsm.Type): TypeData {
 // function show(x: any) {
 //   return inspect(x, { depth: null })
 // }
+
+function createEmptyDocs(): Docs {
+  return {
+    terms: [],
+    hybrids: [],
+    types: [],
+    length: 0,
+  }
+}
+
+function addDoc(docs: Docs, doc: DocItem): Docs {
+  docs[
+    doc.languageLevel === 'term'
+      ? 'terms'
+      : doc.languageLevel === 'type'
+      ? 'types'
+      : doc.languageLevel === 'hybrid'
+      ? 'hybrids'
+      : casesHandled(doc.languageLevel)
+  ].push(doc)
+  docs.length++
+  return docs
+}

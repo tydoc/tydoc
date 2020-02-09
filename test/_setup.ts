@@ -15,10 +15,14 @@ function createContextt() {
       const sourceFile = project.createSourceFile('test.ts', sourceFormatted, {
         overwrite: true,
       })
-      return jsde.extractDocsAndTypesFromSourceFile(sourceFile)
+      return jsde.extractDocsFromModule(sourceFile)
     },
     givenVariables(source: string) {
-      return api.given(source) as jsde.DocVariable[]
+      return api.given(source) as {
+        terms: jsde.DocVariable[]
+        types: any
+        terms_and_types: any
+      }
     },
   }
 

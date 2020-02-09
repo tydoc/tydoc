@@ -1,35 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`extracts doc from type aliases 1`] = `
-Array [
-  Object {
-    "jsDoc": null,
-    "kind": "typeAlias",
-    "languageLevel": "type",
-    "name": "Foo",
-    "sourceLocation": Object {
-      "fileLine": 1,
-      "filePath": "/test.ts",
+Object {
+  "hybrids": Array [],
+  "length": 2,
+  "terms": Array [],
+  "types": Array [
+    Object {
+      "jsDoc": null,
+      "kind": "typeAlias",
+      "languageLevel": "type",
+      "name": "Foo",
+      "sourceLocation": Object {
+        "fileLine": 1,
+        "filePath": "/test.ts",
+      },
+      "text": "export type Foo = {};",
     },
-    "text": "export type Foo = {};",
-  },
-  Object {
-    "jsDoc": Object {
-      "additional": Array [],
-      "primary": Object {
-        "source": "/**
+    Object {
+      "jsDoc": Object {
+        "additional": Array [],
+        "primary": Object {
+          "source": "/**
  * boo
  */",
+        },
       },
+      "kind": "typeAlias",
+      "languageLevel": "type",
+      "name": "Bar",
+      "sourceLocation": Object {
+        "fileLine": 5,
+        "filePath": "/test.ts",
+      },
+      "text": "export type Bar = {};",
     },
-    "kind": "typeAlias",
-    "languageLevel": "type",
-    "name": "Bar",
-    "sourceLocation": Object {
-      "fileLine": 5,
-      "filePath": "/test.ts",
-    },
-    "text": "export type Bar = {};",
-  },
-]
+  ],
+}
 `;
