@@ -58,7 +58,7 @@ type TypeData = {
 interface DocBase {
   name: string
   jsDoc: null | JSDocContent
-  printed: string
+  text: string
   /**
    * This is about if the item is from the JavaScript language or the TypeScript
    * type system. "term" refers to JavaScript values. "type" refers to
@@ -110,7 +110,7 @@ function extractDocsFromDeclaration(
       kind: 'function',
       languageLevel: 'term',
       name,
-      printed: declaration.print(),
+      text: declaration.getText(false),
       signature: {
         parameters: declaration.getParameters().map(
           // p => `name: ${p.getName()} - type:
@@ -140,7 +140,7 @@ function extractDocsFromDeclaration(
         type: {
           name: typeName,
         },
-        printed: declaration.print(),
+        text: declaration.getText(false),
         jsDoc: getJSDocContent(ctx),
         ...commonDocData,
       }
@@ -152,7 +152,7 @@ function extractDocsFromDeclaration(
       kind: 'typeAlias',
       languageLevel: 'type',
       name,
-      printed: declaration.print(),
+      text: declaration.getText(false),
       jsDoc: getJSDocContent(declaration),
       ...commonDocData,
     }

@@ -5,12 +5,13 @@ Array [
   Object {
     "jsDoc": null,
     "kind": "variable",
+    "languageLevel": "term",
     "name": "a",
-    "printed": "a = 1",
     "sourceLocation": Object {
       "fileLine": 1,
       "filePath": "/test.ts",
     },
+    "text": "a = 1",
     "type": Object {
       "name": "1",
     },

@@ -7,7 +7,6 @@ Array [
     "kind": "function",
     "languageLevel": "term",
     "name": "a",
-    "printed": "export function a() { }",
     "signature": Object {
       "parameters": Array [],
       "return": "void",
@@ -16,13 +15,13 @@ Array [
       "fileLine": 1,
       "filePath": "/test.ts",
     },
+    "text": "export function a() {}",
   },
   Object {
     "jsDoc": null,
     "kind": "function",
     "languageLevel": "term",
     "name": "b",
-    "printed": "export function b(a: boolean) { }",
     "signature": Object {
       "parameters": Array [
         Object {
@@ -38,13 +37,13 @@ Array [
       "fileLine": 2,
       "filePath": "/test.ts",
     },
+    "text": "export function b(a: boolean) {}",
   },
   Object {
     "jsDoc": null,
     "kind": "function",
     "languageLevel": "term",
     "name": "c",
-    "printed": "export function c(a: string): number { }",
     "signature": Object {
       "parameters": Array [
         Object {
@@ -60,6 +59,7 @@ Array [
       "fileLine": 3,
       "filePath": "/test.ts",
     },
+    "text": "export function c(a: string): number {}",
   },
 ]
 `;
