@@ -67,7 +67,7 @@
       "<rootDir>/oclif.manifest.json"
     ],
     "setupFiles": [
-      "./test/_setup.ts"
+      "./test/setup.ts"
     ],
     "globals": {
       "ts-jest": {
