@@ -15,6 +15,7 @@ Object {
         "filePath": "/test.ts",
       },
       "text": "a = 1",
+      "textWithJSDoc": "a = 1",
       "type": Object {
         "name": "1",
       },

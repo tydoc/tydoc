@@ -22,6 +22,7 @@ Object {
         "filePath": "/test.ts",
       },
       "text": "export function a() {}",
+      "textWithJSDoc": "export function a() {}",
     },
     Object {
       "jsDoc": null,
@@ -40,13 +41,14 @@ Object {
         "return": Object {
           "name": "void",
         },
-        "text": "(a:boolean) => void",
+        "text": "(a: boolean) => void",
       },
       "sourceLocation": Object {
         "fileLine": 2,
         "filePath": "/test.ts",
       },
       "text": "export function b(a: boolean) {}",
+      "textWithJSDoc": "export function b(a: boolean) {}",
     },
     Object {
       "jsDoc": null,
@@ -65,13 +67,14 @@ Object {
         "return": Object {
           "name": "number",
         },
-        "text": "(a:string) => number",
+        "text": "(a: string) => number",
       },
       "sourceLocation": Object {
         "fileLine": 3,
         "filePath": "/test.ts",
       },
       "text": "export function c(a: string): number {}",
+      "textWithJSDoc": "export function c(a: string): number {}",
     },
   ],
   "types": Array [],
@@ -138,6 +141,7 @@ Object {
         "filePath": "/test.ts",
       },
       "text": "function() {}",
+      "textWithJSDoc": "function() {}",
     },
   ],
   "types": Array [],
@@ -166,6 +170,7 @@ Object {
         "filePath": "/test.ts",
       },
       "text": "() => {}",
+      "textWithJSDoc": "() => {}",
     },
   ],
   "types": Array [],

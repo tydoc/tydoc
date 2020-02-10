@@ -17,6 +17,7 @@ Object {
         "filePath": "/test.ts",
       },
       "text": "export type Foo = {};",
+      "textWithJSDoc": "export type Foo = {};",
     },
     Object {
       "jsDoc": Object {
@@ -65,6 +66,22 @@ Object {
         "filePath": "/test.ts",
       },
       "text": "export type Bar = {
+  /**
+   * Doc about a 2
+   */
+  /**
+   * Doc about a 1
+   */
+  a: string;
+  /**
+   * Doc about b
+   */
+  b: number;
+};",
+      "textWithJSDoc": "/**
+ * boo
+ */
+export type Bar = {
   /**
    * Doc about a 2
    */

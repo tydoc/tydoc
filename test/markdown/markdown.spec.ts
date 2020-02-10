@@ -29,39 +29,47 @@ it('renders markdown', () => {
 
     #### foo
 
+    <!-- prettier-ignore -->
     \`\`\`ts
-    (a:string, b:number) => void
+    (a: string, b: number) => void
     \`\`\`
 
     #### bar
 
+    <!-- prettier-ignore -->
     \`\`\`ts
     () => void
     \`\`\`
 
     #### toto
 
+    <!-- prettier-ignore -->
     \`\`\`ts
     () => void
     \`\`\`
 
     #### fofo
 
+    <!-- prettier-ignore -->
     \`\`\`ts
     () => void
     \`\`\`
 
     ### Types
 
-    #### A
+    #### \`A\`
 
-    - a (\`string\`)
-      About a...
+    \`\`\`ts
+    type A = {
+      /**
+       * About a...
+       */
+      a: string;
+      b: number;
+      c: C;
+    };
+    \`\`\`
 
-    - b (\`number\`)
-      
-    - c (\`C\`)
-      
     "
   `)
 })

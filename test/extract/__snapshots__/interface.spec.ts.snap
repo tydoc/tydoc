@@ -37,6 +37,10 @@ Object {
   foo: string;
   bar: string;
 }",
+      "textWithJSDoc": "export interface A {
+  foo: string;
+  bar: string;
+}",
     },
   ],
 }
