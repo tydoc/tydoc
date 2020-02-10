@@ -3,10 +3,10 @@
 exports[`extracts doc from interface 1`] = `
 Object {
   "hybrids": Array [],
-  "length": 1,
+  "length": 0,
   "terms": Array [],
-  "types": Array [
-    Object {
+  "typeIndex": Object {
+    "A": Object {
       "isExported": true,
       "jsDoc": null,
       "kind": "interface",
@@ -43,6 +43,7 @@ Object {
   bar: string;
 }",
     },
-  ],
+  },
+  "types": Array [],
 }
 `;

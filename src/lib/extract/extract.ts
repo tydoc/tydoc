@@ -11,6 +11,7 @@ export interface Docs {
    * todo
    */
   types: (DocTypeAlias | DocInterface)[]
+  typeIndex: Record<string, DocTypeAlias | DocInterface>
   hybrids: any[]
   length: number
 }
@@ -23,6 +24,7 @@ function createDocs(): Docs {
     terms: [],
     hybrids: [],
     types: [],
+    typeIndex: {},
     length: 0,
   }
 }
@@ -140,6 +142,55 @@ export function extractDocsFromModuleAtPath(filePath: string) {
   return extractDocsFromModule(source)
 }
 
+function extractExportedInterface(
+  typeIndex: any,
+  dec: tsm.InterfaceDeclaration
+): void {
+  extractInterface(true, typeIndex, dec)
+}
+
+function extractInterface(
+  isExported: boolean,
+  typeIndex: any,
+  dec: tsm.InterfaceDeclaration
+): void {
+  const name = dec.getName()
+
+  if (typeIndex[name]) return
+
+  const docItem = {
+    ...extractCommon(dec),
+    kind: 'interface',
+    languageLevel: 'type',
+    isExported,
+    text: dec.getText(),
+    textWithJSDoc: dec.getFullText().trim(),
+    name,
+    jsDoc: extractJSDoc(dec),
+    properties: dec.getProperties().map(propSig => {
+      const type = propSig.getType()
+      if (type.isInterface()) {
+        extractInterface(
+          false,
+          typeIndex,
+          type.getSymbol()!.getDeclarations()[0]! as tsm.InterfaceDeclaration
+        )
+      }
+      const doc = {
+        jsDoc: extractJSDoc(propSig),
+        name: propSig.getName(),
+        type: {
+          name: type.getText(),
+          isPrimitive: !type.isObject(),
+        },
+      }
+      return doc
+    }),
+  }
+
+  typeIndex[docItem.name] = docItem
+}
+
 /**
  * Extract docs from the given module.
  */
@@ -158,28 +209,29 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
     }
 
     if (dec instanceof tsm.InterfaceDeclaration) {
-      addDoc(docs, {
-        ...extractCommon(dec),
-        kind: 'interface',
-        languageLevel: 'type',
-        isExported: true,
-        text: dec.getText(),
-        textWithJSDoc: dec.getFullText().trim(),
-        name: dec.getName(),
-        jsDoc: extractJSDoc(dec),
-        properties: dec.getProperties().map(propSig => {
-          const type = propSig.getType()
-          const doc = {
-            jsDoc: extractJSDoc(propSig),
-            name: propSig.getName(),
-            type: {
-              name: type.getText(),
-              isPrimitive: !type.isObject(),
-            },
-          }
-          return doc
-        }),
-      })
+      extractExportedInterface(docs.typeIndex, dec)
+      // addDoc(docs, {
+      //   ...extractCommon(dec),
+      //   kind: 'interface',
+      //   languageLevel: 'type',
+      //   isExported: true,
+      //   text: dec.getText(),
+      //   textWithJSDoc: dec.getFullText().trim(),
+      //   name: dec.getName(),
+      //   jsDoc: extractJSDoc(dec),
+      //   properties: dec.getProperties().map(propSig => {
+      //     const type = propSig.getType()
+      //     const doc = {
+      //       jsDoc: extractJSDoc(propSig),
+      //       name: propSig.getName(),
+      //       type: {
+      //         name: type.getText(),
+      //         isPrimitive: !type.isObject(),
+      //       },
+      //     }
+      //     return doc
+      //   }),
+      // })
       continue
     }
 

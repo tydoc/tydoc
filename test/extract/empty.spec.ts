@@ -4,6 +4,7 @@ it('extracts nothing if the module is empty', () => {
       "hybrids": Array [],
       "length": 0,
       "terms": Array [],
+      "typeIndex": Object {},
       "types": Array [],
     }
   `)
@@ -16,11 +17,12 @@ it('extracts nothing if the module has no exports', () => {
       const b = 2
     `)
   ).toMatchInlineSnapshot(`
-Object {
-  "hybrids": Array [],
-  "length": 0,
-  "terms": Array [],
-  "types": Array [],
-}
-`)
+    Object {
+      "hybrids": Array [],
+      "length": 0,
+      "terms": Array [],
+      "typeIndex": Object {},
+      "types": Array [],
+    }
+  `)
 })

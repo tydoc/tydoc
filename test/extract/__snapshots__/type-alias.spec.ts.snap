@@ -5,6 +5,7 @@ Object {
   "hybrids": Array [],
   "length": 2,
   "terms": Array [],
+  "typeIndex": Object {},
   "types": Array [
     Object {
       "isExported": true,

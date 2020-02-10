@@ -19,11 +19,36 @@ export function render(docs: Docs): string {
       return s
     })
     .join('\n\n')
-
-  md += '\n\n'
+  md += '\n'
+  md += '\n'
   md += '### Types\n\n'
-  md += docs.types
+  md += Object.values(docs.typeIndex)
     .filter(type => type.isExported)
+    .map(type => {
+      let s = ''
+      s += `#### \`${type.name}\`\n`
+      // s += type.jsDoc ? type.jsDoc.primary.source + '\n' : ''
+      s += '\n'
+      s += '```ts\n'
+      // todo export text presence seems like an extraction concern
+      s += type.textWithJSDoc.replace(/export /, '') + '\n'
+      s += '```\n'
+      // s += type.properties
+      //   .map(prop => {
+      //     let s = ''
+      //     s += `- ${prop.name} (\`${prop.type.name}\`)\n`
+      //     s += `  ${prop.jsDoc ? prop.jsDoc.primary.source + '\n' : ''}`
+      //     return s
+      //   })
+      //   .join('\n')
+      return s
+    })
+    .join('\n')
+  md += '\n'
+  md += '\n'
+  md += '## Type Index\n\n'
+  md += Object.values(docs.typeIndex)
+    .filter(type => !type.isExported)
     .map(type => {
       let s = ''
       s += `#### \`${type.name}\`\n`
@@ -46,8 +71,6 @@ export function render(docs: Docs): string {
     .join('\n')
 
   md += '\n'
-
-  md += '## Type Index\n\n'
 
   return md
 }

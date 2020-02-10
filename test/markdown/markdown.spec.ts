@@ -14,7 +14,7 @@ it('renders markdown', () => {
         export function bar() {}
         export const toto = () => {}
         export const fofo = function fofo2() {}
-        export type A = {
+        export interface A {
           /**
            * About a...
            */
@@ -23,13 +23,13 @@ it('renders markdown', () => {
           c: C
           d: D
         }
-        type C = {
+        interface C {
           d: number,
           e: string
         }
       `,
       `
-        export type D = {
+        export interface D {
           a: string
           b: string
         }
@@ -73,7 +73,7 @@ it('renders markdown', () => {
     #### \`A\`
 
     \`\`\`ts
-    type A = {
+    interface A {
       /**
        * About a...
        */
@@ -81,10 +81,29 @@ it('renders markdown', () => {
       b: number;
       c: C;
       d: D;
-    };
+    }
     \`\`\`
 
+
     ## Type Index
+
+    #### \`C\`
+
+    \`\`\`ts
+    interface C {
+      d: number;
+      e: string;
+    }
+    \`\`\`
+
+    #### \`D\`
+
+    \`\`\`ts
+    interface D {
+      a: string;
+      b: string;
+    }
+    \`\`\`
 
     "
   `)
