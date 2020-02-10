@@ -4,21 +4,21 @@
 
 <!-- prettier-ignore -->
 ```ts
-(docs:import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs) => string
+(docs: import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs) => string
 ```
 
 #### extractDocsFromModuleAtPath
 
 <!-- prettier-ignore -->
 ```ts
-(filePath:string) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
+(filePath: string) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
 ```
 
 #### extractDocsFromModule
 
 <!-- prettier-ignore -->
 ```ts
-(sourceFile:import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/node_modules/ts-morph/lib/ts-morph").SourceFile) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
+(sourceFile: import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/node_modules/ts-morph/lib/ts-morph").SourceFile) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
 ```
 
 ### Types
@@ -91,3 +91,5 @@ interface DocInterface extends DocBase {
 ```ts
 type DocItem = DocFunction | DocVariable | DocTypeAlias | DocInterface
 ```
+
+
