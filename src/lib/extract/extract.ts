@@ -367,7 +367,7 @@ function renderSignature(sig: SignatureData): string {
   if (sig.parameters.length > 0) {
     s += sig.parameters
       .map(p => {
-        return p.name + ':' + p.type.name
+        return p.name + ': ' + p.type.name
       })
       .join(', ')
   }
