@@ -38,7 +38,7 @@ it('renders markdown', () => {
   ).toMatchInlineSnapshot(`
     "## Default Module
 
-    ### Terms
+    ### Exported Terms
 
     #### foo
 
@@ -68,7 +68,7 @@ it('renders markdown', () => {
     () => void
     \`\`\`
 
-    ### Types
+    ### Exported Types
 
     #### \`A\`
 

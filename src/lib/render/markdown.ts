@@ -8,7 +8,7 @@ export function render(docs: Docs): string {
 
   md += '## Default Module\n\n'
 
-  md += '### Terms\n\n'
+  md += '### Exported Terms\n\n'
   md += docs.terms
     .map(term => {
       let s = `#### ${term.name}\n\n`
@@ -21,7 +21,7 @@ export function render(docs: Docs): string {
     .join('\n\n')
   md += '\n'
   md += '\n'
-  md += '### Types\n\n'
+  md += '### Exported Types\n\n'
   md += Object.values(docs.typeIndex)
     .filter(type => type.isExported)
     .map(type => {
