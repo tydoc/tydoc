@@ -2,81 +2,92 @@
 
 #### renderMarkdown
 
+<!-- prettier-ignore -->
 ```ts
-;(
-  docs: import('/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract').Docs
-) => string
+(docs:import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs) => string
 ```
 
 #### extractDocsFromModuleAtPath
 
+<!-- prettier-ignore -->
 ```ts
-;(filePath: string) =>
-  import(
-    '/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract'
-  ).Docs
+(filePath:string) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
 ```
 
 #### extractDocsFromModule
 
+<!-- prettier-ignore -->
 ```ts
-;(
-  sourceFile: import('/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/node_modules/ts-morph/lib/ts-morph').SourceFile
-) =>
-  import(
-    '/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract'
-  ).Docs
+(sourceFile:import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/node_modules/ts-morph/lib/ts-morph").SourceFile) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
 ```
 
 ### Types
 
-#### Docs
+#### `Docs`
 
-- terms (`(import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").DocFunction | import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").DocVariable)[]`)
+```ts
+/**
+ * The root of documentation data.
+ */
+interface Docs {
+  terms: (DocFunction | DocVariable)[]
+  /**
+   * todo
+   */
+  types: (DocTypeAlias | DocInterface)[]
+  hybrids: any[]
+  length: number
+}
+```
 
-- types (`(import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").DocTypeAlias | import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").DocInterface)[]`)
+#### `DocFunction`
 
-- hybrids (`any[]`)
+```ts
+interface DocFunction extends DocBase {
+  kind: 'function'
+  signature: SignatureData & {
+    text: string
+  }
+}
+```
 
-- length (`number`)
+#### `DocVariable`
 
-#### DocFunction
+```ts
+interface DocVariable extends DocBase {
+  kind: 'variable'
+  type: TypeData
+}
+```
 
-- kind (`"function"`)
+#### `DocTypeAlias`
 
-- signature (`SignatureData & { text: string; }`)
+```ts
+interface DocTypeAlias extends DocBase {
+  kind: 'typeAlias'
+  properties: {
+    jsDoc: null | JSDocContent
+    name: string
+    type: { name: string }
+  }[]
+}
+```
 
-#### DocVariable
+#### `DocInterface`
 
-- kind (`"variable"`)
+```ts
+interface DocInterface extends DocBase {
+  kind: 'interface'
+  properties: {
+    jsDoc: null | JSDocContent
+    name: string
+    type: { name: string }
+  }[]
+}
+```
 
-- type (`TypeData`)
+#### `DocItem`
 
-#### DocTypeAlias
-
-- kind (`"typeAlias"`)
-
-- properties (`{ jsDoc: JSDocContent; name: string; type: { name: string; }; }[]`)
-
-#### DocInterface
-
-- kind (`"interface"`)
-
-- properties (`{ jsDoc: JSDocContent; name: string; type: { name: string; }; }[]`)
-
-#### DocItem
-
-- kind (`"function" | "variable" | "typeAlias" | "interface"`)
-
-- name (`string`)
-
-- jsDoc (`JSDocContent`)
-
-- text (`string`)
-
-- languageLevel (`"term" | "type" | "hybrid"`)
-  This is about if the item is from the JavaScript language or the TypeScript
-  type system. "term" refers to JavaScript values. "type" refers to
-  TypeSript types. "hybrid" refers to constructs span both levels, such as classes.
-
-- sourceLocation (`{ filePath: string; fileLine: number; }`)
+```ts
+type DocItem = DocFunction | DocVariable | DocTypeAlias | DocInterface
+```

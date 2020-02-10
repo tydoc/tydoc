@@ -7,6 +7,9 @@ import { casesHandled } from '../../utils'
  */
 export interface Docs {
   terms: (DocFunction | DocVariable)[]
+  /**
+   * todo
+   */
   types: (DocTypeAlias | DocInterface)[]
   hybrids: any[]
   length: number
@@ -83,6 +86,7 @@ interface DocBase {
   name: string
   jsDoc: null | JSDocContent
   text: string
+  textWithJSDoc: string
   /**
    * This is about if the item is from the JavaScript language or the TypeScript
    * type system. "term" refers to JavaScript values. "type" refers to
@@ -182,6 +186,7 @@ function extractDocsFromDeclaration(
       kind: 'interface',
       languageLevel: 'type',
       text: dec.getText(),
+      textWithJSDoc: dec.getFullText().trim(),
       name: dec.getName(),
       jsDoc: extractJSDoc(dec),
       properties: dec.getProperties().map(propSig => {
@@ -226,6 +231,7 @@ function extractDocsFromDeclaration(
         }),
       name,
       text: dec.getText(false),
+      textWithJSDoc: dec.getText(true),
       jsDoc: extractJSDoc(dec),
     }
   }
@@ -263,6 +269,7 @@ function extractDocsFromDeclaration(
         name: typeName,
       },
       text: dec.getText(false),
+      textWithJSDoc: dec.getText(true),
       jsDoc,
     }
   }
@@ -335,6 +342,7 @@ function extractDocsFromFunction(
     kind: 'function',
     languageLevel: 'term',
     text: node.getText(false),
+    textWithJSDoc: node.getText(true),
     signature: {
       // todo bespoke, there are tools available in TS api to get signatures.
       // Check if they offer better solution. We use them for example in the

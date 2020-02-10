@@ -11,6 +11,7 @@ export function render(docs: Docs): string {
     .map(term => {
       let s = `#### ${term.name}\n\n`
       if (term.kind === 'function') {
+        s += '<!-- prettier-ignore -->\n'
         s += markdownCodeBlock(term.signature.text, 'ts')
       }
       return s
@@ -22,18 +23,23 @@ export function render(docs: Docs): string {
   md += docs.types
     .map(type => {
       let s = ''
-      s += `#### ${type.name}\n\n`
-      s += type.properties
-        .map(prop => {
-          let s = ''
-          s += `- ${prop.name} (\`${prop.type.name}\`)\n`
-          s += `  ${prop.jsDoc ? prop.jsDoc.primary.source + '\n' : ''}`
-          return s
-        })
-        .join('\n')
+      s += `#### \`${type.name}\`\n`
+      // s += type.jsDoc ? type.jsDoc.primary.source + '\n' : ''
+      s += '\n'
+      s += '```ts\n'
+      s += type.textWithJSDoc.replace(/export /, '') + '\n'
+      s += '```\n'
+      // s += type.properties
+      //   .map(prop => {
+      //     let s = ''
+      //     s += `- ${prop.name} (\`${prop.type.name}\`)\n`
+      //     s += `  ${prop.jsDoc ? prop.jsDoc.primary.source + '\n' : ''}`
+      //     return s
+      //   })
+      //   .join('\n')
       return s
     })
-    .join('\n\n')
+    .join('\n')
 
   md += '\n'
   return md
