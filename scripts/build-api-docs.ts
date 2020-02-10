@@ -25,7 +25,7 @@ function updateMarkdownBlock(
       `(<!-- START ${blockName} --->).*(<!-- END ${blockName} --->)`,
       'is'
     ),
-    `$1\n${blockContent}$2`
+    `$1\n\n${blockContent}$2`
   )
 
   fs.write(filePath, contents)
