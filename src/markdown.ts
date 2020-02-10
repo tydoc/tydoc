@@ -6,12 +6,31 @@ import { Docs } from './extract'
 export function render(docs: Docs): string {
   let md = ''
 
+  md += '### API\n\n'
   md += docs.terms
     .map(term => {
       let s = `#### ${term.name}\n\n`
       if (term.kind === 'function') {
         s += markdownCodeBlock(term.signature.text, 'ts')
       }
+      return s
+    })
+    .join('\n\n')
+
+  md += '\n\n'
+  md += '### Types\n\n'
+  md += docs.types
+    .map(type => {
+      let s = ''
+      s += `#### ${type.name}\n\n`
+      s += type.properties
+        .map(prop => {
+          let s = ''
+          s += `- ${prop.name} (\`${prop.type.name}\`)\n`
+          s += `  ${prop.jsDoc ? prop.jsDoc.primary.source + '\n' : ''}`
+          return s
+        })
+        .join('\n')
       return s
     })
     .join('\n\n')

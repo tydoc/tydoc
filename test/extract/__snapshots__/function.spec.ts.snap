@@ -80,9 +80,7 @@ Object {
 
 exports[`jsdoc extracts doc from a variable statement 1`] = `
 Object {
-  "source": "/**
- * primary
- */",
+  "source": "primary",
 }
 `;
 
@@ -90,20 +88,14 @@ exports[`jsdoc splits multiple jsDoc blocks by primary and additional (closest t
 Object {
   "additional": Array [
     Object {
-      "source": "/**
- * additional 2
- */",
+      "source": "additional 2",
     },
     Object {
-      "source": "/**
- * additional 1
- */",
+      "source": "additional 1",
     },
   ],
   "primary": Object {
-    "source": "/**
- * primary
- */",
+    "source": "primary",
   },
 }
 `;
@@ -112,20 +104,14 @@ exports[`jsdoc whitespace and comments between multiple jsDoc blocks are ignored
 Object {
   "additional": Array [
     Object {
-      "source": "/**
- * additional 2
- */",
+      "source": "additional 2",
     },
     Object {
-      "source": "/**
- * additional 1
- */",
+      "source": "additional 1",
     },
   ],
   "primary": Object {
-    "source": "/**
- * primary
- */",
+    "source": "primary",
   },
 }
 `;

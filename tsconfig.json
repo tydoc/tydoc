@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "moduleResolution": "node",
-    "target": "ESNext",
+    "target": "ES2019",
     "outDir": "dist",
     "rootDir": "src",
     "lib": ["ESNext", "DOM"]

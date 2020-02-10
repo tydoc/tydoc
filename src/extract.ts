@@ -6,9 +6,9 @@ import { casesHandled } from './utils'
  * The root of documentation data.
  */
 export interface Docs {
-  terms: DocItem[]
-  types: DocItem[]
-  hybrids: DocItem[]
+  terms: (DocFunction | DocVariable)[]
+  types: DocTypeAlias[]
+  hybrids: any[]
   length: number
 }
 
@@ -114,6 +114,11 @@ export interface DocVariable extends DocBase {
 
 export interface DocTypeAlias extends DocBase {
   kind: 'typeAlias'
+  properties: {
+    jsDoc: null | JSDocContent
+    name: string
+    type: { name: string }
+  }[]
 }
 
 export type DocItem = DocFunction | DocVariable | DocTypeAlias
@@ -167,6 +172,25 @@ function extractDocsFromDeclaration(
     return {
       kind: 'typeAlias',
       languageLevel: 'type',
+      properties: dec
+        .getType()
+        .getProperties()
+        .map(p => {
+          const type = p.getTypeAtLocation(dec)
+          let jsDoc = null
+          const valDec = p.getValueDeclarationOrThrow()
+          if (valDec instanceof tsm.PropertySignature) {
+            jsDoc = getJSDocContent(valDec)
+          }
+          return {
+            jsDoc,
+            name: p.getName(),
+            type: {
+              name: type.getText(),
+              isPrimitive: !type.isObject(),
+            },
+          }
+        }),
       name,
       text: dec.getText(false),
       jsDoc: getJSDocContent(dec),
@@ -318,7 +342,7 @@ function renderSignature(sig: SignatureData): string {
  * Extract JSDoc from node. Tease apart primary block from additional blocks.
  */
 function getJSDocContent(node: tsm.JSDocableNode): null | JSDocContent {
-  const jsDocs = node.getJsDocs().map(doc => ({ source: doc.getFullText() }))
+  const jsDocs = node.getJsDocs().map(doc => ({ source: doc.getInnerText() }))
 
   if (jsDocs.length === 0) return null
   if (jsDocs.length === 1) return { primary: jsDocs[0], additional: [] }

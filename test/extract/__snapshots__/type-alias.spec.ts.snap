@@ -11,6 +11,7 @@ Object {
       "kind": "typeAlias",
       "languageLevel": "type",
       "name": "Foo",
+      "properties": Array [],
       "sourceLocation": Object {
         "fileLine": 1,
         "filePath": "/test.ts",
@@ -21,19 +22,61 @@ Object {
       "jsDoc": Object {
         "additional": Array [],
         "primary": Object {
-          "source": "/**
- * boo
- */",
+          "source": "boo",
         },
       },
       "kind": "typeAlias",
       "languageLevel": "type",
       "name": "Bar",
+      "properties": Array [
+        Object {
+          "jsDoc": Object {
+            "additional": Array [
+              Object {
+                "source": "Doc about a 2",
+              },
+            ],
+            "primary": Object {
+              "source": "Doc about a 1",
+            },
+          },
+          "name": "a",
+          "type": Object {
+            "isPrimitive": true,
+            "name": "string",
+          },
+        },
+        Object {
+          "jsDoc": Object {
+            "additional": Array [],
+            "primary": Object {
+              "source": "Doc about b",
+            },
+          },
+          "name": "b",
+          "type": Object {
+            "isPrimitive": true,
+            "name": "number",
+          },
+        },
+      ],
       "sourceLocation": Object {
-        "fileLine": 5,
+        "fileLine": 6,
         "filePath": "/test.ts",
       },
-      "text": "export type Bar = {};",
+      "text": "export type Bar = {
+  /**
+   * Doc about a 2
+   */
+  /**
+   * Doc about a 1
+   */
+  a: string;
+  /**
+   * Doc about b
+   */
+  b: number;
+};",
     },
   ],
 }
