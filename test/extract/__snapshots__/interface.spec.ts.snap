@@ -11,6 +11,24 @@ Object {
       "kind": "interface",
       "languageLevel": "type",
       "name": "A",
+      "properties": Array [
+        Object {
+          "jsDoc": null,
+          "name": "foo",
+          "type": Object {
+            "isPrimitive": true,
+            "name": "string",
+          },
+        },
+        Object {
+          "jsDoc": null,
+          "name": "bar",
+          "type": Object {
+            "isPrimitive": true,
+            "name": "string",
+          },
+        },
+      ],
       "sourceLocation": Object {
         "fileLine": 1,
         "filePath": "/test.ts",

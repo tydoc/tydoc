@@ -11,7 +11,7 @@
     "/oclif.manifest.json"
   ],
   "scripts": {
-    "build:docs": "ts-node src/cli/main module src > api-docs.md",
+    "build:docs": "node dist/cli/main module src",
     "build:oclif": "oclif-dev manifest",
     "build:ts": "tsc",
     "build": "yarn -s build:oclif && yarn -s build:ts",

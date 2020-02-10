@@ -123,6 +123,11 @@ export interface DocTypeAlias extends DocBase {
 
 export interface DocInterface extends DocBase {
   kind: 'interface'
+  properties: {
+    jsDoc: null | JSDocContent
+    name: string
+    type: { name: string }
+  }[]
 }
 
 export type DocItem = DocFunction | DocVariable | DocTypeAlias | DocInterface
@@ -158,7 +163,6 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
 
   return docs
 }
-
 /**
  * Extracts docs from the given declaration.
  */
@@ -171,34 +175,49 @@ function extractDocsFromDeclaration(
     docs.name = name
     return docs
   }
+
   if (dec instanceof tsm.InterfaceDeclaration) {
     return {
+      ...extractCommon(dec),
       kind: 'interface',
       languageLevel: 'type',
       text: dec.getText(),
       name: dec.getName(),
       jsDoc: extractJSDoc(dec),
-      ...extractCommon(dec),
+      properties: dec.getProperties().map(propSig => {
+        const type = propSig.getType()
+        const doc = {
+          jsDoc: extractJSDoc(propSig),
+          name: propSig.getName(),
+          type: {
+            name: type.getText(),
+            isPrimitive: !type.isObject(),
+          },
+        }
+        return doc
+      }),
     }
   }
 
   if (dec instanceof tsm.TypeAliasDeclaration) {
     return {
+      ...extractCommon(dec),
       kind: 'typeAlias',
       languageLevel: 'type',
       properties: dec
         .getType()
         .getProperties()
-        .map(p => {
-          const type = p.getTypeAtLocation(dec)
+        .map(sym => {
+          // todo easier to work with prop sig... see interface example
+          const type = sym.getTypeAtLocation(dec)
           let jsDoc = null
-          const valDec = p.getValueDeclarationOrThrow()
+          const valDec = sym.getValueDeclaration()
           if (valDec instanceof tsm.PropertySignature) {
             jsDoc = extractJSDoc(valDec)
           }
           return {
             jsDoc,
-            name: p.getName(),
+            name: sym.getName(),
             type: {
               name: type.getText(),
               isPrimitive: !type.isObject(),
@@ -208,7 +227,6 @@ function extractDocsFromDeclaration(
       name,
       text: dec.getText(false),
       jsDoc: extractJSDoc(dec),
-      ...extractCommon(dec),
     }
   }
 
@@ -236,6 +254,7 @@ function extractDocsFromDeclaration(
     const typeName = dec.getType().getText()
 
     return {
+      ...extractCommon(dec),
       kind: 'variable',
       languageLevel: 'term',
       name,
@@ -245,7 +264,6 @@ function extractDocsFromDeclaration(
       },
       text: dec.getText(false),
       jsDoc,
-      ...extractCommon(dec),
     }
   }
 
