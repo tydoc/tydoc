@@ -1,13 +1,13 @@
 import * as tsm from 'ts-morph'
 import { inspect } from 'util'
-import { casesHandled } from './utils'
+import { casesHandled } from '../../utils'
 
 /**
  * The root of documentation data.
  */
 export interface Docs {
   terms: (DocFunction | DocVariable)[]
-  types: DocTypeAlias[]
+  types: (DocTypeAlias | DocInterface)[]
   hybrids: any[]
   length: number
 }
@@ -121,7 +121,11 @@ export interface DocTypeAlias extends DocBase {
   }[]
 }
 
-export type DocItem = DocFunction | DocVariable | DocTypeAlias
+export interface DocInterface extends DocBase {
+  kind: 'interface'
+}
+
+export type DocItem = DocFunction | DocVariable | DocTypeAlias | DocInterface
 
 /**
  * Extract docs from the module found at the given file path.
@@ -167,6 +171,16 @@ function extractDocsFromDeclaration(
     docs.name = name
     return docs
   }
+  if (dec instanceof tsm.InterfaceDeclaration) {
+    return {
+      kind: 'interface',
+      languageLevel: 'type',
+      text: dec.getText(),
+      name: dec.getName(),
+      jsDoc: extractJSDoc(dec),
+      ...extractCommon(dec),
+    }
+  }
 
   if (dec instanceof tsm.TypeAliasDeclaration) {
     return {
@@ -180,7 +194,7 @@ function extractDocsFromDeclaration(
           let jsDoc = null
           const valDec = p.getValueDeclarationOrThrow()
           if (valDec instanceof tsm.PropertySignature) {
-            jsDoc = getJSDocContent(valDec)
+            jsDoc = extractJSDoc(valDec)
           }
           return {
             jsDoc,
@@ -193,8 +207,8 @@ function extractDocsFromDeclaration(
         }),
       name,
       text: dec.getText(false),
-      jsDoc: getJSDocContent(dec),
-      ...extractCommonDocDataFromDeclaration(dec),
+      jsDoc: extractJSDoc(dec),
+      ...extractCommon(dec),
     }
   }
 
@@ -217,7 +231,7 @@ function extractDocsFromDeclaration(
     const statement = dec.getParent().getParent()
     const jsDoc =
       statement instanceof tsm.VariableStatement
-        ? getJSDocContent(statement)
+        ? extractJSDoc(statement)
         : null
     const typeName = dec.getType().getText()
 
@@ -231,7 +245,7 @@ function extractDocsFromDeclaration(
       },
       text: dec.getText(false),
       jsDoc,
-      ...extractCommonDocDataFromDeclaration(dec),
+      ...extractCommon(dec),
     }
   }
 
@@ -246,7 +260,7 @@ function extractDocsFromDeclaration(
 /**
  * Extract doc data that is common to all doc items from the given declaration.
  */
-function extractCommonDocDataFromDeclaration(dec: tsm.ExportedDeclarations) {
+function extractCommon(dec: tsm.ExportedDeclarations) {
   const sourceFile = dec.getSourceFile()
   const filePath = sourceFile.getFilePath()
   const fileLine = dec.getStartLineNumber()
@@ -275,7 +289,7 @@ function extractDocsFromFunction(
 
   let jsDoc = null
   if (node instanceof tsm.FunctionDeclaration) {
-    jsDoc = getJSDocContent(node)
+    jsDoc = extractJSDoc(node)
   } else {
     // An ArrowFunction or FunctionExpression can be within an exported
     // variable. jsDoc lives at the variable statement level. Try to find it.
@@ -288,7 +302,7 @@ function extractDocsFromFunction(
       .getParent()
       ?.getParent()
     if (maybeVarDec instanceof tsm.VariableDeclaration) {
-      jsDoc = getJSDocContent(node)
+      jsDoc = extractJSDoc(node)
     }
   }
 
@@ -311,7 +325,7 @@ function extractDocsFromFunction(
       text: renderSignature(signatureData),
     },
     jsDoc,
-    ...extractCommonDocDataFromDeclaration(node),
+    ...extractCommon(node),
   } as Omit<DocFunction, 'name'>
 
   return doc
@@ -341,7 +355,7 @@ function renderSignature(sig: SignatureData): string {
 /**
  * Extract JSDoc from node. Tease apart primary block from additional blocks.
  */
-function getJSDocContent(node: tsm.JSDocableNode): null | JSDocContent {
+function extractJSDoc(node: tsm.JSDocableNode): null | JSDocContent {
   const jsDocs = node.getJsDocs().map(doc => ({ source: doc.getInnerText() }))
 
   if (jsDocs.length === 0) return null

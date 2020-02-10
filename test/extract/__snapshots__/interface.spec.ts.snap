@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`extracts doc from interface 1`] = `
+Object {
+  "hybrids": Array [],
+  "length": 1,
+  "terms": Array [],
+  "types": Array [
+    Object {
+      "jsDoc": null,
+      "kind": "interface",
+      "languageLevel": "type",
+      "name": "A",
+      "sourceLocation": Object {
+        "fileLine": 1,
+        "filePath": "/test.ts",
+      },
+      "text": "export interface A {
+  foo: string;
+  bar: string;
+}",
+    },
+  ],
+}
+`;

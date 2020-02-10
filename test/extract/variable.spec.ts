@@ -1,5 +1,3 @@
-const ctx = createContext()
-
 it('extracts docs', () => {
   expect(
     ctx.given(

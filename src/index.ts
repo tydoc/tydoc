@@ -1,2 +1,2 @@
-export * from './extract'
-export { render as renderMarkdown } from './markdown'
+export * from './lib/extract/extract'
+export { render as renderMarkdown } from './lib/render/markdown'

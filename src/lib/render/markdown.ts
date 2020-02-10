@@ -1,4 +1,4 @@
-import { Docs } from './extract'
+import { Docs } from '../extract/extract'
 
 /**
  * Render docs as Markdown.

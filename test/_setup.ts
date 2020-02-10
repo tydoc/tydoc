@@ -33,13 +33,20 @@ function createContextt() {
   return api
 }
 
+const ctxx = createContextt()
+
 declare global {
   export const createContext: typeof createContextt
+  export const ctx: typeof ctxx
   namespace NodeJS {
     interface Global {
       createContext: typeof createContextt
+      ctx: typeof ctxx
     }
   }
 }
 
-global.createContext = createContextt
+Object.assign(global, {
+  createContext: createContextt,
+  ctx: ctxx,
+})

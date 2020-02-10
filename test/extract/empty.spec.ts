@@ -1,6 +1,3 @@
-import '../../src/extract'
-const ctx = createContext()
-
 it('extracts nothing if the module is empty', () => {
   expect(ctx.given('')).toMatchInlineSnapshot(`
     Object {
