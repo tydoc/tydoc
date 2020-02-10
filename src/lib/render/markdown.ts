@@ -27,6 +27,7 @@ export function render(docs: Docs): string {
       // s += type.jsDoc ? type.jsDoc.primary.source + '\n' : ''
       s += '\n'
       s += '```ts\n'
+      // todo export text presence seems like an extraction concern
       s += type.textWithJSDoc.replace(/export /, '') + '\n'
       s += '```\n'
       // s += type.properties

@@ -14,7 +14,7 @@ Object {
       "properties": Array [],
       "sourceLocation": Object {
         "fileLine": 1,
-        "filePath": "/test.ts",
+        "filePath": "/a.ts",
       },
       "text": "export type Foo = {};",
       "textWithJSDoc": "export type Foo = {};",
@@ -63,7 +63,7 @@ Object {
       ],
       "sourceLocation": Object {
         "fileLine": 6,
-        "filePath": "/test.ts",
+        "filePath": "/a.ts",
       },
       "text": "export type Bar = {
   /**

@@ -19,7 +19,7 @@ Object {
       },
       "sourceLocation": Object {
         "fileLine": 1,
-        "filePath": "/test.ts",
+        "filePath": "/a.ts",
       },
       "text": "export function a() {}",
       "textWithJSDoc": "export function a() {}",
@@ -45,7 +45,7 @@ Object {
       },
       "sourceLocation": Object {
         "fileLine": 2,
-        "filePath": "/test.ts",
+        "filePath": "/a.ts",
       },
       "text": "export function b(a: boolean) {}",
       "textWithJSDoc": "export function b(a: boolean) {}",
@@ -71,7 +71,7 @@ Object {
       },
       "sourceLocation": Object {
         "fileLine": 3,
-        "filePath": "/test.ts",
+        "filePath": "/a.ts",
       },
       "text": "export function c(a: string): number {}",
       "textWithJSDoc": "export function c(a: string): number {}",
@@ -138,7 +138,7 @@ Object {
       },
       "sourceLocation": Object {
         "fileLine": 1,
-        "filePath": "/test.ts",
+        "filePath": "/a.ts",
       },
       "text": "function() {}",
       "textWithJSDoc": "function() {}",
@@ -167,7 +167,7 @@ Object {
       },
       "sourceLocation": Object {
         "fileLine": 1,
-        "filePath": "/test.ts",
+        "filePath": "/a.ts",
       },
       "text": "() => {}",
       "textWithJSDoc": "() => {}",

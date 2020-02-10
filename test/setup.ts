@@ -13,12 +13,25 @@ function createContextt() {
     markdown(source: string) {
       return jsde.renderMarkdown(api.given(source))
     },
-    given(source: string) {
-      const sourceFormatted = Prettier.format(source, { parser: 'typescript' })
-      const sourceFile = project.createSourceFile('test.ts', sourceFormatted, {
-        overwrite: true,
-      })
-      return jsde.extractDocsFromModule(sourceFile)
+    /**
+     * Pass a set of synthetic source files. The first source is considered the
+     * entrypoint. Files are named by alphabet letters, starting from "a",
+     * incrementing toward "z".
+     */
+    given(...sources: string[]) {
+      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+      const sourcesFormatted = sources.map(source =>
+        Prettier.format(source, { parser: 'typescript' })
+      )
+      const sourceFiles = sourcesFormatted
+        .map(source => [letters.shift()!, source])
+        .map(([moduleName, source]) =>
+          project.createSourceFile(`${moduleName}.ts`, source, {
+            overwrite: true,
+          })
+        )
+      const entrypoint = sourceFiles[0]
+      return jsde.extractDocsFromModule(entrypoint)
     },
     givenVariables(source: string) {
       return api.given(source) as {

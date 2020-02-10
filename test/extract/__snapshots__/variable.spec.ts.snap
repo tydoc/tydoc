@@ -12,7 +12,7 @@ Object {
       "name": "a",
       "sourceLocation": Object {
         "fileLine": 1,
-        "filePath": "/test.ts",
+        "filePath": "/a.ts",
       },
       "text": "a = 1",
       "textWithJSDoc": "a = 1",

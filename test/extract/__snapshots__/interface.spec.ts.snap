@@ -31,7 +31,7 @@ Object {
       ],
       "sourceLocation": Object {
         "fileLine": 1,
-        "filePath": "/test.ts",
+        "filePath": "/a.ts",
       },
       "text": "export interface A {
   foo: string;
