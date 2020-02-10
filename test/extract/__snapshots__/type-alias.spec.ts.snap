@@ -7,6 +7,7 @@ Object {
   "terms": Array [],
   "types": Array [
     Object {
+      "isExported": true,
       "jsDoc": null,
       "kind": "typeAlias",
       "languageLevel": "type",
@@ -20,6 +21,7 @@ Object {
       "textWithJSDoc": "export type Foo = {};",
     },
     Object {
+      "isExported": true,
       "jsDoc": Object {
         "additional": Array [],
         "primary": Object {

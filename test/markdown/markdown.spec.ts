@@ -3,29 +3,42 @@ const ctx = createContext()
 
 it('renders markdown', () => {
   expect(
-    ctx.markdown(`
-      /**
-       * Toto
-       */
-      export function foo(a:string, b:number) {}
-      export function bar() {}
-      export const toto = () => {}
-      export const fofo = function fofo2() {}
-      export type A = {
+    ctx.markdown(
+      `
+        import { D } from './b'
+
         /**
-         * About a...
+         * Toto
          */
-        a: string,
-        b: number
-        c: C
-      }
-      type C = {
-        d: number,
-        e: string
-      }
-  `)
+        export function foo(a:string, b:number) {}
+        export function bar() {}
+        export const toto = () => {}
+        export const fofo = function fofo2() {}
+        export type A = {
+          /**
+           * About a...
+           */
+          a: string,
+          b: number
+          c: C
+          d: D
+        }
+        type C = {
+          d: number,
+          e: string
+        }
+      `,
+      `
+        export type D = {
+          a: string
+          b: string
+        }
+    `
+    )
   ).toMatchInlineSnapshot(`
-    "### API
+    "## Default Module
+
+    ### Terms
 
     #### foo
 
@@ -67,8 +80,11 @@ it('renders markdown', () => {
       a: string;
       b: number;
       c: C;
+      d: D;
     };
     \`\`\`
+
+    ## Type Index
 
     "
   `)

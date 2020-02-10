@@ -6,7 +6,9 @@ import { Docs } from '../extract/extract'
 export function render(docs: Docs): string {
   let md = ''
 
-  md += '### API\n\n'
+  md += '## Default Module\n\n'
+
+  md += '### Terms\n\n'
   md += docs.terms
     .map(term => {
       let s = `#### ${term.name}\n\n`
@@ -21,6 +23,7 @@ export function render(docs: Docs): string {
   md += '\n\n'
   md += '### Types\n\n'
   md += docs.types
+    .filter(type => type.isExported)
     .map(type => {
       let s = ''
       s += `#### \`${type.name}\`\n`
@@ -43,6 +46,9 @@ export function render(docs: Docs): string {
     .join('\n')
 
   md += '\n'
+
+  md += '## Type Index\n\n'
+
   return md
 }
 

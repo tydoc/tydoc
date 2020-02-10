@@ -7,6 +7,7 @@ Object {
   "terms": Array [],
   "types": Array [
     Object {
+      "isExported": true,
       "jsDoc": null,
       "kind": "interface",
       "languageLevel": "type",

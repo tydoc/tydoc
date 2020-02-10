@@ -10,8 +10,8 @@ function createContextt() {
   })
 
   const api = {
-    markdown(source: string) {
-      return jsde.renderMarkdown(api.given(source))
+    markdown(...sources: string[]) {
+      return jsde.renderMarkdown(api.given(...sources))
     },
     /**
      * Pass a set of synthetic source files. The first source is considered the

@@ -27,23 +27,6 @@ function createDocs(): Docs {
   }
 }
 
-/**
- * Add a doc item to docs.
- */
-function addDoc(docs: Docs, doc: DocItem): Docs {
-  docs[
-    doc.languageLevel === 'term'
-      ? 'terms'
-      : doc.languageLevel === 'type'
-      ? 'types'
-      : doc.languageLevel === 'hybrid'
-      ? 'hybrids'
-      : casesHandled(doc.languageLevel)
-  ].push(doc)
-  docs.length++
-  return docs
-}
-
 interface JSDocBlock {
   source: string
 }
@@ -118,6 +101,7 @@ export interface DocVariable extends DocBase {
 
 export interface DocTypeAlias extends DocBase {
   kind: 'typeAlias'
+  isExported: boolean
   properties: {
     jsDoc: null | JSDocContent
     name: string
@@ -127,10 +111,13 @@ export interface DocTypeAlias extends DocBase {
 
 export interface DocInterface extends DocBase {
   kind: 'interface'
+  isExported: boolean
   properties: {
     jsDoc: null | JSDocContent
     name: string
-    type: { name: string }
+    type: {
+      name: string
+    }
   }[]
 }
 
@@ -160,126 +147,142 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
   const exs = sourceFile.getExportedDeclarations()
   const docs = createDocs()
 
-  for (const [name, declarations] of exs) {
-    const doc = extractDocsFromDeclaration(name, declarations[0])
-    addDoc(docs, doc)
-  }
+  for (const [name, decs] of exs) {
+    const dec = decs[0]
 
-  return docs
-}
-/**
- * Extracts docs from the given declaration.
- */
-function extractDocsFromDeclaration(
-  name: string,
-  dec: tsm.ExportedDeclarations
-): DocItem {
-  if (dec instanceof tsm.FunctionDeclaration) {
-    const docs = extractDocsFromFunction(dec) as DocFunction
-    docs.name = name
-    return docs
-  }
-
-  if (dec instanceof tsm.InterfaceDeclaration) {
-    return {
-      ...extractCommon(dec),
-      kind: 'interface',
-      languageLevel: 'type',
-      text: dec.getText(),
-      textWithJSDoc: dec.getFullText().trim(),
-      name: dec.getName(),
-      jsDoc: extractJSDoc(dec),
-      properties: dec.getProperties().map(propSig => {
-        const type = propSig.getType()
-        const doc = {
-          jsDoc: extractJSDoc(propSig),
-          name: propSig.getName(),
-          type: {
-            name: type.getText(),
-            isPrimitive: !type.isObject(),
-          },
-        }
-        return doc
-      }),
+    if (dec instanceof tsm.FunctionDeclaration) {
+      const doc = extractDocsFromFunction(dec) as DocFunction
+      doc.name = name
+      addDoc(docs, doc)
+      continue
     }
-  }
 
-  if (dec instanceof tsm.TypeAliasDeclaration) {
-    return {
-      ...extractCommon(dec),
-      kind: 'typeAlias',
-      languageLevel: 'type',
-      properties: dec
-        .getType()
-        .getProperties()
-        .map(sym => {
-          // todo easier to work with prop sig... see interface example
-          const type = sym.getTypeAtLocation(dec)
-          let jsDoc = null
-          const valDec = sym.getValueDeclaration()
-          if (valDec instanceof tsm.PropertySignature) {
-            jsDoc = extractJSDoc(valDec)
-          }
-          return {
-            jsDoc,
-            name: sym.getName(),
+    if (dec instanceof tsm.InterfaceDeclaration) {
+      addDoc(docs, {
+        ...extractCommon(dec),
+        kind: 'interface',
+        languageLevel: 'type',
+        isExported: true,
+        text: dec.getText(),
+        textWithJSDoc: dec.getFullText().trim(),
+        name: dec.getName(),
+        jsDoc: extractJSDoc(dec),
+        properties: dec.getProperties().map(propSig => {
+          const type = propSig.getType()
+          const doc = {
+            jsDoc: extractJSDoc(propSig),
+            name: propSig.getName(),
             type: {
               name: type.getText(),
               isPrimitive: !type.isObject(),
             },
           }
+          return doc
         }),
-      name,
-      text: dec.getText(false),
-      textWithJSDoc: dec.getText(true),
-      jsDoc: extractJSDoc(dec),
+      })
+      continue
     }
-  }
 
-  if (dec instanceof tsm.VariableDeclaration) {
-    // If the variable is pointing to a function we will treat it like as if
-    // it were a function declaration.
-    const initializer = dec.getInitializer()
-    if (initializer) {
-      if (
-        initializer instanceof tsm.ArrowFunction ||
-        initializer instanceof tsm.FunctionExpression
-      ) {
-        const docs = extractDocsFromFunction(initializer) as DocFunction
-        docs.name = name
-        return docs
+    if (dec instanceof tsm.TypeAliasDeclaration) {
+      addDoc(docs, {
+        ...extractCommon(dec),
+        kind: 'typeAlias',
+        languageLevel: 'type',
+        isExported: true,
+        properties: dec
+          .getType()
+          .getProperties()
+          .map(sym => {
+            // todo easier to work with prop sig... see interface example
+            const type = sym.getTypeAtLocation(dec)
+            let jsDoc = null
+            const valDec = sym.getValueDeclaration()
+            if (valDec instanceof tsm.PropertySignature) {
+              jsDoc = extractJSDoc(valDec)
+            }
+            return {
+              jsDoc,
+              name: sym.getName(),
+              type: {
+                name: type.getText(),
+                isPrimitive: !type.isObject(),
+              },
+            }
+          }),
+        name,
+        text: dec.getText(false),
+        textWithJSDoc: dec.getText(true),
+        jsDoc: extractJSDoc(dec),
+      })
+      continue
+    }
+
+    if (dec instanceof tsm.VariableDeclaration) {
+      // If the variable is pointing to a function we will treat it like as if
+      // it were a function declaration.
+      const initializer = dec.getInitializer()
+      if (initializer) {
+        if (
+          initializer instanceof tsm.ArrowFunction ||
+          initializer instanceof tsm.FunctionExpression
+        ) {
+          const doc = extractDocsFromFunction(initializer) as DocFunction
+          doc.name = name
+          addDoc(docs, doc)
+          continue
+        }
       }
+
+      // jsDoc lives at var statement level
+      const statement = dec.getParent().getParent()
+      const jsDoc =
+        statement instanceof tsm.VariableStatement
+          ? extractJSDoc(statement)
+          : null
+      const typeName = dec.getType().getText()
+
+      addDoc(docs, {
+        ...extractCommon(dec),
+        kind: 'variable',
+        languageLevel: 'term',
+        name,
+        // type: type && extractTypeData(type),
+        type: {
+          name: typeName,
+        },
+        text: dec.getText(false),
+        textWithJSDoc: dec.getText(true),
+        jsDoc,
+      })
+      continue
     }
 
-    // jsDoc lives at var statement level
-    const statement = dec.getParent().getParent()
-    const jsDoc =
-      statement instanceof tsm.VariableStatement
-        ? extractJSDoc(statement)
-        : null
-    const typeName = dec.getType().getText()
+    // todo
+    // casesHandled(declaration)
 
-    return {
-      ...extractCommon(dec),
-      kind: 'variable',
-      languageLevel: 'term',
-      name,
-      // type: type && extractTypeData(type),
-      type: {
-        name: typeName,
-      },
-      text: dec.getText(false),
-      textWithJSDoc: dec.getText(true),
-      jsDoc,
-    }
+    throw new Error(
+      `unknown kind of declaration or declaration scenario\n\n${inspect(dec)}`
+    )
   }
 
-  // todo
-  // casesHandled(declaration)
+  return docs
 
-  throw new Error(
-    `unknown kind of declaration or declaration scenario\n\n${inspect(dec)}`
-  )
+  /**
+   * Add a doc item to docs.
+   */
+  function addDoc(docs: Docs, doc: DocItem): Docs {
+    docs[
+      doc.languageLevel === 'term'
+        ? 'terms'
+        : doc.languageLevel === 'type'
+        ? 'types'
+        : doc.languageLevel === 'hybrid'
+        ? 'hybrids'
+        : casesHandled(doc.languageLevel)
+    ].push(doc)
+    docs.length++
+    return docs
+  }
 }
 
 /**
