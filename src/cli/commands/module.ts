@@ -1,4 +1,6 @@
 import Command, { flags } from '@oclif/command'
+import * as fs from 'fs-jetpack'
+import * as path from 'path'
 import { extractDocsFromModuleAtPath, renderMarkdown } from '../../'
 
 export class Log extends Command {
@@ -9,7 +11,18 @@ export class Log extends Command {
   }
   async run() {
     const { args, flags } = this.parse(Log)
-    const docs = extractDocsFromModuleAtPath(args.filePath)
+    const existsResult = fs.exists(args.filePath)
+
+    if (existsResult === false) {
+      return this.error(`No module found at ${args.filePath}`)
+    }
+
+    let docs
+    if (existsResult === 'dir') {
+      docs = extractDocsFromModuleAtPath(path.join(args.filePath, 'index.ts'))
+    } else {
+      docs = extractDocsFromModuleAtPath(args.filePath)
+    }
 
     if (flags.json) {
       this.log(JSON.stringify(docs, null, 2))

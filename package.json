@@ -25,6 +25,7 @@
     "@oclif/config": "^1.14.0",
     "@oclif/plugin-help": "^2.2.3",
     "@types/node": "^13.1.4",
+    "fs-jetpack": "^2.2.3",
     "globby": "^11.0.0",
     "ts-morph": "^6.0.2",
     "typescript": "^3.7.4"
@@ -60,7 +61,8 @@
       ]
     ],
     "watchPathIgnorePatterns": [
-      "<rootDir>/dist/"
+      "<rootDir>/dist/",
+      "<rootDir>/oclif.manifest.json"
     ],
     "setupFiles": [
       "./test/_setup.ts"
