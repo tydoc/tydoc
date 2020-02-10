@@ -11,6 +11,7 @@
     "/oclif.manifest.json"
   ],
   "scripts": {
+    "build:docs": "ts-node src/cli/main module src > api-docs.md",
     "build:oclif": "oclif-dev manifest",
     "build:ts": "tsc",
     "build": "yarn -s build:oclif && yarn -s build:ts",
@@ -40,6 +41,7 @@
     "jest-watch-typeahead": "^0.4.2",
     "prettier": "^1.19.1",
     "ts-jest": "^25.2.0",
+    "ts-node": "^8.6.2",
     "ts-node-dev": "^1.0.0-pre.44"
   },
   "prettier": {
