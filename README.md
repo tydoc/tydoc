@@ -16,7 +16,9 @@ Work in progress 👷‍
 
 <!-- START API DOCS --->
 
-### API
+## Default Module
+
+### Terms
 
 #### renderMarkdown
 
@@ -53,6 +55,7 @@ interface Docs {
    * todo
    */
   types: (DocTypeAlias | DocInterface)[]
+  typeIndex: Record<string, DocTypeAlias | DocInterface>
   hybrids: any[]
   length: number
 }
@@ -83,6 +86,7 @@ interface DocVariable extends DocBase {
 ```ts
 interface DocTypeAlias extends DocBase {
   kind: 'typeAlias'
+  isExported: boolean
   properties: {
     jsDoc: null | JSDocContent
     name: string
@@ -96,18 +100,25 @@ interface DocTypeAlias extends DocBase {
 ```ts
 interface DocInterface extends DocBase {
   kind: 'interface'
+  isExported: boolean
   properties: {
     jsDoc: null | JSDocContent
     name: string
-    type: { name: string }
+    type: {
+      name: string
+    }
   }[]
 }
 ```
 
-#### `DocItem`
+## Type Index
+
+#### `TypeData`
 
 ```ts
-type DocItem = DocFunction | DocVariable | DocTypeAlias | DocInterface
+interface TypeData {
+  name: string
+}
 ```
 
 <!-- END API DOCS --->
