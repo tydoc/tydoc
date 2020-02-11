@@ -1,83 +1,62 @@
 import { Docs } from '../extract/extract'
+import { codeBlock, codeSpan, document, section } from '../lib/markdown'
+
+export interface Options {
+  /**
+   * Whether or not the API terms section should have a title and nest its term
+   * entries under it. If false, each term entry title is de-nested by one level.
+   */
+  flatTermsSection: boolean
+}
 
 /**
  * Render docs as Markdown.
  */
-export function render(docs: Docs): string {
-  let md = ''
+export function render(docs: Docs, opts: Options): string {
+  const d = document()
 
-  md += '## Default Module\n\n'
+  // once multiple modules are supported, we will need to have module sections
+  // md += '## Default Module\n\n'
 
-  md += '### Exported Terms\n\n'
-  md += docs.terms
-    .map(term => {
-      let s = `#### ${term.name}\n\n`
-      if (term.kind === 'function') {
-        s += '<!-- prettier-ignore -->\n'
-        s += markdownCodeBlock(term.signature.text, 'ts')
-      }
-      return s
-    })
-    .join('\n\n')
-  md += '\n'
-  md += '\n'
-  md += '### Exported Types\n\n'
-  md += Object.values(docs.typeIndex)
-    .filter(type => type.isExported)
-    .map(type => {
-      let s = ''
-      s += `#### \`${type.name}\`\n`
-      // s += type.jsDoc ? type.jsDoc.primary.source + '\n' : ''
-      s += '\n'
-      s += '```ts\n'
-      // todo export text presence seems like an extraction concern
-      s += type.textWithJSDoc.replace(/export /, '') + '\n'
-      s += '```\n'
-      // s += type.properties
-      //   .map(prop => {
-      //     let s = ''
-      //     s += `- ${prop.name} (\`${prop.type.name}\`)\n`
-      //     s += `  ${prop.jsDoc ? prop.jsDoc.primary.source + '\n' : ''}`
-      //     return s
-      //   })
-      //   .join('\n')
-      return s
-    })
-    .join('\n')
-  md += '\n'
-  md += '\n'
-  md += '## Type Index\n\n'
-  md += Object.values(docs.typeIndex)
-    .filter(type => !type.isExported)
-    .map(type => {
-      let s = ''
-      s += `#### \`${type.name}\`\n`
-      // s += type.jsDoc ? type.jsDoc.primary.source + '\n' : ''
-      s += '\n'
-      s += '```ts\n'
-      // todo export text presence seems like an extraction concern
-      s += type.textWithJSDoc.replace(/export /, '') + '\n'
-      s += '```\n'
-      // s += type.properties
-      //   .map(prop => {
-      //     let s = ''
-      //     s += `- ${prop.name} (\`${prop.type.name}\`)\n`
-      //     s += `  ${prop.jsDoc ? prop.jsDoc.primary.source + '\n' : ''}`
-      //     return s
-      //   })
-      //   .join('\n')
-      return s
-    })
-    .join('\n')
+  const exportedTerms = docs.terms.map(term => {
+    const s = section(codeSpan(term.name))
+    if (term.kind === 'function') {
+      s.add('<!-- prettier-ignore -->', codeBlock('ts', term.signature.text))
+    }
+    return s
+  })
 
-  md += '\n'
+  const exportedTermsSection = opts.flatTermsSection
+    ? exportedTerms
+    : [section('Exported Terms').add(...exportedTerms)]
 
-  return md
-}
+  d.add(...exportedTermsSection)
 
-/**
- * Render the given string inside markdown codeblock.
- */
-function markdownCodeBlock(s: string, languageType?: string): string {
-  return '```' + (languageType || '') + '\n' + s + '\n' + '```'
+  d.add(
+    section('Exported Types').add(
+      ...Object.values(docs.typeIndex)
+        .filter(type => type.isExported)
+        .map(type => {
+          // todo export text presence seems like an extraction concern
+          return section(codeSpan(type.name)).add(
+            codeBlock('ts', type.textWithJSDoc.replace(/export /, ''))
+          )
+        })
+    )
+  )
+
+  d.add(
+    section('Type Index').add(
+      ...Object.values(docs.typeIndex)
+        .filter(type => !type.isExported)
+        .map(type => {
+          // todo export text presence seems like an extraction concern
+          return section(codeSpan(type.name)).add(
+            codeBlock('ts', type.textWithJSDoc.replace(/export /, ''))
+          )
+        })
+    )
+  )
+
+  return d.render({ level: 3 })
 }

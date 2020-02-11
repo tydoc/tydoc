@@ -1,9 +1,68 @@
-import '../../src'
+export {}
 const ctx = createContext()
+
+describe('options', () => {
+  describe('flatTermsSection', () => {
+    it('when enabled terms are nested under a heading', () => {
+      expect(
+        ctx.markdown(
+          { flatTermsSection: true },
+          `
+            export function foo() {}
+          `
+        )
+      ).toMatchInlineSnapshot(`
+        "### \`foo\`
+
+        <!-- prettier-ignore -->
+        \`\`\`ts
+        () => void
+        \`\`\`
+
+        ### Exported Types
+
+
+        ### Type Index
+
+
+        "
+      `)
+    })
+
+    it('when disabled terms are not nested under a heading', () => {
+      expect(
+        ctx.markdown(
+          { flatTermsSection: false },
+          `
+            export function foo() {}
+          `
+        )
+      ).toMatchInlineSnapshot(`
+        "### Exported Terms
+
+        #### \`foo\`
+
+        <!-- prettier-ignore -->
+        \`\`\`ts
+        () => void
+        \`\`\`
+
+        ### Exported Types
+
+
+        ### Type Index
+
+
+        "
+      `)
+    })
+  })
+})
 
 it('renders markdown', () => {
   expect(
     ctx.markdown(
+      { flatTermsSection: true },
       `
         import { D } from './b'
 
@@ -36,75 +95,70 @@ it('renders markdown', () => {
     `
     )
   ).toMatchInlineSnapshot(`
-    "## Default Module
+"### \`foo\`
 
-    ### Exported Terms
+<!-- prettier-ignore -->
+\`\`\`ts
+(a: string, b: number) => void
+\`\`\`
 
-    #### foo
+### \`bar\`
 
-    <!-- prettier-ignore -->
-    \`\`\`ts
-    (a: string, b: number) => void
-    \`\`\`
+<!-- prettier-ignore -->
+\`\`\`ts
+() => void
+\`\`\`
 
-    #### bar
+### \`toto\`
 
-    <!-- prettier-ignore -->
-    \`\`\`ts
-    () => void
-    \`\`\`
+<!-- prettier-ignore -->
+\`\`\`ts
+() => void
+\`\`\`
 
-    #### toto
+### \`fofo\`
 
-    <!-- prettier-ignore -->
-    \`\`\`ts
-    () => void
-    \`\`\`
+<!-- prettier-ignore -->
+\`\`\`ts
+() => void
+\`\`\`
 
-    #### fofo
+### Exported Types
 
-    <!-- prettier-ignore -->
-    \`\`\`ts
-    () => void
-    \`\`\`
+#### \`A\`
 
-    ### Exported Types
+\`\`\`ts
+interface A {
+  /**
+   * About a...
+   */
+  a: string;
+  b: number;
+  c: C;
+  d: D;
+}
+\`\`\`
 
-    #### \`A\`
+### Type Index
 
-    \`\`\`ts
-    interface A {
-      /**
-       * About a...
-       */
-      a: string;
-      b: number;
-      c: C;
-      d: D;
-    }
-    \`\`\`
+#### \`C\`
 
+\`\`\`ts
+interface C {
+  d: number;
+  e: string;
+}
+\`\`\`
 
-    ## Type Index
+#### \`D\`
 
-    #### \`C\`
+\`\`\`ts
+interface D {
+  a: string;
+  b: string;
+}
+\`\`\`
 
-    \`\`\`ts
-    interface C {
-      d: number;
-      e: string;
-    }
-    \`\`\`
-
-    #### \`D\`
-
-    \`\`\`ts
-    interface D {
-      a: string;
-      b: string;
-    }
-    \`\`\`
-
-    "
-  `)
+"
+`)
 })

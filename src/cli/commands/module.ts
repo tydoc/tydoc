@@ -30,7 +30,7 @@ export class Log extends Command {
     }
 
     if (flags.markdown) {
-      this.log(renderMarkdown(docs))
+      this.log(renderMarkdown(docs, { flatTermsSection: false }))
       return
     }
   }

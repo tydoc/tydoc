@@ -6,7 +6,8 @@ updateMarkdownBlock(
   path.join(__dirname, '../README.md'),
   'api docs',
   renderMarkdown(
-    extractDocsFromModuleAtPath(path.join(__dirname, '../src/index.ts'))
+    extractDocsFromModuleAtPath(path.join(__dirname, '../src/index.ts')),
+    { flatTermsSection: true }
   )
 )
 

@@ -16,32 +16,40 @@ Work in progress 👷‍
 
 <!-- START API DOCS --->
 
-## Default Module
-
-### Terms
-
-#### renderMarkdown
+### `renderMarkdown`
 
 <!-- prettier-ignore -->
 ```ts
-(docs: import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs) => string
+(docs: import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs, opts: import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/render/markdown").Options) => string
 ```
 
-#### extractDocsFromModuleAtPath
+### `extractDocsFromModuleAtPath`
 
 <!-- prettier-ignore -->
 ```ts
 (filePath: string) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
 ```
 
-#### extractDocsFromModule
+### `extractDocsFromModule`
 
 <!-- prettier-ignore -->
 ```ts
 (sourceFile: import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/node_modules/ts-morph/lib/ts-morph").SourceFile) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
 ```
 
-### Types
+### Exported Types
+
+#### `Options`
+
+```ts
+interface Options {
+  /**
+   * Whether or not the API terms section should have a title and nest its term
+   * entries under it. If false, each term entry title is de-nested by one level.
+   */
+  flatTermsSection: boolean
+}
+```
 
 #### `Docs`
 
@@ -111,7 +119,7 @@ interface DocInterface extends DocBase {
 }
 ```
 
-## Type Index
+### Type Index
 
 #### `TypeData`
 

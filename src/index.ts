@@ -1,2 +1,5 @@
 export * from './lib/extract/extract'
-export { render as renderMarkdown } from './lib/render/markdown'
+export {
+  Options as renderMarkdownOptions,
+  render as renderMarkdown,
+} from './lib/render/markdown'
