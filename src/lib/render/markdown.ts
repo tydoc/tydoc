@@ -4,7 +4,7 @@ import { codeBlock, codeSpan, document, section } from '../lib/markdown'
 export interface Options {
   /**
    * Whether or not the API terms section should have a title and nest its term
-   * entries under it. If false, each term entry title is de-nested by one level.
+   * entries under it. If false, term entry titles are de-nested by one level.
    */
   flatTermsSection: boolean
 }

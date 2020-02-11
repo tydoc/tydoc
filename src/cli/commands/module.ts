@@ -8,6 +8,11 @@ export class Log extends Command {
   static flags = {
     markdown: flags.boolean({ default: true, char: 'm', exclusive: ['json'] }),
     json: flags.boolean({ default: false, char: 'j', exclusive: ['markdown'] }),
+    'flat-terms-section': flags.boolean({
+      default: false,
+      description:
+        'For use with markdown rendering. Whether or not the API terms section should have a title and nest its term entries under it. If false, term entry titles are de-nested by one level.',
+    }),
   }
   async run() {
     const { args, flags } = this.parse(Log)
@@ -30,7 +35,10 @@ export class Log extends Command {
     }
 
     if (flags.markdown) {
-      this.log(renderMarkdown(docs, { flatTermsSection: false }))
+      const options = {
+        flatTermsSection: flags['flat-terms-section'],
+      }
+      this.log(renderMarkdown(docs, options))
       return
     }
   }
