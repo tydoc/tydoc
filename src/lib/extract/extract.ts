@@ -202,19 +202,19 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
   for (const [name, decs] of exs) {
     const dec = decs[0]
 
-    if (dec instanceof tsm.FunctionDeclaration) {
+    if (tsm.Node.isFunctionDeclaration(dec)) {
       const doc = extractFunction(dec) as DocFunction
       doc.name = name
       addDoc(docs, doc)
       continue
     }
 
-    if (dec instanceof tsm.InterfaceDeclaration) {
+    if (tsm.Node.isInterfaceDeclaration(dec)) {
       extractExportedInterface(docs.typeIndex, name, dec)
       continue
     }
 
-    if (dec instanceof tsm.TypeAliasDeclaration) {
+    if (tsm.Node.isTypeAliasDeclaration(dec)) {
       addDoc(docs, {
         ...extractCommon(dec),
         kind: 'typeAlias',
@@ -230,7 +230,7 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
             const type = sym.getTypeAtLocation(dec)
             let jsDoc = null
             const valDec = sym.getValueDeclaration()
-            if (valDec instanceof tsm.PropertySignature) {
+            if (valDec && tsm.Node.isPropertySignature(valDec)) {
               jsDoc = extractJSDoc(valDec)
             }
             return {
@@ -250,14 +250,14 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
       continue
     }
 
-    if (dec instanceof tsm.VariableDeclaration) {
+    if (tsm.Node.isVariableDeclaration(dec)) {
       // If the variable is pointing to a function we will treat it like as if
       // it were a function declaration.
       const initializer = dec.getInitializer()
       if (initializer) {
         if (
-          initializer instanceof tsm.ArrowFunction ||
-          initializer instanceof tsm.FunctionExpression
+          tsm.Node.isArrowFunction(initializer) ||
+          tsm.Node.isFunctionExpression(initializer)
         ) {
           const doc = extractFunction(initializer) as DocFunction
           doc.name = name
@@ -268,10 +268,9 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
 
       // jsDoc lives at var statement level
       const statement = dec.getParent().getParent()
-      const jsDoc =
-        statement instanceof tsm.VariableStatement
-          ? extractJSDoc(statement)
-          : null
+      const jsDoc = tsm.Node.isVariableStatement(statement)
+        ? extractJSDoc(statement)
+        : null
       const typeName = dec.getType().getText()
 
       addDoc(docs, {
@@ -349,7 +348,7 @@ function extractFunction(
   // }
 
   let jsDoc = null
-  if (node instanceof tsm.FunctionDeclaration) {
+  if (tsm.Node.isFunctionDeclaration(node)) {
     jsDoc = extractJSDoc(node)
   } else {
     // An ArrowFunction or FunctionExpression can be within an exported
@@ -362,7 +361,7 @@ function extractFunction(
       .getParent()
       .getParent()
       ?.getParent()
-    if (maybeVarDec instanceof tsm.VariableDeclaration) {
+    if (maybeVarDec && tsm.Node.isVariableDeclaration(maybeVarDec)) {
       jsDoc = extractJSDoc(node)
     }
   }
