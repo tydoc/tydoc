@@ -1,6 +1,3 @@
-export {}
-const ctx = createContext()
-
 describe('options', () => {
   describe('flatTermsSection', () => {
     it('when enabled terms are nested under a heading', () => {
