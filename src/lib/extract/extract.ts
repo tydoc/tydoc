@@ -103,7 +103,7 @@ export interface DocVariable extends DocBase {
 
 export interface DocTypeAlias extends DocBase {
   kind: 'typeAlias'
-  isExported: boolean
+  exported: null | { name: string }
   properties: {
     jsDoc: null | JSDocContent
     name: string
@@ -113,7 +113,7 @@ export interface DocTypeAlias extends DocBase {
 
 export interface DocInterface extends DocBase {
   kind: 'interface'
-  isExported: boolean
+  exported: null | { name: string }
   properties: {
     jsDoc: null | JSDocContent
     name: string
@@ -124,6 +124,8 @@ export interface DocInterface extends DocBase {
 }
 
 export type DocItem = DocFunction | DocVariable | DocTypeAlias | DocInterface
+
+type TypeIndex = Record<string, DocItem>
 
 /**
  * Extract docs from the module found at the given file path.
@@ -143,35 +145,34 @@ export function extractDocsFromModuleAtPath(filePath: string) {
 }
 
 function extractExportedInterface(
-  typeIndex: any,
+  typeIndex: TypeIndex,
+  exportName: string,
   dec: tsm.InterfaceDeclaration
 ): void {
-  extractInterface(true, typeIndex, dec)
+  extractInterface(exportName, typeIndex, dec)
 }
 
 function extractInterface(
-  isExported: boolean,
-  typeIndex: any,
+  exportName: null | string,
+  typeIndex: TypeIndex,
   dec: tsm.InterfaceDeclaration
 ): void {
-  const name = dec.getName()
+  if (typeIndex[dec.getName()]) return
 
-  if (typeIndex[name]) return
-
-  const docItem = {
+  const docItem: DocInterface = {
     ...extractCommon(dec),
     kind: 'interface',
     languageLevel: 'type',
-    isExported,
+    exported: exportName ? { name: exportName } : null,
     text: dec.getText(),
     textWithJSDoc: dec.getFullText().trim(),
-    name,
+    name: dec.getName(),
     jsDoc: extractJSDoc(dec),
     properties: dec.getProperties().map(propSig => {
       const type = propSig.getType()
       if (type.isInterface()) {
         extractInterface(
-          false,
+          null,
           typeIndex,
           type.getSymbol()!.getDeclarations()[0]! as tsm.InterfaceDeclaration
         )
@@ -209,29 +210,7 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
     }
 
     if (dec instanceof tsm.InterfaceDeclaration) {
-      extractExportedInterface(docs.typeIndex, dec)
-      // addDoc(docs, {
-      //   ...extractCommon(dec),
-      //   kind: 'interface',
-      //   languageLevel: 'type',
-      //   isExported: true,
-      //   text: dec.getText(),
-      //   textWithJSDoc: dec.getFullText().trim(),
-      //   name: dec.getName(),
-      //   jsDoc: extractJSDoc(dec),
-      //   properties: dec.getProperties().map(propSig => {
-      //     const type = propSig.getType()
-      //     const doc = {
-      //       jsDoc: extractJSDoc(propSig),
-      //       name: propSig.getName(),
-      //       type: {
-      //         name: type.getText(),
-      //         isPrimitive: !type.isObject(),
-      //       },
-      //     }
-      //     return doc
-      //   }),
-      // })
+      extractExportedInterface(docs.typeIndex, name, dec)
       continue
     }
 
@@ -240,7 +219,9 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
         ...extractCommon(dec),
         kind: 'typeAlias',
         languageLevel: 'type',
-        isExported: true,
+        exported: {
+          name,
+        },
         properties: dec
           .getType()
           .getProperties()

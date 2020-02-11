@@ -8,7 +8,9 @@ Object {
   "typeIndex": Object {},
   "types": Array [
     Object {
-      "isExported": true,
+      "exported": Object {
+        "name": "Foo",
+      },
       "jsDoc": null,
       "kind": "typeAlias",
       "languageLevel": "type",
@@ -22,7 +24,9 @@ Object {
       "textWithJSDoc": "export type Foo = {};",
     },
     Object {
-      "isExported": true,
+      "exported": Object {
+        "name": "Bar",
+      },
       "jsDoc": Object {
         "additional": Array [],
         "primary": Object {

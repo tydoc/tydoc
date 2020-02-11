@@ -39,7 +39,7 @@ Work in progress 👷‍
 
 ### Exported Types
 
-#### `Options`
+#### `RenderMarkdownOptions`
 
 ```ts
 interface Options {
@@ -94,7 +94,7 @@ interface DocVariable extends DocBase {
 ```ts
 interface DocTypeAlias extends DocBase {
   kind: 'typeAlias'
-  isExported: boolean
+  exported: null | { name: string }
   properties: {
     jsDoc: null | JSDocContent
     name: string
@@ -108,7 +108,7 @@ interface DocTypeAlias extends DocBase {
 ```ts
 interface DocInterface extends DocBase {
   kind: 'interface'
-  isExported: boolean
+  exported: null | { name: string }
   properties: {
     jsDoc: null | JSDocContent
     name: string

@@ -35,10 +35,10 @@ export function render(docs: Docs, opts: Options): string {
   d.add(
     section('Exported Types').add(
       ...Object.values(docs.typeIndex)
-        .filter(type => type.isExported)
+        .filter(type => type.exported)
         .map(type => {
           // todo export text presence seems like an extraction concern
-          return section(codeSpan(type.name)).add(
+          return section(codeSpan(type.exported!.name)).add(
             codeBlock('ts', type.textWithJSDoc.replace(/export /, ''))
           )
         })
@@ -48,7 +48,7 @@ export function render(docs: Docs, opts: Options): string {
   d.add(
     section('Type Index').add(
       ...Object.values(docs.typeIndex)
-        .filter(type => !type.isExported)
+        .filter(type => !type.exported)
         .map(type => {
           // todo export text presence seems like an extraction concern
           return section(codeSpan(type.name)).add(

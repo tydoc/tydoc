@@ -70,7 +70,8 @@ it('renders markdown', () => {
         export function bar() {}
         export const toto = () => {}
         export const fofo = function fofo2() {}
-        export interface A {
+        export { A as AAlias }
+        interface A {
           /**
            * About a...
            */
@@ -122,7 +123,7 @@ it('renders markdown', () => {
 
 ### Exported Types
 
-#### \`A\`
+#### \`AAlias\`
 
 \`\`\`ts
 interface A {
