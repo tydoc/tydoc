@@ -16,17 +16,55 @@ export interface Docs {
   length: number
 }
 
+interface DocsManager {
+  add(docItem: DocItem): DocsManager
+  getTypeDoc(name: string): null | DocTypeAlias | DocInterface
+  addTypeDoc(docItem: DocTypeAlias | DocInterface): DocsManager
+  data(): Docs
+}
+
 /**
  * Create a new set of docs.
  */
-function createDocs(): Docs {
-  return {
+function createDocs(): DocsManager {
+  const data: Docs = {
     terms: [],
     hybrids: [],
     types: [],
     typeIndex: {},
     length: 0,
   }
+
+  const api: DocsManager = {
+    /**
+     * Add a doc item to docs.
+     */
+    add(doc) {
+      data[
+        doc.languageLevel === 'term'
+          ? 'terms'
+          : doc.languageLevel === 'type'
+          ? 'types'
+          : doc.languageLevel === 'hybrid'
+          ? 'hybrids'
+          : casesHandled(doc.languageLevel)
+      ].push(doc)
+      data.length++
+      return api
+    },
+    getTypeDoc(name) {
+      return data.typeIndex[name] ?? null
+    },
+    addTypeDoc(docItem) {
+      data.typeIndex[docItem.name] = docItem
+      return api
+    },
+    data() {
+      return data
+    },
+  }
+
+  return api
 }
 
 interface JSDocBlock {
@@ -123,7 +161,17 @@ export interface DocInterface extends DocBase {
   }[]
 }
 
-export type DocItem = DocFunction | DocVariable | DocTypeAlias | DocInterface
+export interface DocObject extends DocBase {
+  kind: 'object'
+  properties: { name: string; type: TypeData }[]
+}
+
+export type DocItem =
+  | DocObject
+  | DocFunction
+  | DocVariable
+  | DocTypeAlias
+  | DocInterface
 
 type TypeIndex = Record<string, DocItem>
 
@@ -145,19 +193,19 @@ export function extractDocsFromModuleAtPath(filePath: string) {
 }
 
 function extractExportedInterface(
-  typeIndex: TypeIndex,
+  docs: DocsManager,
   exportName: string,
   dec: tsm.InterfaceDeclaration
 ): void {
-  extractInterface(exportName, typeIndex, dec)
+  extractInterface(exportName, docs, dec)
 }
 
 function extractInterface(
   exportName: null | string,
-  typeIndex: TypeIndex,
+  docs: DocsManager,
   dec: tsm.InterfaceDeclaration
 ): void {
-  if (typeIndex[dec.getName()]) return
+  if (docs.getTypeDoc(dec.getName())) return
 
   const docItem: DocInterface = {
     ...extractCommon(dec),
@@ -173,7 +221,7 @@ function extractInterface(
       if (type.isInterface()) {
         extractInterface(
           null,
-          typeIndex,
+          docs,
           type.getSymbol()!.getDeclarations()[0]! as tsm.InterfaceDeclaration
         )
       }
@@ -189,8 +237,36 @@ function extractInterface(
     }),
   }
 
-  typeIndex[docItem.name] = docItem
+  docs.addTypeDoc(docItem)
 }
+
+// function extractObject(
+//   exportName: string,
+//   docs: DocsManager,
+//   node: tsm.ObjectLiteralExpression
+// ) {
+//   type.getProperties().map(prop => {})
+//   docs.add({
+//     ...extractCommon(dec),
+//     kind: 'object',
+//     jsDoc,
+//     languageLevel: 'term',
+//     name: dec.getName(),
+//     text: dec.getText(),
+//     textWithJSDoc: dec.getFullText(),
+//     properties: initializer
+//       .getType()
+//       .getProperties()
+//       .map(prop => {
+//         return {
+//           name: prop.getName(),
+//           type: {
+//             name: prop.getType().getText(),
+//           },
+//         }
+//       }),
+//   })
+// }
 
 /**
  * Extract docs from the given module.
@@ -205,17 +281,17 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
     if (tsm.Node.isFunctionDeclaration(dec)) {
       const doc = extractFunction(dec) as DocFunction
       doc.name = name
-      addDoc(docs, doc)
+      docs.add(doc)
       continue
     }
 
     if (tsm.Node.isInterfaceDeclaration(dec)) {
-      extractExportedInterface(docs.typeIndex, name, dec)
+      extractExportedInterface(docs, name, dec)
       continue
     }
 
     if (tsm.Node.isTypeAliasDeclaration(dec)) {
-      addDoc(docs, {
+      docs.add({
         ...extractCommon(dec),
         kind: 'typeAlias',
         languageLevel: 'type',
@@ -251,6 +327,12 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
     }
 
     if (tsm.Node.isVariableDeclaration(dec)) {
+      // jsDoc lives at var statement level
+      const statement = dec.getParent().getParent()
+      const jsDoc = tsm.Node.isVariableStatement(statement)
+        ? extractJSDoc(statement)
+        : null
+
       // If the variable is pointing to a function we will treat it like as if
       // it were a function declaration.
       const initializer = dec.getInitializer()
@@ -261,19 +343,18 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
         ) {
           const doc = extractFunction(initializer) as DocFunction
           doc.name = name
-          addDoc(docs, doc)
+          docs.add(doc)
           continue
         }
+        // if (tsm.Node.isObjectLiteralExpression(initializer)) {
+        //   extractObject(name, docs, initializer)
+        //   continue
+        // }
       }
 
-      // jsDoc lives at var statement level
-      const statement = dec.getParent().getParent()
-      const jsDoc = tsm.Node.isVariableStatement(statement)
-        ? extractJSDoc(statement)
-        : null
       const typeName = dec.getType().getText()
 
-      addDoc(docs, {
+      docs.add({
         ...extractCommon(dec),
         kind: 'variable',
         languageLevel: 'term',
@@ -297,25 +378,10 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
     )
   }
 
-  return docs
-
-  /**
-   * Add a doc item to docs.
-   */
-  function addDoc(docs: Docs, doc: DocItem): Docs {
-    docs[
-      doc.languageLevel === 'term'
-        ? 'terms'
-        : doc.languageLevel === 'type'
-        ? 'types'
-        : doc.languageLevel === 'hybrid'
-        ? 'hybrids'
-        : casesHandled(doc.languageLevel)
-    ].push(doc)
-    docs.length++
-    return docs
-  }
+  return docs.data()
 }
+
+// function extractObjectLiteral(node:tsm.object){}
 
 /**
  * Extract doc data that is common to all doc items from the given declaration.
