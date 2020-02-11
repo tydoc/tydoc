@@ -10,7 +10,7 @@ function createContextt() {
   })
 
   const api = {
-    markdown(opts: jsde.renderMarkdownOptions, ...sources: string[]) {
+    markdown(opts: jsde.RenderMarkdownOptions, ...sources: string[]) {
       return jsde.renderMarkdown(api.given(...sources), opts)
     },
     /**
