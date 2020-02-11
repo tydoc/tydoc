@@ -20,21 +20,21 @@ Work in progress 👷‍
 
 <!-- prettier-ignore -->
 ```ts
-(docs: import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs, opts: import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/render/markdown").Options) => string
+(docs: Docs, opts: Options) => string
 ```
 
 ### `extractDocsFromModuleAtPath`
 
 <!-- prettier-ignore -->
 ```ts
-(filePath: string) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
+(filePath: string) => Docs
 ```
 
 ### `extractDocsFromModule`
 
 <!-- prettier-ignore -->
 ```ts
-(sourceFile: import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/node_modules/ts-morph/lib/ts-morph").SourceFile) => import("/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract").Docs
+(sourceFile: SourceFile) => Docs
 ```
 
 ### Exported Types

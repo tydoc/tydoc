@@ -203,7 +203,7 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
     const dec = decs[0]
 
     if (dec instanceof tsm.FunctionDeclaration) {
-      const doc = extractDocsFromFunction(dec) as DocFunction
+      const doc = extractFunction(dec) as DocFunction
       doc.name = name
       addDoc(docs, doc)
       continue
@@ -259,7 +259,7 @@ export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
           initializer instanceof tsm.ArrowFunction ||
           initializer instanceof tsm.FunctionExpression
         ) {
-          const doc = extractDocsFromFunction(initializer) as DocFunction
+          const doc = extractFunction(initializer) as DocFunction
           doc.name = name
           addDoc(docs, doc)
           continue
@@ -339,7 +339,7 @@ function extractCommon(dec: tsm.ExportedDeclarations) {
  * full doc data because jsDoc is kept on variable declarations and name should
  * be the exported one not the maybe-present explicit function expression name.
  */
-function extractDocsFromFunction(
+function extractFunction(
   node: tsm.ArrowFunction | tsm.FunctionExpression | tsm.FunctionDeclaration
 ): Omit<DocFunction, 'name'> {
   // todo anything useful we can by revealing explicitly named function expressions?
@@ -428,7 +428,7 @@ function extractJSDoc(node: tsm.JSDocableNode): null | JSDocContent {
 
 function getTypeData(type: tsm.Type): TypeData {
   return {
-    name: type.getText(),
+    name: type.getText(undefined, tsm.ts.TypeFormatFlags.None),
   }
 }
 

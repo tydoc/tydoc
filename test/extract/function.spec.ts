@@ -34,6 +34,45 @@ it('if function expression given name different than variable, is ignored', () =
   ).toEqual('foo')
 })
 
+it('signature text does not render param types in fully qualified style (import("...").<...>)', () => {
+  expect(
+    ctx.given(
+      `
+        import { A } from './b'
+        export function foo (a: A) {}
+      `,
+      `
+        export interface A {}
+      `
+    )
+  ).toMatchSnapshot()
+})
+
+it.todo('sig param type from dep is is qualified if option set so')
+it.todo(
+  'sig param type in qualified style shows path relative to package root basd on real package main setting'
+)
+it.todo(
+  "sig param type in qualified style that is of dep's main module shows only the package name"
+)
+it.todo(
+  'externally visible types from deps make those types part of the api type index'
+)
+it.todo(
+  'if two types from different modules would conflict in the type index then they are qualified by module name pascal-case named'
+)
+
+it('signature text does render param types in fully qualified style (import("...").<...>) for types from dependencies', () => {
+  expect(
+    ctx.given(
+      `
+        import { SourceFile } from 'ts-morph'
+        export function foo (a: SourceFile) {}
+      `
+    )
+  ).toMatchSnapshot()
+})
+
 describe('jsdoc', () => {
   it('is null when no jsDoc is present', () => {
     expect(
