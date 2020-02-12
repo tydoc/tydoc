@@ -5,3 +5,7 @@
 export function casesHandled(x: never): never {
   throw new Error(`A case was not handled for value: ${x}`)
 }
+
+export function dump(...args: any[]) {
+  console.error(...args)
+}

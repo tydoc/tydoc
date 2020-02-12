@@ -1,3 +1,4 @@
+import * as tsm from 'ts-morph'
 import * as Docman from './docman'
 
 /**
@@ -5,18 +6,13 @@ import * as Docman from './docman'
  */
 export function extractDocsFromModuleAtPath(filePath: string): Docman.Docs {
   const project = new tsm.Project({ addFilesFromTsConfig: true })
-
   project.addSourceFileAtPathIfExists(filePath)
-
   const source = project.getSourceFile(filePath)
-
   if (!source) {
     throw new Error(`No file at ${filePath}`)
   }
-
   // todo hoist to higher level, extractDocsFromProject
   const docman = Docman.create()
-
   return extractDocsFromModule(docman, source)
 }
 
@@ -44,15 +40,14 @@ export function extractDocsFromModule(
     } else {
       docExport.isMain = false
     }
-    if (tsm.Node.isTypeNode(node)) {
+    if (isTypeLevel(node)) {
       mod.exported.types.push(docExport)
     } else {
       mod.exported.terms.push(docExport)
       docExport.type = getTypeName(node.getType())
-      extractDocsFromVisibleType(docman, node.getType())
     }
+    extractDocsFromVisibleType(docman, node.getType())
   }
-
   return docman.data()
 }
 
@@ -69,6 +64,14 @@ function extractDocsFromVisibleType(docman: Docman.Docman, type: tsm.Type) {
   docman.data().typeIndex[typeName] = true as any
   docman.data().typeIndex[typeName] = {
     name: typeName,
+    nameApparent: type.getApparentType().getText(),
+    target: type.getTargetType()?.getText(),
+    symbol: type.getSymbol()?.getName(),
+    isAlias: type.getSymbol()?.isAlias(),
+    valDec: type
+      .getSymbol()
+      ?.getValueDeclaration()
+      ?.getText(),
     isCallable: isCallable(type),
     properties: props.map(propSym => {
       const sig = propSym.getDeclarations()[0] as  // todo why multiple?
@@ -86,9 +89,9 @@ function extractDocsFromVisibleType(docman: Docman.Docman, type: tsm.Type) {
         propName = struct.name
         typeName = 'todo' // todo
       }
-      if (type.getSymbol()?.getName() === undefined) {
-        dump(sig.getStructure())
-      }
+      // if (type.getSymbol()?.getName() === undefined) {
+      //   dump(sig.getStructure())
+      // }
       extractDocsFromVisibleType(docman, type)
       return {
         name: propName,
@@ -141,6 +144,9 @@ function isCallable(t: tsm.Type): boolean {
   return t.getCallSignatures().length > 0
 }
 
-function dump(...args: any[]) {
-  console.error(...args)
+function isTypeLevel(node: tsm.Node) {
+  return (
+    tsm.Node.isTypeAliasDeclaration(node) ||
+    tsm.Node.isInterfaceDeclaration(node)
+  )
 }
