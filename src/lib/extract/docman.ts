@@ -71,10 +71,17 @@ export interface DocModule {
   }
 }
 
+export type TypeInfo = {
+  name: string
+  isPrim: boolean
+  isRef: boolean
+  isLit: boolean
+}
+
 export interface DocExport {
   isMain: boolean
-  name: string
-  type: string
+  exportName: string
+  type: TypeInfo
 }
 
 /**
