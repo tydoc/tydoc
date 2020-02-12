@@ -27,14 +27,14 @@ Work in progress 👷‍
 
 <!-- prettier-ignore -->
 ```ts
-(filePath: string) => Docs
+(filePath: ('./a/b').SourceFile) => Docs
 ```
 
 ### `extractDocsFromModule`
 
 <!-- prettier-ignore -->
 ```ts
-(sourceFile: SourceFile) => Docs
+(sourceFile: ('./a/c').SourceFile) => Docs
 ```
 
 ### Exported Types
@@ -116,6 +116,15 @@ interface DocInterface extends DocBase {
       name: string
     }
   }[]
+}
+```
+
+#### `DocObject`
+
+```ts
+interface DocObject extends DocBase {
+  kind: 'object'
+  properties: { name: string; type: TypeData }[]
 }
 ```
 

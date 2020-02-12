@@ -3,8 +3,9 @@ it('extracts doc from interface', () => {
     ctx.given(`
       export interface A {
         foo: string
-        bar: string
+        bar: B
       }
+      interface B {}
     `)
   ).toMatchSnapshot()
 })

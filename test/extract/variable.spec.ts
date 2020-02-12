@@ -27,6 +27,18 @@ it('extracts the type name', () => {
   ])
 })
 
+describe.only('variable objects', () => {
+  it('documents an object if the variable points to an object', () => {
+    expect(
+      ctx.given(`
+        export const foo = { a: "" }
+        export const bar: Bar = { a: "flip" }
+        interface Bar { a: "flip" }
+      `)
+    ).toMatchSnapshot()
+  })
+})
+
 describe('jsdoc', () => {
   it('is null when no jsDoc is present', () => {
     expect(

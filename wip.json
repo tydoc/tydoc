@@ -1,0 +1,248 @@
+{
+  "modules": [
+    {
+      "name": "index",
+      "exported": {
+        "hasMain": true,
+        "terms": [
+          {
+            "name": "default",
+            "isMain": true,
+            "type": "App"
+          },
+          {
+            "name": "log",
+            "isMain": false,
+            "type": "Logger"
+          },
+          {
+            "name": "schema",
+            "isMain": false,
+            "type": "Schema"
+          },
+          {
+            "name": "server",
+            "isMain": false,
+            "type": "ServerWithCustomizer"
+          },
+          {
+            "name": "settings",
+            "isMain": false,
+            "type": "Settings"
+          }
+        ],
+        "types": []
+      },
+      "absoluteFilePath": "/Users/jasonkuhrt/projects/nexus/nexus-future/src/index.ts",
+      "projectRelativeFilePath": "todo"
+    }
+  ],
+  "terms": [],
+  "hybrids": [],
+  "types": [],
+  "typeIndex": {
+    "App": {
+      "name": "App",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "log",
+          "type": "Logger.Logger"
+        },
+        {
+          "name": "server",
+          "type": "Server.ServerWithCustomizer"
+        },
+        {
+          "name": "settings",
+          "type": "Settings"
+        },
+        {
+          "name": "schema",
+          "type": "Schema"
+        }
+      ],
+      "signatures": []
+    },
+    "Logger": {
+      "name": "Logger",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "fatal",
+          "type": "Log"
+        },
+        {
+          "name": "error",
+          "type": "Log"
+        },
+        {
+          "name": "warn",
+          "type": "Log"
+        },
+        {
+          "name": "info",
+          "type": "Log"
+        },
+        {
+          "name": "debug",
+          "type": "Log"
+        },
+        {
+          "name": "trace",
+          "type": "Log"
+        },
+        {
+          "name": "addToContext",
+          "type": "(context: Context) => Logger"
+        },
+        {
+          "name": "child",
+          "type": "(name: string) => Logger"
+        }
+      ],
+      "signatures": []
+    },
+    "ServerWithCustomizer": {
+      "name": "ServerWithCustomizer",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "custom",
+          "type": "(customizer: Customizer) => void"
+        },
+        {
+          "name": "start",
+          "type": "todo"
+        },
+        {
+          "name": "stop",
+          "type": "todo"
+        }
+      ],
+      "signatures": []
+    },
+    "Settings": {
+      "name": "Settings",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "original",
+          "type": "SettingsData"
+        },
+        {
+          "name": "current",
+          "type": "SettingsData"
+        },
+        {
+          "name": "change",
+          "type": "todo"
+        }
+      ],
+      "signatures": []
+    },
+    "Readonly<{ logger: Readonly<{ level: Level; pretty: Readonly<{ enabled: boolean; color: boolean; levelLabel: boolean; timeDiff: boolean; }>; output: Output; }>; schema: SettingsInput; server: Required<...>; }>": {
+      "name": "Readonly<{ logger: Readonly<{ level: Level; pretty: Readonly<{ enabled: boolean; color: boolean; levelLabel: boolean; timeDiff: boolean; }>; output: Output; }>; schema: SettingsInput; server: Required<...>; }>",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "logger",
+          "type": "Logger.SettingsData"
+        },
+        {
+          "name": "schema",
+          "type": "SchemaC.SettingsData"
+        },
+        {
+          "name": "server",
+          "type": "Server.ExtraSettingsData"
+        }
+      ],
+      "signatures": []
+    },
+    "Readonly<{ level: Level; pretty: Readonly<{ enabled: boolean; color: boolean; levelLabel: boolean; timeDiff: boolean; }>; output: Output; }>": {
+      "name": "Readonly<{ level: Level; pretty: Readonly<{ enabled: boolean; color: boolean; levelLabel: boolean; timeDiff: boolean; }>; output: Output; }>",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "level",
+          "type": "Level.Level"
+        },
+        {
+          "name": "pretty",
+          "type": "Readonly<{\nenabled: boolean\ncolor: boolean\nlevelLabel: boolean\ntimeDiff: boolean\n}>"
+        },
+        {
+          "name": "output",
+          "type": "Output.Output"
+        }
+      ],
+      "signatures": []
+    },
+    "Readonly<{ enabled: boolean; color: boolean; levelLabel: boolean; timeDiff: boolean; }>": {
+      "name": "Readonly<{ enabled: boolean; color: boolean; levelLabel: boolean; timeDiff: boolean; }>",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "enabled",
+          "type": "boolean"
+        },
+        {
+          "name": "color",
+          "type": "boolean"
+        },
+        {
+          "name": "levelLabel",
+          "type": "boolean"
+        },
+        {
+          "name": "timeDiff",
+          "type": "boolean"
+        }
+      ],
+      "signatures": []
+    },
+    "Output": {
+      "name": "Output",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "write",
+          "type": "(message: string) => void"
+        }
+      ],
+      "signatures": []
+    },
+    "SettingsInput": {
+      "name": "SettingsInput",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "connections",
+          "type": "ConnectionConfig & {\n    // We tried the idea of types.default: false | ConnectionConfig\n    // but got blocked by https://github.com/microsoft/TypeScript/issues/17867\n\n    /**\n     * todo\n     *\n     * @default `false`\n     */\n    disableDefaultType?: boolean\n    /**\n     * todo\n     */\n    types?: {\n      default?: ConnectionConfig\n      // Extra undefined below is forced by it being above, forced via `?:`.\n      // This is a TS limitation, cannot express void vs missing semantics,\n      // being tracked here: https://github.com/microsoft/TypeScript/issues/13195\n      [typeName: string]: ConnectionConfig | undefined\n    }\n  }"
+        }
+      ],
+      "signatures": []
+    },
+    "Required<ExtraSettingsInput>": {
+      "name": "Required<ExtraSettingsInput>",
+      "isCallable": false,
+      "properties": [
+        {
+          "name": "port",
+          "type": "number"
+        },
+        {
+          "name": "playground",
+          "type": "boolean"
+        },
+        {
+          "name": "startMessage",
+          "type": "(address: { port: number; host: string; ip: string }) => void"
+        }
+      ],
+      "signatures": []
+    }
+  },
+  "length": 0
+}

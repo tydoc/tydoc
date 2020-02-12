@@ -63,3 +63,54 @@ Object {
   },
 }
 `;
+
+exports[`variable objects documents an object if the variable points to an object 1`] = `
+Object {
+  "hybrids": Array [],
+  "length": 2,
+  "terms": Array [
+    Object {
+      "jsDoc": null,
+      "kind": "object",
+      "languageLevel": "term",
+      "name": "foo",
+      "properties": Array [
+        Object {
+          "name": "a",
+          "type": Object {
+            "name": "string",
+          },
+        },
+      ],
+      "sourceLocation": Object {
+        "fileLine": 1,
+        "filePath": "/a.ts",
+      },
+      "text": "{ a: \\"\\" }",
+      "textWithJSDoc": " { a: \\"\\" }",
+    },
+    Object {
+      "jsDoc": null,
+      "kind": "object",
+      "languageLevel": "term",
+      "name": "bar",
+      "properties": Array [
+        Object {
+          "name": "a",
+          "type": Object {
+            "name": "\\"flip\\"",
+          },
+        },
+      ],
+      "sourceLocation": Object {
+        "fileLine": 2,
+        "filePath": "/a.ts",
+      },
+      "text": "{ a: \\"flip\\" }",
+      "textWithJSDoc": " { a: \\"flip\\" }",
+    },
+  ],
+  "typeIndex": Object {},
+  "types": Array [],
+}
+`;

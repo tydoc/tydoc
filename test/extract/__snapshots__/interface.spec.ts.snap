@@ -81,8 +81,8 @@ Object {
           "jsDoc": null,
           "name": "bar",
           "type": Object {
-            "isPrimitive": true,
-            "name": "string",
+            "isPrimitive": false,
+            "name": "B",
           },
         },
       ],
@@ -92,12 +92,26 @@ Object {
       },
       "text": "export interface A {
   foo: string;
-  bar: string;
+  bar: B;
 }",
       "textWithJSDoc": "export interface A {
   foo: string;
-  bar: string;
+  bar: B;
 }",
+    },
+    "B": Object {
+      "exported": null,
+      "jsDoc": null,
+      "kind": "interface",
+      "languageLevel": "type",
+      "name": "B",
+      "properties": Array [],
+      "sourceLocation": Object {
+        "fileLine": 5,
+        "filePath": "/a.ts",
+      },
+      "text": "interface B {}",
+      "textWithJSDoc": "interface B {}",
     },
   },
   "types": Array [],
