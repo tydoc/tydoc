@@ -339,12 +339,6 @@ function extractTypeDocFromPrimitive(n: tsm.Node): Docman.DocTypePrimitive {
   }
 }
 
-function isInline(t: tsm.Type): boolean {}
-
-// function isTerminalType(t: tsm.Type): boolean {
-//   return t.isLiteral() || isPrimitive(t) || t.isAny()
-// }
-
 function isLiteral(t: tsm.Type): boolean {
   return t.isLiteral()
 }
@@ -359,69 +353,10 @@ function isPrimitive(t: tsm.Type): boolean {
     t.isString() ||
     t.isBoolean() ||
     t.isUndefined() ||
-    t.isUnknown()
+    t.isUnknown() ||
+    t.isAny()
   )
 }
-
-// function getTypeInfo(tn: tsm.Type | tsm.Node): Docman.TypeInfo {
-//   const t = isNode(tn) ? tn.getType() : tn
-//   return {
-//     name: getTypeName(tn),
-//     isPrim: isPrimitive(t),
-//     isRef: !(isPrimitive(t) || t.isLiteral()),
-//     isLit: t.isLiteral(),
-//     isCallable: false, // todo
-//   }
-// }
-
-// function getTypeName(
-//   tn: tsm.Type | tsm.Node
-//   // | tsm.TypeAliasDeclaration
-//   // | tsm.InterfaceDeclaration
-//   // | tsm.PropertySignature
-//   // | tsm.ParameterDeclaration
-// ): string {
-//   if (isNode(tn)) {
-//     if (tsm.Node.isParameterDeclaration(tn)) {
-//       const struct = tn.getStructure()
-//       if (isUndefined(struct.type)) {
-//         return 'unknown'
-//       } else if (isString(struct.type)) {
-//         return struct.type
-//       } else {
-//         // typeName = struct.type(new tsm.CodeBlockWriter()) // todo
-//         return 'unknown'
-//       }
-//     }
-//     if (tsm.Node.isTypeAliasDeclaration(tn)) {
-//       // todo code comment why symvol would be undefined
-//       const s = tn.getSymbol()
-//       if (s) {
-//         return s.getName()
-//       }
-//     }
-//     if (tsm.Node.isInterfaceDeclaration(tn)) {
-//       return tn.getName()
-//     }
-//     if (tsm.Node.isPropertySignature(tn)) {
-//       const struct = tn.getStructure()
-//       if (isUndefined(struct.type)) {
-//         return 'unknown'
-//       } else if (isString(struct.type)) {
-//         return struct.type
-//       } else {
-//         // typeName = struct.type(new tsm.CodeBlockWriter()) // todo
-//         return 'unknown'
-//       }
-//     }
-//   }
-
-//   return tn.getText(undefined, tsm.ts.TypeFormatFlags.None)
-// }
-
-// function isTypeCallable(t: tsm.Type): boolean {
-//   return t.getCallSignatures().length > 0
-// }
 
 function isNodeAtTypeLevel(node: tsm.Node) {
   return (
