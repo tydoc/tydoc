@@ -1,7 +1,6 @@
 import * as Prettier from 'prettier'
 import * as tsm from 'ts-morph'
 import * as jsde from '../src'
-import * as Docman from '../src/lib/extract/docman'
 
 function createContextt() {
   const project = new tsm.Project({
@@ -23,16 +22,18 @@ function createContextt() {
       const sourcesFormatted = sources.map(source =>
         Prettier.format(source, { parser: 'typescript' })
       )
-      const sourceFiles = sourcesFormatted
+      sourcesFormatted
         .map(source => [letters.shift()!, source])
-        .map(([moduleName, source]) =>
+        .forEach(([moduleName, source]) =>
           project.createSourceFile(`${moduleName}.ts`, source, {
             overwrite: true,
           })
         )
-      const entrypoint = sourceFiles[0]
-      const docman = Docman.create()
-      return jsde.extractDocsFromModule(docman, entrypoint)
+
+      return jsde.extractDocsFromProject({
+        entrypoints: ['a'],
+        project: project,
+      })
     },
   }
 

@@ -1,5 +1,5 @@
-import { Docs } from '../extract/extract'
-import { codeBlock, codeSpan, document, section } from '../lib/markdown'
+import * as D from '../extract/docman'
+import { codeSpan, document, Element, section } from '../lib/markdown'
 
 export interface Options {
   /**
@@ -12,51 +12,74 @@ export interface Options {
 /**
  * Render docs as Markdown.
  */
-export function render(docs: Docs, opts: Options): string {
+export function render(docs: D.DocPackage, opts: Options): string {
   const d = document()
 
-  // once multiple modules are supported, we will need to have module sections
-  // md += '## Default Module\n\n'
+  if (docs.modules.length === 0) {
+    // do nothing
+  } else if (docs.modules.length === 1) {
+    d.add(...renderModule(opts, docs.modules[0], docs.typeIndex))
+  } else {
+    d.add(
+      ...docs.modules.map(mod => {
+        return section(codeSpan(mod.name)).add(
+          ...renderModule(opts, mod, docs.typeIndex)
+        )
+      })
+    )
+  }
 
-  const exportedTerms = docs.terms.map(term => {
-    const s = section(codeSpan(term.name))
-    if (term.kind === 'function') {
-      s.add('<!-- prettier-ignore -->', codeBlock('ts', term.signature.text))
+  return d.render({ level: 3 })
+}
+
+/**
+ * Render one module of the package.
+ */
+function renderModule(
+  opts: Options,
+  mod: D.DocModule,
+  ti: D.TypeIndex
+): Element[] {
+  const exportedTypes = mod.namedExports.filter(ex => ex.isType)
+  const exportedTerms = mod.namedExports.filter(ex => ex.isTerm)
+
+  const g = []
+  const exportedTermsContent = exportedTerms.map(ex => {
+    const s = section(codeSpan(ex.name))
+    if (ex.type.kind === 'function') {
+      // todo
+      // s.add('<!-- prettier-ignore -->', codeBlock('ts', ex.signature.text))
     }
     return s
   })
 
   const exportedTermsSection = opts.flatTermsSection
-    ? exportedTerms
-    : [section('Exported Terms').add(...exportedTerms)]
+    ? exportedTermsContent
+    : [section('Exported Terms').add(...exportedTermsContent)]
 
-  d.add(...exportedTermsSection)
+  g.push(...exportedTermsSection)
 
-  d.add(
+  g.push(
     section('Exported Types').add(
-      ...Object.values(docs.typeIndex)
-        .filter(type => type.exported)
-        .map(type => {
-          // todo export text presence seems like an extraction concern
-          return section(codeSpan(type.exported!.name)).add(
-            codeBlock('ts', type.textWithJSDoc.replace(/export /, ''))
-          )
-        })
+      ...exportedTypes.map(ext => {
+        return section(codeSpan(ext.name))
+        // .add(
+        //   codeBlock('ts', type.textWithJSDoc.replace(/export /, ''))
+        // )
+      })
     )
   )
 
-  d.add(
+  g.push(
     section('Type Index').add(
-      ...Object.values(docs.typeIndex)
-        .filter(type => !type.exported)
-        .map(type => {
-          // todo export text presence seems like an extraction concern
-          return section(codeSpan(type.name)).add(
-            codeBlock('ts', type.textWithJSDoc.replace(/export /, ''))
-          )
-        })
+      ...Object.values(ti).map(type => {
+        return section(codeSpan(type.name))
+        // .add(
+        //   codeBlock('ts', type.textWithJSDoc.replace(/export /, ''))
+        // )
+      })
     )
   )
 
-  return d.render({ level: 3 })
+  return g
 }

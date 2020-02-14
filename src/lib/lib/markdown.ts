@@ -8,23 +8,23 @@ interface Renderable {
 
 type SectionData = {
   title: string
-  children: RenderLike[]
+  children: Element[]
 }
 
 interface Section extends Renderable {
-  add(...content: RenderLike[]): Section
+  add(...content: Element[]): Section
 }
 
 interface CodeBlock extends Renderable {}
 
 type DocumentData = {
-  children: RenderLike[]
+  children: Element[]
 }
 
-type RenderLike = Renderable | string
+export type Element = Renderable | string
 
 interface Document extends Renderable {
-  add(...content: RenderLike[]): Section
+  add(...content: Element[]): Section
 }
 
 /**
@@ -121,3 +121,32 @@ export function heading(n: number, content: string): string {
 export function codeSpan(content: string): string {
   return `\`${content}\``
 }
+
+interface Group {
+  add(...elements: Element[]): Group
+  render(state: RenderState): string
+}
+
+// /**
+//  * Create a flat grouping of content. This is just a little wrapper around
+//  * effectively an array of elements. This is handy to be able to easily go
+//  * between flat and non-flat content without having to go through potentially
+//  * unwanted refactoring.
+//  */
+// export function group(): Group {
+//   const data = {
+//     elements: [],
+//   }
+//   const api: Group = {
+//     add(...elements) {
+//       elements.push(...elements)
+//       return api
+//     },
+//     render(state){
+//       return data.elements.map((c,el) => {
+//         if (typeof el === 'string') c +
+//       })
+//     }
+//   }
+//   return api
+// }

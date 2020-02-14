@@ -1,14 +1,13 @@
 import * as fs from 'fs-jetpack'
 import * as path from 'path'
-import { extractDocsFromModuleAtPath, renderMarkdown } from '../src'
+import { extractDocsFromProject, renderMarkdown } from '../src'
 
+const docsData = extractDocsFromProject({ entrypoints: ['index'] })
+const docsMarkdown = renderMarkdown(docsData, { flatTermsSection: true })
 updateMarkdownBlock(
   path.join(__dirname, '../README.md'),
   'api docs',
-  renderMarkdown(
-    extractDocsFromModuleAtPath(path.join(__dirname, '../src/index.ts')),
-    { flatTermsSection: true }
-  )
+  docsMarkdown
 )
 
 /**

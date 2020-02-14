@@ -1,3 +1,5 @@
+import { inspect } from 'util'
+
 /**
  * Use this to make assertion at end of if-else chain that all members of a
  * union have been accounted for.
@@ -7,5 +9,6 @@ export function casesHandled(x: never): never {
 }
 
 export function dump(...args: any[]) {
-  console.error(...args)
+  const argsInspected = args.map(a => inspect(a, { depth: 20 }))
+  console.error(...argsInspected)
 }
