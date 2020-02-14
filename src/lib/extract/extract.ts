@@ -109,15 +109,17 @@ function extractDocsFromNode(
   n: tsm.Node
 ): Docman.DocType {
   const debug = isAPIExport ? Debug('extract:export') : Debug('extract:visible')
+  debug('start doc %s ', n.getKindName())
 
   // todo hack...
   if (depth > 3) {
     debug('depth limit reached')
     return { kind: 'unknown', name: '?' }
   }
+
   const t = n.getType()
   const fqtn = getFullyQualifiedTypeName(t)
-  debug('start doc %s (%s)', fqtn, n.getKindName())
+  debug('type is %s', fqtn)
   const isTerm = tsm.Node.isFunctionDeclaration(n)
 
   if (isPrimitive(t)) {
@@ -281,18 +283,35 @@ function getFullyQualifiedTypeName(t: tsm.Type): string {
   //   )
   // )
   // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.MultilineObjectLiterals))
-  if (isInline(t)) {
+  const sym = t.getSymbol()
+  if (!sym) {
+    debug('no symbol, considering this type to be inline')
     return '__INLINE__'
   }
-  const s = t.getSymbol()! // guarded by inline check above
-  const sourceFile = s.getDeclarations()[0].getSourceFile()
+
+  let typeName: string
+
+  const aliasSym = t.getAliasSymbol()
+  if (aliasSym) {
+    typeName = aliasSym.getName()
+  } else if (sym.getName() === '__type') {
+    debug(
+      'type has no alias symbol and its own symbol is named "__type", so considering it to be inline'
+    )
+    return '__INLINE__'
+  } else {
+    // todo what would get name be here then...?
+    // typeName = sym.getName()
+    typeName = t.getText(undefined, tsm.ts.TypeFormatFlags.None)
+  }
+
+  const sourceFile = sym.getDeclarations()[0].getSourceFile()
   const filePath = sourceFile.getFilePath()
   const fileDirPath = path.dirname(filePath)
   const qualifyPath = path.join(
     fileDirPath,
     sourceFile.getBaseNameWithoutExtension()
   )
-  const typeName = t.getText(undefined, tsm.ts.TypeFormatFlags.None)
   const fqtn = `("${qualifyPath}").${typeName}`
   return fqtn
 }
@@ -320,18 +339,7 @@ function extractTypeDocFromPrimitive(n: tsm.Node): Docman.DocTypePrimitive {
   }
 }
 
-function isInline(t: tsm.Type): boolean {
-  const s = t.getSymbol()
-  if (!s) {
-    debug('no symbol, considering this type to be inline')
-    return true
-  }
-  if (s.getName() === '__type') {
-    debug('symbol is named "__type" so considering it to be inline')
-    return true
-  }
-  return false
-}
+function isInline(t: tsm.Type): boolean {}
 
 // function isTerminalType(t: tsm.Type): boolean {
 //   return t.isLiteral() || isPrimitive(t) || t.isAny()
