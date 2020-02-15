@@ -54,7 +54,7 @@ export function extractDocsFromProject(opts: Options): Doc.DocPackage {
     sourceFileEntrypoints.push(sf)
   }
 
-  const docman = Doc.create()
+  const docman = Doc.createManager()
   sourceFileEntrypoints.forEach(sf => {
     extractDocsFromModule(docman, sf)
   })
@@ -281,73 +281,3 @@ function extractPropertyDocsFromType(
     })
   })
 }
-
-// /**
-//  * Return the type symbol for a type. If the type has an alias available, use
-//  * that. If the type is named somehow otherwise, use that.
-//  */
-// function getSymbolPreferingAlias(t: tsm.Type): undefined | tsm.Symbol {
-//   debug('searching for symbol for type %s', t.getText())
-//   const asym = t.getAliasSymbol()
-//   if (asym) {
-//     debug('found alias %s', asym.getName())
-//     return asym
-//   }
-//   const s = t.getSymbol()
-//   if (s) {
-//     debug('found concrete %s', s.getName())
-//     return s
-//   }
-//   debug('type has no symbol')
-// }
-
-function isTypeIndexableNode(n: tsm.Node): boolean {
-  return (
-    tsm.Node.isTypeAliasDeclaration(n) || tsm.Node.isInterfaceDeclaration(n)
-  )
-}
-
-// /**
-//  * Get the FQTN from a node.
-//  *
-//  * The reason we want to do this from a node rather than a type is that there
-//  * seems to be some information that we can only get from a now. Namely when a
-//  * node is a type literal, getting the type from that literal will reveal the
-//  * type alias point to it, rather than the literal type structure. This means it
-//  * is impossible (seems so) to tell a literal type from the type object alone.
-//  */
-// function getFullyQualifiedTypeNameFromNode(n: tsm.Node): string {
-//   // if we n.getType().getText() we would get the type alias info, which is not
-//   // what we want.
-//   if (tsm.Node.isTypeLiteralNode(n)) {
-//     return '__INLINE__'
-//   }
-//   // if (tsm.Node.isArrayTypeNode(n)) {
-//   //   n.getType()
-//   //   debug(n.getType().getText())
-//   //   debug(
-//   //     n
-//   //       .getType()
-//   //       .getSymbol()
-//   //       ?.getDeclarations()[0]
-//   //       .getType()
-//   //       .getText()
-//   //   )
-//   //   debug(
-//   //     getTypeSymPreferingAlias(n.getType())
-//   //       ?.getDeclarations()[0]
-//   //       .getText()
-//   //   )
-//   // }
-//   return getFullyQualifiedTypeName(n.getType())
-// }
-
-// function extractTypeDocFromLiteral(n: tsm.Node) {
-//   const t = tsm.Node.isSignaturedDeclaration(n)
-//     ? n.getReturnType()
-//     : n.getType()
-//   return Doc.literal({
-//     name: t.getText(),
-//     base: t.getBaseTypeOfLiteralType().getText(),
-//   })
-// }

@@ -18,7 +18,7 @@ export interface Manager {
 /**
  * Create a new set of docs.
  */
-export function create(): Manager {
+export function createManager(): Manager {
   const d: DocPackage = {
     modules: [],
     typeIndex: {},
@@ -61,30 +61,6 @@ export function create(): Manager {
 }
 
 export function getFullyQualifiedTypeName(t: tsm.Type): string {
-  // exploring type text rendering
-  // dump(t.getApparentType())
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.NoTruncation))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.UseFullyQualifiedType))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.UseStructuralFallback))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.WriteOwnNameForAnyLike))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.InElementType))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.None))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.MultilineObjectLiterals))
-
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.NoTruncation))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.UseFullyQualifiedType))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.UseStructuralFallback))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.WriteOwnNameForAnyLike))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.InElementType))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.None))
-  // dump(
-  //   t.getText(
-  //     undefined,
-  //     tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope
-  //   )
-  // )
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.MultilineObjectLiterals))
   // It can happen that a type has no symbol but does have alias symbol, for
   // example union types.
   const s = t.getSymbol()
@@ -115,29 +91,6 @@ export function getFullyQualifiedTypeName(t: tsm.Type): string {
   return fqtn
 }
 
-type DocTypeBase = {
-  // name: string
-}
-// prettier-ignore
-export type DocProp = { kind: 'prop'; name: string; type: Node }
-// prettier-ignore
-export type DocSig            = { kind: 'sig', params: DocSigParam[]; return: Node }
-// prettier-ignore
-export type DocTypePrimitive  = { kind: 'primitive', type: string } & DocTypeBase
-// prettier-ignore
-export type DocTypeLiteral    = { kind: 'literal'; base: string } & DocTypeBase
-// prettier-ignore
-export type DocTypeIndexRef   = { kind: 'typeIndexRef', link: string } & DocTypeBase
-// prettier-ignore
-export type DocTypeArray      = { kind: 'array'; innerType: Node }
-// prettier-ignore
-export type DocTypeAlias      = { kind: 'alias'; name: string, type: Node, } & DocTypeBase
-// prettier-ignore
-export type DocTypeInterface  = { kind: 'interface'; name: string; props: DocProp[] }
-// prettier-ignore
-export type DocTypeObject     = { kind: 'object'; props: DocProp[] }
-// prettier-ignore
-export type DocTypeCallable   = { kind: 'callable', isOverloaded: boolean, hasProps:boolean, sigs: DocSig[], props: DocProp[] } & DocTypeBase
 // prettier-ignore
 export type Node =
   | DocUnion
@@ -150,18 +103,16 @@ export type Node =
   | DocTypeObject
   | DocTypeCallable
   | DocUnsupported
+  // todo unused?
   | { kind: 'function'; signatures: DocSig[] }
-  | ({
-      kind: 'callable_object'
-      signatures: DocSig[]
-      properties: DocProp[]
-    } & DocTypeBase)
-  | ({
-      kind: 'callable_interface'
-      properties: DocProp[]
-      signatures: DocSig[]
-    } & DocTypeBase)
-export type IndexableNode = DocTypeAlias | DocTypeInterface
+  | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & DocTypeBase
+  | { kind: 'callable_interface'; properties: DocProp[]; signatures: DocSig[] } & DocTypeBase
+
+// prettier-ignore
+export type IndexableNode =
+  | DocTypeAlias
+  | DocTypeInterface
+
 export type DocModule = {
   name: string
   mainExport: null | Node
@@ -172,31 +123,50 @@ export type DocModule = {
     type: Node
   }[]
 }
+
 export type TypeIndex = Index<IndexableNode>
+
 export type DocPackage = {
   modules: DocModule[]
   typeIndex: TypeIndex
 }
 
+type DocTypeBase = {}
+
+// prettier-ignore
+export type DocProp = { kind: 'prop'; name: string; type: Node }
+
+export type DocTypeArray = { kind: 'array'; innerType: Node }
+
 export function array(innerType: Node): DocTypeArray {
   return { kind: 'array', innerType }
 }
+// prettier-ignore
+export type DocTypeLiteral = { kind: 'literal'; base: string } & DocTypeBase
 
 export function literal(input: { name: string; base: string }): DocTypeLiteral {
   return { kind: 'literal', ...input }
 }
+// prettier-ignore
+export type DocTypePrimitive = { kind: 'primitive', type: string } & DocTypeBase
 
 export function prim(type: string): DocTypePrimitive {
   return { kind: 'primitive', type }
 }
+// prettier-ignore
+export type DocTypeIndexRef = { kind: 'typeIndexRef', link: string } & DocTypeBase
 
 export function typeIndexRef(link: string): DocTypeIndexRef {
   return { kind: 'typeIndexRef', link }
 }
 // prettier-ignore
+export type DocTypeAlias = { kind: 'alias'; name: string, type: Node, } & DocTypeBase
+// prettier-ignore
 export function alias(input: { name: string; type: Node }): DocTypeAlias {
   return { kind: 'alias', ...input }
 }
+// prettier-ignore
+export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] }
 // prettier-ignore
 export function inter(input: { name: string; props: DocProp[] }): DocTypeInterface {
   return { kind: 'interface', ...input}
@@ -206,13 +176,19 @@ export function prop(input: { name: string, type: Node }): DocProp {
   return { kind: 'prop', ...input }
 }
 // prettier-ignore
+export type DocTypeObject = { kind: 'object'; props: DocProp[] }
+// prettier-ignore
 export function obj(input: { props: DocProp[] }): DocTypeObject {
   return { kind: 'object', ...input }
 }
 // prettier-ignore
+export type DocTypeCallable = { kind: 'callable', isOverloaded: boolean, hasProps:boolean, sigs: DocSig[], props: DocProp[] } & DocTypeBase
+// prettier-ignore
 export function callable(input: { sigs: DocSig[], props: DocProp[] }): DocTypeCallable {
   return { kind: 'callable', isOverloaded: input.sigs.length > 1, hasProps: input.props.length > 0, ...input }
 }
+
+export type DocSig = { kind: 'sig'; params: DocSigParam[]; return: Node }
 // prettier-ignorp
 export function sig(input: { params: DocSigParam[]; return: Node }): DocSig {
   return { kind: 'sig', ...input }
