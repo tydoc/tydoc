@@ -32,7 +32,10 @@ export function createManager(): Manager {
       // something without a symbol must be inline since it means it is nameless
       if (!t.getSymbol() && !t.getAliasSymbol()) return false
       // an object with no alias means it must be inline
-      if (!hasAlias(t) && t.isObject()) return false
+      // note that interfaces are considered objects so we filter these out
+      if (!t.isInterface()) {
+        if (!hasAlias(t) && t.isObject()) return false
+      }
       return true
     },
     isIndexed(name) {
@@ -46,10 +49,10 @@ export function createManager(): Manager {
         const fqtn = getFullyQualifiedTypeName(t)
         if (!api.isIndexed(fqtn)) {
           // register then hydrate, this prevents infinite loops
-          debug('provisioning entry in type index')
+          debug('provisioning entry in type index: %s', fqtn)
           api.d.typeIndex[fqtn] = {} as any
           const result = doc() as IndexableNode
-          debug('hydrating entry in type index')
+          debug('hydrating entry in type index: %s', fqtn)
           api.d.typeIndex[fqtn] = result
         }
         return typeIndexRef(fqtn)
@@ -73,7 +76,6 @@ export function getFullyQualifiedTypeName(t: tsm.Type): string {
   } else if (s) {
     // todo what would get name be here then...?
     // typeName = sym.getName()
-    debug('%j', t.isObject())
     sourceFile = s.getDeclarations()[0].getSourceFile()
     typeName = t.getText(undefined, tsm.ts.TypeFormatFlags.None)
   } else {
@@ -81,14 +83,20 @@ export function getFullyQualifiedTypeName(t: tsm.Type): string {
       `Given type ${t.getText()} has neither symbol nor alias symbol`
     )
   }
+  const typePath = getPathFromProjectRoot(sourceFile)
+  const fqtn = `("${typePath}").${typeName}`
+  return fqtn
+}
+
+function getPathFromProjectRoot(sourceFile: tsm.SourceFile): string {
   const filePath = sourceFile.getFilePath()
   const fileDirPath = path.dirname(filePath)
-  const qualifyPath = path.join(
+  const modulePath = path.join(
     fileDirPath,
     sourceFile.getBaseNameWithoutExtension()
   )
-  const fqtn = `("${qualifyPath}").${typeName}`
-  return fqtn
+  // todo relative to project root...
+  return modulePath
 }
 
 // prettier-ignore
