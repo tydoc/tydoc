@@ -1,4 +1,4 @@
-import * as D from '../extract/docman'
+import * as D from '../extract/doc'
 import { codeSpan, document, Element, section } from '../lib/markdown'
 
 export interface Options {

@@ -1,0 +1,203 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`can be a return type ref 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": true,
+          "isType": false,
+          "name": "fa",
+          "type": Object {
+            "kind": "function",
+            "name": "(\\"/a\\").() => A",
+            "properties": Array [],
+            "signatures": Array [
+              Object {
+                "parameters": Array [],
+                "return": Object {
+                  "kind": "typeref",
+                  "name": "(\\"/a\\").A",
+                },
+              },
+            ],
+          },
+        },
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "name": "B",
+          "type": Object {
+            "kind": "typeref",
+            "name": "(\\"/a\\").B",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "aliasAlias",
+      "name": "(\\"/a\\").A",
+      "refType": Object {
+        "kind": "object",
+        "name": "__INLINE__",
+        "properties": Array [
+          Object {
+            "name": "b",
+            "type": Object {
+              "kind": "typeref",
+              "name": "(\\"/a\\").B",
+            },
+          },
+        ],
+        "signatures": Array [],
+      },
+    },
+    "(\\"/a\\").B": Object {
+      "kind": "object",
+      "name": "(\\"/a\\").B",
+      "properties": Array [
+        Object {
+          "name": "a",
+          "type": Object {
+            "kind": "primitive",
+            "name": "string",
+          },
+        },
+      ],
+      "signatures": Array [],
+    },
+  },
+}
+`;
+
+exports[`can be recursive within inline objects 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "name": "A",
+          "type": Object {
+            "kind": "typeref",
+            "name": "(\\"/a\\").A",
+          },
+        },
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "name": "B",
+          "type": Object {
+            "kind": "typeref",
+            "name": "(\\"/a\\").B",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "aliasAlias",
+      "name": "(\\"/a\\").A",
+      "refType": Object {
+        "kind": "object",
+        "name": "__INLINE__",
+        "properties": Array [
+          Object {
+            "name": "a",
+            "type": Object {
+              "kind": "object",
+              "name": "__INLINE__",
+              "properties": Array [
+                Object {
+                  "name": "aa",
+                  "type": Object {
+                    "kind": "typeref",
+                    "name": "(\\"/a\\").B",
+                  },
+                },
+              ],
+              "signatures": Array [],
+            },
+          },
+        ],
+        "signatures": Array [],
+      },
+    },
+    "(\\"/a\\").B": Object {
+      "kind": "object",
+      "name": "(\\"/a\\").B",
+      "properties": Array [
+        Object {
+          "name": "b",
+          "type": Object {
+            "kind": "object",
+            "name": "__INLINE__",
+            "properties": Array [
+              Object {
+                "name": "bb",
+                "type": Object {
+                  "kind": "typeref",
+                  "name": "(\\"/a\\").A",
+                },
+              },
+            ],
+            "signatures": Array [],
+          },
+        },
+      ],
+      "signatures": Array [],
+    },
+  },
+}
+`;
+
+exports[`can be self recursive 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "name": "A",
+          "type": Object {
+            "kind": "typeref",
+            "name": "(\\"/a\\").A",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "aliasAlias",
+      "name": "(\\"/a\\").A",
+      "refType": Object {
+        "kind": "object",
+        "name": "__INLINE__",
+        "properties": Array [
+          Object {
+            "name": "a",
+            "type": Object {
+              "kind": "typeref",
+              "name": "(\\"/a\\").A",
+            },
+          },
+        ],
+        "signatures": Array [],
+      },
+    },
+  },
+}
+`;

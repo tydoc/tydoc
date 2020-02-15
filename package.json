@@ -26,10 +26,12 @@
     "@oclif/config": "^1.14.0",
     "@oclif/plugin-help": "^2.2.3",
     "@types/debug": "^4.1.5",
+    "@types/lodash": "^4.14.149",
     "@types/node": "^13.1.4",
     "debug": "^4.1.1",
     "fs-jetpack": "^2.2.3",
     "globby": "^11.0.0",
+    "lodash": "^4.17.15",
     "ts-morph": "^6.0.2",
     "typescript": "^3.7.4"
   },
@@ -61,6 +63,12 @@
         "jest-watch-toggle-config",
         {
           "setting": "verbose"
+        }
+      ],
+      [
+        "jest-watch-toggle-config",
+        {
+          "setting": "bail"
         }
       ]
     ],

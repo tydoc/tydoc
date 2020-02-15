@@ -1,9 +1,12 @@
 import Debug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
-import * as Docman from './docman'
+import * as Doc from './doc'
+import { isCallable, isNodeAtTypeLevel, isPrimitive } from './utils'
 
-const debug = Debug('extract')
+const debug = Debug('dox:extract')
+const debugExport = Debug('dox:extract:export')
+const debugVisible = Debug('dox:extract:visible')
 
 interface Options {
   entrypoints: string[]
@@ -15,7 +18,7 @@ interface Options {
  * the given list of entrypoint modules. Everything that is reachable from the
  * exports will be considered part of the API.
  */
-export function extractDocsFromProject(opts: Options): Docman.DocPackage {
+export function extractDocsFromProject(opts: Options): Doc.DocPackage {
   const project =
     opts.project ??
     new tsm.Project({
@@ -51,7 +54,7 @@ export function extractDocsFromProject(opts: Options): Docman.DocPackage {
     sourceFileEntrypoints.push(sf)
   }
 
-  const docman = Docman.create()
+  const docman = Doc.create()
   sourceFileEntrypoints.forEach(sf => {
     extractDocsFromModule(docman, sf)
   })
@@ -64,32 +67,32 @@ export function extractDocsFromProject(opts: Options): Docman.DocPackage {
  * Everything that is reachable will be considered.
  */
 export function extractDocsFromModule(
-  docman: Docman.Docman,
+  docman: Doc.Manager,
   sourceFile: tsm.SourceFile
-): Docman.DocPackage {
+): Doc.DocPackage {
   const mod = {
     name: sourceFile.getBaseNameWithoutExtension(),
     // absoluteFilePath: sourceFile.getFilePath(),
     // projectRelativeFilePath: 'todo', // todo
     mainExport: null,
     namedExports: [],
-  } as Docman.DocModule
+  } as Doc.DocModule
 
   for (const ex of sourceFile.getExportedDeclarations()) {
     const exportName = ex[0]
-    const n = ex[1][0] // todo why multiple?
-    const typeDoc = extractDocsFromNode(docman, 0, true, false, n)
+    const n = ex[1][0]
+    const typeDoc = extractDocsFromModuleExport(docman, n)
     const isType = isNodeAtTypeLevel(n)
     if (exportName === 'default') {
       mod.mainExport = typeDoc
-    } else {
-      mod.namedExports.push({
-        name: exportName,
-        type: typeDoc,
-        isType: isType,
-        isTerm: !isType,
-      })
+      continue
     }
+    mod.namedExports.push({
+      name: exportName,
+      type: typeDoc,
+      isType: isType,
+      isTerm: !isType,
+    })
     // extractDocsFromExportedNode(docman, [exportName, n])
   }
 
@@ -101,279 +104,250 @@ export function extractDocsFromModule(
  * Extract doc from the node. Recurses into linked nodes until a terminal is hit
  * (e.g. boolean, string)
  */
-function extractDocsFromNode(
-  docman: Docman.Docman,
-  depth: number,
-  isAPIExport: boolean,
-  inlineMode: boolean,
+// prettier-ignore
+function extractDocsFromModuleExport(
+  docs: Doc.Manager,
   n: tsm.Node
-): Docman.DocType {
-  const debug = isAPIExport ? Debug('extract:export') : Debug('extract:visible')
-  debug('start doc %s ', n.getKindName())
-
-  // todo hack...
-  if (depth > 3) {
-    debug('depth limit reached')
-    return { kind: 'unknown', name: '?' }
-  }
-
-  const t = n.getType()
-  const fqtn = getFullyQualifiedTypeName(t)
-  debug('type is %s', fqtn)
-  const isTerm = tsm.Node.isFunctionDeclaration(n)
-
-  if (isPrimitive(t)) {
-    debug('done doc %s (primitive)', fqtn)
-    return extractTypeDocFromPrimitive(n)
-  }
-  if (isLiteral(t)) {
-    debug('done doc %s (literal)', fqtn)
-    return extractTypeDocFromLiteral(n)
-  }
-  if (docman.d.typeIndex[fqtn]) {
-    debug('done doc %s (already in type index)', fqtn)
-    return {
-      kind: 'typeref',
-      name: fqtn,
-    }
-  }
-
-  if (!isTerm) {
-    if (fqtn === '__INLINE__') {
-      if (inlineMode === false) {
-        debug('enter inline mode')
-        inlineMode = true
-      }
-    } else {
-      if (inlineMode === true) {
-        debug('exit inline mode')
-        inlineMode = false
-      }
-    }
-  }
-
-  if (!isTerm && !inlineMode) {
-    debug('enter name into type index -> %s', fqtn)
-    docman.d.typeIndex[fqtn] = {} as any
-  }
-
-  const sigs = t.getCallSignatures()
-  const props = t.getProperties()
-  const doc = {
-    name: fqtn,
-    kind: tsm.Node.isInterfaceDeclaration(n)
-      ? 'interface'
-      : tsm.Node.isFunctionDeclaration(n)
-      ? 'function'
-      : tsm.Node.isArrowFunction(n)
-      ? 'function'
-      : tsm.Node.isTypeAliasDeclaration(n)
-      ? 'alias'
-      : t.isObject()
-      ? 'object'
-      : 'unknown',
-    properties: props.map(p => {
-      debug('start property %j', p.getName())
-      const nNext = p.getDeclarations()[0]
-      if (nNext === undefined) {
-        debug('failed to get next node from property')
-        return {
-          name: p.getName(),
-          type: {},
-        }
-      }
-      return {
-        name: p.getName(),
-        type: extractDocsFromNode(docman, depth + 1, false, inlineMode, nNext),
-      }
-    }),
-    signatures: sigs.map(sig => {
-      return {
-        parameters: sig.getParameters().map(param => {
-          debug('start callable parameter %j', param.getName(), {
-            declaredType: param.getDeclaredType().getText(),
-            typeAtLocation: param.getTypeAtLocation(n).getText(),
-            typeViaDeclaration: param
-              .getDeclarations()[0]
-              .getType()
-              .getText(),
-            typeViaSymbol: param
-              .getDeclarations()[0]
-              .getType()
-              .getSymbol()
-              ?.getName(),
-          })
-          return {
-            name: param.getName(),
-            type: extractDocsFromNode(
-              docman,
-              depth + 1,
-              false,
-              inlineMode,
-              param.getDeclarations()[0]
-            ),
-          }
-        }),
-        // todo
-        return: extractReturnType(sig),
-      }
-    }),
-  } as Docman.DocType
-
-  // - exported terms never go into the type index
-  // - inline types never go into the type index
-  if (!(isAPIExport && isTerm) && !inlineMode) {
-    debug('done doc %s (hydrate name in Index addition)', fqtn)
-    docman.d.typeIndex[fqtn] = doc
-    return {
-      kind: 'typeref',
-      name: fqtn,
-    }
-  }
-
-  return doc
-
-  /**
-   * Extract the return type. If the node is a function and the function does
-   * not have an explicit return type annotation then the type will attempt to
-   * be inferred (todo, currently assumes void).
-   */
-  function extractReturnType(sig: tsm.Signature): Docman.DocType {
-    debug('start callable return')
-    const returnS = sig.getReturnType().getSymbol()
-    // return symbol can be undefined when function does not have an explicit
-    // return type annotation.
-    if (returnS === undefined) {
-      // todo try to get the inferred type from the function
-      return { kind: 'primitive', name: 'void' }
-    } else {
-      return extractDocsFromNode(
-        docman,
-        depth + 1,
-        false,
-        inlineMode,
-        returnS.getDeclarations()[0]
-      )
-    }
-  }
+): Doc.Node {
+  debugExport('start')
+  debugExport('-> node kind is %s', n.getKindName())
+  debugExport('-> type text is %j', n.getType().getText())
+  return extractDocsFromType(docs, n.getType())
 }
 
-function getFullyQualifiedTypeName(t: tsm.Type): string {
-  // exploring type text rendering
-  // dump(t.getApparentType())
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.NoTruncation))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.UseFullyQualifiedType))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.UseStructuralFallback))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.WriteOwnNameForAnyLike))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.InElementType))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.None))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope))
-  // dump(t.getText(n, tsm.ts.TypeFormatFlags.MultilineObjectLiterals))
-
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.NoTruncation))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.UseFullyQualifiedType))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.UseStructuralFallback))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.WriteOwnNameForAnyLike))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.InElementType))
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.None))
-  // dump(
-  //   t.getText(
-  //     undefined,
-  //     tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope
-  //   )
-  // )
-  // dump(t.getText(undefined, tsm.ts.TypeFormatFlags.MultilineObjectLiterals))
-  const sym = t.getSymbol()
-  if (!sym) {
-    debug('no symbol, considering this type to be inline')
-    return '__INLINE__'
+function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
+  debugVisible('start')
+  debugVisible('-> type text is %j', t.getText())
+  if (isTypeFromDependencies(t)) {
+    debugVisible('type is from a dependency, stopping here')
+    return Doc.unsupported(t.getText())
   }
-
-  let typeName: string
-
-  const aliasSym = t.getAliasSymbol()
-  if (aliasSym) {
-    typeName = aliasSym.getName()
-  } else if (sym.getName() === '__type') {
-    debug(
-      'type has no alias symbol and its own symbol is named "__type", so considering it to be inline'
-    )
-    return '__INLINE__'
+  if (manager.isIndexable(t)) {
+    debugVisible('-> type is indexable')
+    const fqtn = Doc.getFullyQualifiedTypeName(t)
+    if (manager.isIndexed(fqtn)) {
+      debugVisible('-> cache hit on index')
+      return manager.getFromIndex(fqtn)
+    }
   } else {
-    // todo what would get name be here then...?
-    // typeName = sym.getName()
-    typeName = t.getText(undefined, tsm.ts.TypeFormatFlags.None)
+    debugVisible('-> type is not indexable')
   }
-
-  const sourceFile = sym.getDeclarations()[0].getSourceFile()
-  const filePath = sourceFile.getFilePath()
-  const fileDirPath = path.dirname(filePath)
-  const qualifyPath = path.join(
-    fileDirPath,
-    sourceFile.getBaseNameWithoutExtension()
-  )
-  const fqtn = `("${qualifyPath}").${typeName}`
-  return fqtn
-}
-
-// function extractTerminalOrRefTypeDocFromNode(docman: any, n: tsm.Node): {}
-
-function extractTypeDocFromLiteral(n: tsm.Node): Docman.DocTypeLiteral {
-  const t = tsm.Node.isSignaturedDeclaration(n)
-    ? n.getReturnType()
-    : n.getType()
-  return {
-    kind: 'literal',
-    name: t.getText(),
-    base: t.getBaseTypeOfLiteralType().getText(),
+  if (t.isLiteral()) {
+    debugVisible('-> is literal')
+    return Doc.literal({
+      name: t.getText(),
+      base: t.getBaseTypeOfLiteralType().getText(),
+    })
   }
-}
-
-function extractTypeDocFromPrimitive(n: tsm.Node): Docman.DocTypePrimitive {
-  const t = tsm.Node.isSignaturedDeclaration(n)
-    ? n.getReturnType()
-    : n.getType()
-  return {
-    kind: 'primitive',
-    name: t.getText(),
+  if (isPrimitive(t)) {
+    debugVisible('-> is primitive')
+    return Doc.prim(t.getText())
   }
+  if (t.isArray()) {
+    debugVisible('-> is array')
+    const innerType = t.getArrayElementTypeOrThrow()
+    return Doc.array(
+      manager.indexIfApplicable(t, () =>
+        extractAliasIfOne(t, extractDocsFromType(manager, innerType))
+      )
+    )
+  }
+  if (t.isInterface()) {
+    debugVisible('-> is interface')
+    const s = t.getSymbolOrThrow()
+    return manager.indexIfApplicable(t, () =>
+      Doc.inter({
+        name: s.getName(),
+        props: extractPropertyDocsFromType(manager, t),
+      })
+    )
+  }
+  // Place before object becuase objects are superset.
+  if (isCallable(t)) {
+    debugVisible('-> is callable')
+    return manager.indexIfApplicable(t, () =>
+      extractAliasIfOne(
+        t,
+        Doc.callable({
+          props: extractPropertyDocsFromType(manager, t),
+          sigs: extractSigDocsFromType(manager, t),
+        })
+      )
+    )
+  }
+  // Place after callable check because objects are superset.
+  if (t.isObject()) {
+    debugVisible('-> is object')
+    return manager.indexIfApplicable(t, () =>
+      extractAliasIfOne(
+        t,
+        Doc.obj({
+          props: extractPropertyDocsFromType(manager, t),
+        })
+      )
+    )
+  }
+  if (t.isUnion()) {
+    debugVisible('-> is union')
+    return manager.indexIfApplicable(t, () =>
+      extractAliasIfOne(
+        t,
+        Doc.union(
+          t.getUnionTypes().map(tm => {
+            debugVisible('-> handle union member')
+            return manager.indexIfApplicable(tm, () =>
+              extractAliasIfOne(tm, extractDocsFromType(manager, tm))
+            )
+          })
+        )
+      )
+    )
+  }
+  debugVisible('unsupported kind of type %s', t.getText())
+  return Doc.unsupported(t.getText())
 }
 
-function isLiteral(t: tsm.Type): boolean {
-  return t.isLiteral()
-}
-/**
- * Tell if the given type is primitive or not.
- */
-function isPrimitive(t: tsm.Type): boolean {
+function isTypeFromDependencies(t: tsm.Type): boolean {
   return (
-    t.getText() === 'void' ||
-    t.isNull() ||
-    t.isNumber() ||
-    t.isString() ||
-    t.isBoolean() ||
-    t.isUndefined() ||
-    t.isUnknown() ||
-    t.isAny()
+    t
+      .getSymbol()
+      ?.getDeclarations()[0]
+      ?.getSourceFile()
+      .getFilePath()
+      .includes('/node_modules/') ?? false
   )
 }
 
-function isNodeAtTypeLevel(node: tsm.Node) {
+function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
+  const as = t.getAliasSymbol()
+  // is it possible to get alias of aliases? It seems the checker "compacts"
+  // these and if we __really__ wanted to "see" the chain we'd have to go the
+  // node AST way.
+  // debug(as?.getAliasedSymbol()?.getName())
+  if (!as) {
+    return doc
+  }
+  debug('-> found an alias to extract: %s', as.getName())
+  return Doc.alias({
+    name: as.getName(),
+    type: doc,
+  })
+}
+function extractSigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
+  return t.getCallSignatures().map(sig => {
+    const tRet = sig.getReturnType()
+    const params = sig.getParameters()
+    return Doc.sig({
+      return: docs.indexIfApplicable(tRet, () =>
+        extractAliasIfOne(tRet, extractDocsFromType(docs, tRet))
+      ),
+      params: params.map(p => {
+        const node = p.getDeclarations()[0]
+        const paramName = p.getName()
+        const paramType = node.getType()
+        // what is this method for then? It was just returning an `any` type
+        // const paramType = p.getDeclaredType()
+        // prettier-ignore
+        debugVisible('handle callable param: %s %s %s', node.getKindName(), paramName, paramType.getText())
+        return Doc.sigParam({
+          name: paramName,
+          type: docs.indexIfApplicable(paramType, () =>
+            extractAliasIfOne(paramType, extractDocsFromType(docs, paramType))
+          ),
+        })
+      }),
+    })
+  })
+}
+
+function extractPropertyDocsFromType(
+  docs: Doc.Manager,
+  t: tsm.Type
+): Doc.DocProp[] {
+  return t.getProperties().map(p => {
+    // prettier-ignore
+    const node = p.getDeclarations()[0] as tsm.PropertySignature | tsm.MethodSignature
+    const propName = p.getName()
+    const propType = node.getType()
+    // what is this method for then? It was just returning an `any` type
+    // const propType = p.getDeclaredType()
+    // prettier-ignore
+    debugVisible('handle property: %s %s %s', node.getKindName(), propName, propType.getText())
+    return Doc.prop({
+      name: propName,
+      type: docs.indexIfApplicable(propType, () =>
+        extractAliasIfOne(propType, extractDocsFromType(docs, propType))
+      ),
+    })
+  })
+}
+
+// /**
+//  * Return the type symbol for a type. If the type has an alias available, use
+//  * that. If the type is named somehow otherwise, use that.
+//  */
+// function getSymbolPreferingAlias(t: tsm.Type): undefined | tsm.Symbol {
+//   debug('searching for symbol for type %s', t.getText())
+//   const asym = t.getAliasSymbol()
+//   if (asym) {
+//     debug('found alias %s', asym.getName())
+//     return asym
+//   }
+//   const s = t.getSymbol()
+//   if (s) {
+//     debug('found concrete %s', s.getName())
+//     return s
+//   }
+//   debug('type has no symbol')
+// }
+
+function isTypeIndexableNode(n: tsm.Node): boolean {
   return (
-    tsm.Node.isTypeAliasDeclaration(node) ||
-    tsm.Node.isInterfaceDeclaration(node) ||
-    tsm.Node.isPropertySignature(node)
+    tsm.Node.isTypeAliasDeclaration(n) || tsm.Node.isInterfaceDeclaration(n)
   )
 }
 
-function isNode(x: unknown): x is tsm.Node {
-  return x instanceof tsm.Node
-}
+// /**
+//  * Get the FQTN from a node.
+//  *
+//  * The reason we want to do this from a node rather than a type is that there
+//  * seems to be some information that we can only get from a now. Namely when a
+//  * node is a type literal, getting the type from that literal will reveal the
+//  * type alias point to it, rather than the literal type structure. This means it
+//  * is impossible (seems so) to tell a literal type from the type object alone.
+//  */
+// function getFullyQualifiedTypeNameFromNode(n: tsm.Node): string {
+//   // if we n.getType().getText() we would get the type alias info, which is not
+//   // what we want.
+//   if (tsm.Node.isTypeLiteralNode(n)) {
+//     return '__INLINE__'
+//   }
+//   // if (tsm.Node.isArrayTypeNode(n)) {
+//   //   n.getType()
+//   //   debug(n.getType().getText())
+//   //   debug(
+//   //     n
+//   //       .getType()
+//   //       .getSymbol()
+//   //       ?.getDeclarations()[0]
+//   //       .getType()
+//   //       .getText()
+//   //   )
+//   //   debug(
+//   //     getTypeSymPreferingAlias(n.getType())
+//   //       ?.getDeclarations()[0]
+//   //       .getText()
+//   //   )
+//   // }
+//   return getFullyQualifiedTypeName(n.getType())
+// }
 
-function isString(x: unknown): x is string {
-  return typeof x === 'string'
-}
-
-function isUndefined(x: unknown): x is undefined {
-  return x === undefined
-}
+// function extractTypeDocFromLiteral(n: tsm.Node) {
+//   const t = tsm.Node.isSignaturedDeclaration(n)
+//     ? n.getReturnType()
+//     : n.getType()
+//   return Doc.literal({
+//     name: t.getText(),
+//     base: t.getBaseTypeOfLiteralType().getText(),
+//   })
+// }

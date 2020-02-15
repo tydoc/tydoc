@@ -1,5 +1,9 @@
 import { inspect } from 'util'
 
+export type Index<T> = Record<string, T>
+
+export type Thunk<T> = () => T
+
 /**
  * Use this to make assertion at end of if-else chain that all members of a
  * union have been accounted for.
