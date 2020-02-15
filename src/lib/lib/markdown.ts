@@ -102,6 +102,8 @@ export function codeBlock(languageType: string, content: string): CodeBlock {
   }
 }
 
+export const tsCodeBlock = codeBlock.bind(null, 'ts')
+
 /**
  * Create a markdown heading.
  */

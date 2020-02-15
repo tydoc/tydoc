@@ -12,6 +12,8 @@ Work in progress 👷‍
 
 - Amazing use-case for [Quokka.js](https://quokkajs.com/) if you have it. Set yourself up a test module using techniques like those seen in `test/setup.ts` and get the best possible feedback loop going!
 
+- Very little information about the TS AST seems available. There is [the Wiki](https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API) and a bit of information here https://sandersn.github.io/manual/Typescript-compiler-implementation.html.
+
 ## API
 
 <!-- START API DOCS --->
@@ -29,16 +31,34 @@ Work in progress 👷‍
 
 #### `RenderMarkdownOptions`
 
+```ts
+typeIndexRef
+```
 
 ### Type Index
 
+#### `Options`
+
+```ts
+interface
+```
+
 #### `DocPackage`
 
+```ts
+alias
+```
 
-#### `Node`
+#### `undefined`
 
+```ts
+typeIndexRef
+```
 
-#### `Thunk`
+#### `undefined`
 
+```ts
+typeIndexRef
+```
 
 <!-- END API DOCS --->

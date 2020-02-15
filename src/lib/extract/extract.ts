@@ -2,7 +2,7 @@ import Debug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import * as Doc from './doc'
-import { isCallable, isNodeAtTypeLevel, isPrimitive } from './utils'
+import { hasAlias, isCallable, isNodeAtTypeLevel, isPrimitive } from './utils'
 
 const debug = Debug('dox:extract')
 const debugExport = Debug('dox:extract:export')
@@ -127,24 +127,24 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     const fqtn = Doc.getFullyQualifiedTypeName(t)
     if (manager.isIndexed(fqtn)) {
       debugVisible('-> cache hit on index')
-      return manager.getFromIndex(fqtn)
+      return Doc.typeIndexRef(fqtn)
     }
   } else {
     debugVisible('-> type is not indexable')
   }
   if (t.isLiteral()) {
-    debugVisible('-> is literal')
+    debugVisible('-> type is literal')
     return Doc.literal({
       name: t.getText(),
       base: t.getBaseTypeOfLiteralType().getText(),
     })
   }
   if (isPrimitive(t)) {
-    debugVisible('-> is primitive')
+    debugVisible('-> type is primitive')
     return Doc.prim(t.getText())
   }
   if (t.isArray()) {
-    debugVisible('-> is array')
+    debugVisible('-> type is array')
     const innerType = t.getArrayElementTypeOrThrow()
     return Doc.array(
       manager.indexIfApplicable(t, () =>
@@ -153,18 +153,21 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     )
   }
   if (t.isInterface()) {
-    debugVisible('-> is interface')
+    debugVisible('-> type is interface')
     const s = t.getSymbolOrThrow()
     return manager.indexIfApplicable(t, () =>
       Doc.inter({
         name: s.getName(),
+        raw: {
+          text: t.getText(),
+        },
         props: extractPropertyDocsFromType(manager, t),
       })
     )
   }
   // Place before object becuase objects are superset.
   if (isCallable(t)) {
-    debugVisible('-> is callable')
+    debugVisible('-> type is callable')
     return manager.indexIfApplicable(t, () =>
       extractAliasIfOne(
         t,
@@ -177,7 +180,7 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   }
   // Place after callable check because objects are superset.
   if (t.isObject()) {
-    debugVisible('-> is object')
+    debugVisible('-> type is object')
     return manager.indexIfApplicable(t, () =>
       extractAliasIfOne(
         t,
@@ -188,13 +191,13 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     )
   }
   if (t.isUnion()) {
-    debugVisible('-> is union')
+    debugVisible('-> type is union')
     return manager.indexIfApplicable(t, () =>
       extractAliasIfOne(
         t,
         Doc.union(
           t.getUnionTypes().map(tm => {
-            debugVisible('-> handle union member')
+            debugVisible('-> handle union member %s', tm.getText())
             return manager.indexIfApplicable(tm, () =>
               extractAliasIfOne(tm, extractDocsFromType(manager, tm))
             )
@@ -219,17 +222,18 @@ function isTypeFromDependencies(t: tsm.Type): boolean {
 }
 
 function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
-  const as = t.getAliasSymbol()
   // is it possible to get alias of aliases? It seems the checker "compacts"
   // these and if we __really__ wanted to "see" the chain we'd have to go the
   // node AST way.
   // debug(as?.getAliasedSymbol()?.getName())
-  if (!as) {
+  if (!hasAlias(t)) {
     return doc
   }
+  const as = t.getAliasSymbol()!
   debug('-> found an alias to extract: %s', as.getName())
   return Doc.alias({
     name: as.getName(),
+    checkerText: t.getText(),
     type: doc,
   })
 }
@@ -273,11 +277,10 @@ function extractPropertyDocsFromType(
     // const propType = p.getDeclaredType()
     // prettier-ignore
     debugVisible('handle property: %s %s %s', node.getKindName(), propName, propType.getText())
+    // Do not try to index type here. Must come after index lookup.
     return Doc.prop({
       name: propName,
-      type: docs.indexIfApplicable(propType, () =>
-        extractAliasIfOne(propType, extractDocsFromType(docs, propType))
-      ),
+      type: extractAliasIfOne(propType, extractDocsFromType(docs, propType)),
     })
   })
 }

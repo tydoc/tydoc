@@ -1,5 +1,11 @@
 import * as D from '../extract/doc'
-import { codeSpan, document, Element, section } from '../lib/markdown'
+import {
+  codeSpan,
+  document,
+  Element,
+  section,
+  tsCodeBlock,
+} from '../lib/markdown'
 
 export interface Options {
   /**
@@ -62,10 +68,13 @@ function renderModule(
   g.push(
     section('Exported Types').add(
       ...exportedTypes.map(ext => {
-        return section(codeSpan(ext.name))
-        // .add(
-        //   codeBlock('ts', type.textWithJSDoc.replace(/export /, ''))
-        // )
+        const type = ext.type
+        const c = section(codeSpan(ext.name))
+        c.add(tsCodeBlock(type.kind))
+        if (type.kind === 'interface') {
+          // c.add(tsCodeBlock(type.raw.text))
+        }
+        return c
       })
     )
   )
@@ -73,9 +82,16 @@ function renderModule(
   g.push(
     section('Type Index').add(
       ...Object.values(ti).map(type => {
-        return section(codeSpan(type.name))
+        const c = section(codeSpan(type.name))
+        c.add(tsCodeBlock(type.kind))
+
+        // console.log(inspect(type,{depth:null}))
+        if (type.kind === 'alias') {
+          // c.add(tsCodeBlock(type.type.kind))
+        }
+        return c
         // .add(
-        //   codeBlock('ts', type.textWithJSDoc.replace(/export /, ''))
+        //   tsCodeBlock(type.textWithJSDoc.replace(/export /, ''))
         // )
       })
     )

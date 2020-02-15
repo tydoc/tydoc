@@ -140,6 +140,7 @@ export type DocPackage = {
 }
 
 type DocTypeBase = {}
+// type DocTypeBase = { checkerText: string }
 
 // prettier-ignore
 export type DocProp = { kind: 'prop'; name: string; type: Node }
@@ -168,15 +169,17 @@ export function typeIndexRef(link: string): DocTypeIndexRef {
   return { kind: 'typeIndexRef', link }
 }
 // prettier-ignore
-export type DocTypeAlias = { kind: 'alias'; name: string, type: Node, } & DocTypeBase
+export type DocTypeAlias = { kind: 'alias'; name: string, type: Node, checkerText: string } & DocTypeBase
 // prettier-ignore
-export function alias(input: { name: string; type: Node }): DocTypeAlias {
+export function alias(input: { name: string; type: Node, checkerText: string }): DocTypeAlias {
   return { kind: 'alias', ...input }
 }
 // prettier-ignore
-export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] }
+export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[], raw: { text: string } }
 // prettier-ignore
-export function inter(input: { name: string; props: DocProp[] }): DocTypeInterface {
+type InterInput = { name: string; props: DocProp[], raw: { text: string } }
+// prettier-ignore
+export function inter(input: InterInput): DocTypeInterface {
   return { kind: 'interface', ...input}
 }
 // prettier-ignore
