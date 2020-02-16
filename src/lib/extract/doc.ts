@@ -101,7 +101,7 @@ function getPathFromProjectRoot(sourceFile: tsm.SourceFile): string {
 
 // prettier-ignore
 export type Node =
-  | DocUnion
+  | DocTypeUnion
   | DocTypePrimitive
   | DocTypeLiteral
   | DocTypeAlias
@@ -111,6 +111,7 @@ export type Node =
   | DocTypeObject
   | DocTypeIndexRef
   | DocUnsupported
+  | DocTypeIntersection
   // todo unused?
   | { kind: 'function'; signatures: DocSig[] }
   | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & Raw
@@ -122,7 +123,8 @@ export type IndexableNode =
   | DocTypeInterface
 
 export type TypeNode =
-  | DocUnion
+  | DocTypeUnion
+  | DocTypeIntersection
   | DocTypePrimitive
   | DocTypeLiteral
   | DocTypeAlias
@@ -310,12 +312,28 @@ export function unsupported(raw: Raw): DocUnsupported {
   return { kind: 'unsupported', ...raw }
 }
 
+//
+// Intersection Node
+//
+
+export type DocTypeIntersection = { kind: 'intersection'; types: Node[] } & Raw
+
+type IntersectionInput = Omit<DocTypeIntersection, 'kind'>
+
+export function intersection(input: IntersectionInput): DocTypeIntersection {
+  return { kind: 'intersection', ...input }
+}
+
+//
+// Union Node
+//
+
 // prettier-ignore
-export type DocUnion = { kind:'union', isDiscriminated: boolean, discriminantProperties: null | string[], types: Node[] } & Raw
+export type DocTypeUnion = { kind:'union', isDiscriminated: boolean, discriminantProperties: null | string[], types: Node[] } & Raw
 
 type UnionInput = { types: Node[] } & Raw
 
-export function union(input: UnionInput): DocUnion {
+export function union(input: UnionInput): DocTypeUnion {
   const discriminantProperties = findDiscriminant(input.types)
   return {
     kind: 'union',

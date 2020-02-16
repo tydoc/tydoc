@@ -8,23 +8,23 @@ interface Renderable {
 
 type SectionData = {
   title: string
-  children: Element[]
+  children: Node[]
 }
 
 interface Section extends Renderable {
-  add(...content: Element[]): Section
+  add(...content: Node[]): Section
 }
 
 interface CodeBlock extends Renderable {}
 
 type DocumentData = {
-  children: Element[]
+  children: Node[]
 }
 
-export type Element = Renderable | string
+export type Node = Renderable | string
 
 interface Document extends Renderable {
-  add(...content: Element[]): Section
+  add(...content: Node[]): Section
 }
 
 /**
@@ -125,7 +125,7 @@ export function codeSpan(content: string): string {
 }
 
 interface Group {
-  add(...elements: Element[]): Group
+  add(...elements: Node[]): Group
   render(state: RenderState): string
 }
 

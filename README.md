@@ -14,22 +14,31 @@ Work in progress 👷‍
   - [`fromProject`](#fromproject)
   - [`fromModule`](#frommodule)
   - [Exported Types](#exported-types)
-    - [`RenderMarkdownOptions` `I`](#rendermarkdownoptions-i)
+    - [`I` `RenderMarkdownOptions`](#i-rendermarkdownoptions)
   - [Type Index](#type-index)
-    - [`Options` `I`](#options-i)
-    - [`DocPackage` `T`](#docpackage-t)
-    - [`DocModule` `T`](#docmodule-t)
-    - [`DocTypePrimitive` `T`](#doctypeprimitive-t)
-    - [`DocTypeLiteral` `T`](#doctypeliteral-t)
-    - [`DocTypeArray` `T`](#doctypearray-t)
-    - [`Node` `U`](#node-u)
-    - [`DocTypeIndexRef` `T`](#doctypeindexref-t)
-    - [`DocSig` `T`](#docsig-t)
-    - [`DocSigParam` `T`](#docsigparam-t)
-    - [`Expor` `T`](#expor-t)
-    - [`Options` `I`](#options-i-1)
-    - [`Manager` `I`](#manager-i)
-    - [`Thunk` `F`](#thunk-f)
+    - [`I` `Options`](#i-options)
+    - [`T` `DocPackage`](#t-docpackage)
+    - [`T` `DocModule`](#t-docmodule)
+    - [`&` `DocTypeUnion`](#-doctypeunion)
+    - [`|` `Node`](#-node)
+    - [`T` `DocTypePrimitive`](#t-doctypeprimitive)
+    - [`T` `DocTypeLiteral`](#t-doctypeliteral)
+    - [`&` `DocTypeAlias`](#-doctypealias)
+    - [`T` `Raw`](#t-raw)
+    - [`&` `DocTypeInterface`](#-doctypeinterface)
+    - [`T` `DocProp`](#t-docprop)
+    - [`&` `DocTypeCallable`](#-doctypecallable)
+    - [`T` `DocSig`](#t-docsig)
+    - [`T` `DocSigParam`](#t-docsigparam)
+    - [`T` `DocTypeArray`](#t-doctypearray)
+    - [`&` `DocTypeObject`](#-doctypeobject)
+    - [`T` `DocTypeIndexRef`](#t-doctypeindexref)
+    - [`&` `DocUnsupported`](#-docunsupported)
+    - [`&` `DocTypeIntersection`](#-doctypeintersection)
+    - [`T` `Expor`](#t-expor)
+    - [`I` `Options`](#i-options-1)
+    - [`I` `Manager`](#i-manager)
+    - [`F` `Thunk`](#f-thunk)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -49,24 +58,39 @@ Work in progress 👷‍
 
 ### `renderMarkdown`
 
+```ts
+typeof import(
+  "/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/render/markdown"
+).render;
+```
 
 ### `fromProject`
 
+```ts
+typeof import(
+  "/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract"
+).fromProject;
+```
 
 ### `fromModule`
 
+```ts
+typeof import(
+  "/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract"
+).fromModule;
+```
 
 ### Exported Types
 
-#### `RenderMarkdownOptions` `I`
+#### `I` `RenderMarkdownOptions`
 
 ```ts
-typeIndexRef
+typeIndexRef;
 ```
 
 ### Type Index
 
-#### `Options` `I`
+#### `I` `Options`
 
 ```ts
 export interface Options {
@@ -74,11 +98,11 @@ export interface Options {
    * Whether or not the API terms section should have a title and nest its term
    * entries under it. If false, term entry titles are de-nested by one level.
    */
-  flatTermsSection: boolean
+  flatTermsSection: boolean;
 }
 ```
 
-#### `DocPackage` `T`
+#### `T` `DocPackage`
 
 ```ts
 //
@@ -86,12 +110,12 @@ export interface Options {
 //
 
 export type DocPackage = {
-  modules: DocModule[]
-  typeIndex: TypeIndex
-}
+  modules: DocModule[];
+  typeIndex: TypeIndex;
+};
 ```
 
-#### `DocModule` `T`
+#### `T` `DocModule`
 
 ```ts
 //
@@ -99,55 +123,142 @@ export type DocPackage = {
 //
 
 export type DocModule = {
-  kind: 'module'
-  name: string
-  mainExport: null | Node
-  namedExports: Expor[]
-}
+  kind: "module";
+  name: string;
+  mainExport: null | Node;
+  namedExports: Expor[];
+};
 ```
 
-#### `DocTypePrimitive` `T`
+#### `&` `DocTypeUnion`
 
 ```ts
-// prettier-ignore
-export type DocTypePrimitive = { kind: 'primitive', type: string }
+//
+// Union Node
+//
+
+export type DocTypeUnion = {
+  kind: "union";
+  isDiscriminated: boolean;
+  discriminantProperties: null | string[];
+  types: Node[];
+} & Raw;
 ```
 
-#### `DocTypeLiteral` `T`
+#### `|` `Node`
 
 ```ts
-// prettier-ignore
-export type DocTypeLiteral = { kind: 'literal'; base: string }
+export type Node =
+  | DocTypeUnion
+  | DocTypePrimitive
+  | DocTypeLiteral
+  | DocTypeAlias
+  | DocTypeInterface
+  | DocTypeCallable
+  | DocTypeArray
+  | DocTypeObject
+  | DocTypeIndexRef
+  | DocUnsupported
+  | DocTypeIntersection
+  // todo unused?
+  | { kind: "function"; signatures: DocSig[] }
+  | ({
+      kind: "callable_object";
+      signatures: DocSig[];
+      properties: DocProp[];
+    } & Raw)
+  | ({
+      kind: "callable_interface";
+      properties: DocProp[];
+      signatures: DocSig[];
+    } & Raw);
 ```
 
-#### `DocTypeArray` `T`
+#### `T` `DocTypePrimitive`
 
 ```ts
-export type DocTypeArray = { kind: 'array'; innerType: Node }
+export type DocTypePrimitive = { kind: "primitive"; type: string };
 ```
 
-#### `Node` `U`
+#### `T` `DocTypeLiteral`
 
 ```ts
-type Node = 
-  | DocUnion  
-  | DocTypePrimitive  
-  | DocTypeLiteral  
-  | DocTypeAlias  
-  | DocTypeInterface  
-  | DocTypeCallable  
-  | DocTypeArray  
-  | DocTypeObject  
-  | DocTypeIndexRef  
-  | DocUnsupported  
-  | { kind: 'function'; signatures: DocSig[] }  
-  |   
-  | 
+export type DocTypeLiteral = { kind: "literal"; base: string };
 ```
 
-#### `DocTypeIndexRef` `T`
+#### `&` `DocTypeAlias`
 
 ```ts
+export type DocTypeAlias = { kind: "alias"; name: string; type: Node } & Raw;
+```
+
+#### `T` `Raw`
+
+```ts
+export type Raw = {
+  raw: {
+    typeText: string;
+    nodeText: string;
+    nodeFullText: string;
+  };
+};
+```
+
+#### `&` `DocTypeInterface`
+
+```ts
+export type DocTypeInterface = {
+  kind: "interface";
+  name: string;
+  props: DocProp[];
+} & Raw;
+```
+
+#### `T` `DocProp`
+
+```ts
+export type DocProp = { kind: "prop"; name: string; type: Node };
+```
+
+#### `&` `DocTypeCallable`
+
+```ts
+export type DocTypeCallable = {
+  kind: "callable";
+  isOverloaded: boolean;
+  hasProps: boolean;
+  sigs: DocSig[];
+  props: DocProp[];
+} & Raw;
+```
+
+#### `T` `DocSig`
+
+```ts
+export type DocSig = { kind: "sig"; params: DocSigParam[]; return: Node };
+```
+
+#### `T` `DocSigParam`
+
+```ts
+export type DocSigParam = { kind: "sigParam"; name: string; type: Node };
+```
+
+#### `T` `DocTypeArray`
+
+```ts
+export type DocTypeArray = { kind: "array"; innerType: Node };
+```
+
+#### `&` `DocTypeObject`
+
+```ts
+export type DocTypeObject = { kind: "object"; props: DocProp[] } & Raw;
+```
+
+#### `T` `DocTypeIndexRef`
+
+````ts
 /**
  * A link to the type index. All named types go into the type index. When a type
  * or export includes a named type, rather than documenting it inline, a
@@ -155,7 +266,7 @@ type Node =
  *
  */
 export type DocTypeIndexRef = {
-  kind: 'typeIndexRef'
+  kind: "typeIndexRef";
   /**
    * An identifier that can be used to lookup the type in the type index.
    *
@@ -165,24 +276,27 @@ export type DocTypeIndexRef = {
    * docs.typeIndex[typeIndexRef.link]
    * ```
    */
-  link: string
-}
-```
+  link: string;
+};
+````
 
-#### `DocSig` `T`
-
-```ts
-export type DocSig = { kind: 'sig'; params: DocSigParam[]; return: Node }
-```
-
-#### `DocSigParam` `T`
+#### `&` `DocUnsupported`
 
 ```ts
-// prettier-ignore
-export type DocSigParam = { kind:'sigParam', name: string; type: Node }
+export type DocUnsupported = { kind: "unsupported" } & Raw;
 ```
 
-#### `Expor` `T`
+#### `&` `DocTypeIntersection`
+
+```ts
+//
+// Intersection Node
+//
+
+export type DocTypeIntersection = { kind: "intersection"; types: Node[] } & Raw;
+```
+
+#### `T` `Expor`
 
 ```ts
 //
@@ -190,40 +304,39 @@ export type DocSigParam = { kind:'sigParam', name: string; type: Node }
 //
 
 export type Expor = {
-  kind: 'export'
-  name: string
-  isTerm: boolean
-  isType: boolean
-  type: Node
-}
+  kind: "export";
+  name: string;
+  isTerm: boolean;
+  isType: boolean;
+  type: Node;
+};
 ```
 
-#### `Options` `I`
+#### `I` `Options`
 
 ```ts
 interface Options {
-  entrypoints: string[]
-  project?: tsm.Project
+  entrypoints: string[];
+  project?: tsm.Project;
 }
 ```
 
-#### `Manager` `I`
+#### `I` `Manager`
 
 ```ts
 export interface Manager {
-  d: DocPackage
-  isIndexable(t: tsm.Type): boolean
-  isIndexed(name: string): boolean
-  getFromIndex(name: string): Node
-  indexIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
+  d: DocPackage;
+  isIndexable(t: tsm.Type): boolean;
+  isIndexed(name: string): boolean;
+  getFromIndex(name: string): Node;
+  indexIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node;
 }
 ```
 
-#### `Thunk` `F`
+#### `F` `Thunk`
 
 <!-- prettier-ignore -->
 ```ts
 export type Thunk<T> = () => T
 ```
-
 <!-- END API DOCS --->

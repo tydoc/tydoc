@@ -1,11 +1,9 @@
+import * as Debug from 'Debug'
+import * as Prettier from 'prettier'
 import * as Doc from '../extract/doc'
-import {
-  codeSpan,
-  document,
-  Element,
-  section,
-  tsCodeBlock,
-} from '../lib/markdown'
+import { codeSpan, document, Node, section, tsCodeBlock } from '../lib/markdown'
+const debug = Debug('dox:markdown')
+const debugModule = Debug('dox:markdown:module')
 
 export interface Options {
   /**
@@ -19,6 +17,8 @@ export interface Options {
  * Render docs as Markdown.
  */
 export function render(docs: Doc.DocPackage, opts: Options): string {
+  debug('start')
+
   const c = document()
 
   if (docs.modules.length === 0) {
@@ -35,7 +35,18 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
     )
   }
 
-  return c.render({ level: 3 })
+  // .replace() hack until we have jsdoc extraction
+  const docsString = c
+    .render({ level: 3 })
+    .replace(/\/\/ prettier-ignore\n/g, '')
+
+  debug('prettier start')
+  const formattedDocsString = Prettier.format(docsString, {
+    parser: 'markdown',
+  })
+  debug('prettier done')
+
+  return formattedDocsString
 
   /**
    * Render one module of the package.
@@ -44,13 +55,17 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
     opts: Options,
     mod: Doc.DocModule,
     ti: Doc.TypeIndex
-  ): Element[] {
+  ): Node[] {
+    debugModule('start')
     const exportedTypes = mod.namedExports.filter(ex => ex.isType)
     const exportedTerms = mod.namedExports.filter(ex => ex.isTerm)
+
+    debugModule('start exported terms')
 
     const els = []
     const exportedTermsContent = exportedTerms.map(ex => {
       const c = section(codeSpan(ex.name))
+      c.add(tsCodeBlock((ex.type as any)?.raw.typeText()))
       return c
     })
 
@@ -59,6 +74,8 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       : [section('Exported Terms').add(...exportedTermsContent)]
 
     els.push(...exportedTermsSection)
+
+    debugModule('start exported types')
 
     els.push(
       section('Exported Types').add(
@@ -71,6 +88,8 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       )
     )
 
+    debugModule('start type index')
+
     els.push(
       section('Type Index').add(
         ...Object.values(ti).map(t => {
@@ -79,20 +98,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
           if (t.kind === 'alias' && t.type.kind === 'callable') {
             c.add('<!-- prettier-ignore -->')
           }
-          if (t.kind === 'alias' && t.type.kind === 'union') {
-            // todo it seems type/node text for unions is not working?
-            // c.add(tsCodeBlock(t.type.raw.nodeText))
-            c.add(
-              tsCodeBlock(
-                `type ${t.name} = \n  | ` +
-                  t.type.types
-                    .map((t: any) => t.name ?? t?.raw?.nodeFullText ?? '')
-                    .join('  \n  | ')
-              )
-            )
-          } else {
-            c.add(tsCodeBlock(t.raw.nodeFullText))
-          }
+          c.add(tsCodeBlock(t.raw.nodeFullText))
           return c
         })
       )
@@ -104,25 +110,46 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
   // todo need type modelling for concept of "named" type
   // todo need type modelling for concept of "type" export
   function typeTitle(et: Doc.TypeNode | Doc.Expor) {
+    let icon = ''
     if (et.kind === 'export') {
-      return codeSpan(et.name) + ' ' + codeSpan(typeSymbol(et.type))
+      icon = typeIcon(et.type)
+    } else {
+      icon = typeIcon(et)
+    }
+
+    if (icon) icon = codeSpan(icon) + ' '
+
+    if (et.kind === 'export') {
+      return icon + codeSpan(et.name)
     } else {
       // @ts-ignore
-      return codeSpan(et.name) + ' ' + codeSpan(typeSymbol(et))
+      return icon + codeSpan(et.name)
     }
   }
 
-  function typeSymbol(t: Doc.Node): string {
+  function typeIcon(t: Doc.Node): string {
     if (t.kind === 'interface') return 'I'
     if (t.kind === 'object') return 'T'
     if (t.kind === 'callable') return 'F'
-    if (t.kind === 'union') return 'U'
+    if (t.kind === 'union') return '|'
+    if (t.kind === 'intersection') return '&'
     if (t.kind === 'alias') {
-      return typeSymbol(t.type)
+      return typeIcon(t.type)
     }
     if (t.kind === 'typeIndexRef') {
-      return typeSymbol(docs.typeIndex[t.link])
+      return typeIcon(docs.typeIndex[t.link])
     }
     return '' // todo
   }
+
+  //   function unionCodeBlock(t: any): MD.Node {
+  //     return tsCodeBlock(
+  //       `type ${t.name} = \n  | ` +
+  //         t.type.types
+  //           .map((t: any) => {
+  //             return t.name || t.raw?.nodeFullText || t.raw?.typeText || ''
+  //           })
+  //           .join('  \n  | ')
+  //     )
+  //   }
 }

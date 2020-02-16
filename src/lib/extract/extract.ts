@@ -201,16 +201,32 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
       extractAliasIfOne(
         t,
         Doc.union({
+          ...getRaw(t),
           types: t.getUnionTypes().map(tm => {
             debugVisible('-> handle union member %s', tm.getText())
+            // todo no extract alias here ...
             return extractAliasIfOne(tm, fromType(manager, tm))
           }),
-          ...getRaw(t),
         })
       )
     )
   }
-  debugVisible('unsupported kind of type %s', t.getText())
+  if (t.isIntersection()) {
+    debugVisible('-> type is intersection')
+    return manager.indexIfApplicable(t, () =>
+      extractAliasIfOne(
+        t,
+        Doc.intersection({
+          ...getRaw(t),
+          types: t.getIntersectionTypes().map(tm => {
+            debugVisible('-> handle intersection member %s', tm.getText())
+            return fromType(manager, tm)
+          }),
+        })
+      )
+    )
+  }
+  debugWarn('unsupported kind of type %s', t.getText())
   return Doc.unsupported(getRaw(t))
 }
 
@@ -278,9 +294,10 @@ function getRaw(t: tsm.Type): Doc.Raw {
   if (!node) {
     return {
       raw: {
+        // todo null instead of empty string?
         nodeFullText: '',
         nodeText: '',
-        typeText: '',
+        typeText: t.getText().trim(),
       },
     }
   }
