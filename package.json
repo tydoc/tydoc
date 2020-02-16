@@ -11,7 +11,9 @@
     "/oclif.manifest.json"
   ],
   "scripts": {
-    "build:docs": "ts-node scripts/build-api-docs",
+    "build:docs:toc": "doctoc README.md",
+    "build:docs:api": "ts-node scripts/build-api-docs",
+    "build:docs": "yarn -s build:docs:api && yarn -s build:docs:toc",
     "build:oclif": "oclif-dev manifest",
     "build:ts": "tsc",
     "build": "yarn -s build:oclif && yarn -s build:ts",
@@ -29,6 +31,7 @@
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.1.4",
     "debug": "^4.1.1",
+    "doctoc": "^1.4.0",
     "fs-jetpack": "^2.2.3",
     "globby": "^11.0.0",
     "lodash": "^4.17.15",

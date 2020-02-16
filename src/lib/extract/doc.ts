@@ -102,34 +102,47 @@ function getPathFromProjectRoot(sourceFile: tsm.SourceFile): string {
 // prettier-ignore
 export type Node =
   | DocUnion
-  | DocTypeIndexRef
   | DocTypePrimitive
   | DocTypeLiteral
-  | DocTypeArray
   | DocTypeAlias
   | DocTypeInterface
-  | DocTypeObject
   | DocTypeCallable
+  | DocTypeArray
+  | DocTypeObject
+  | DocTypeIndexRef
   | DocUnsupported
   // todo unused?
   | { kind: 'function'; signatures: DocSig[] }
-  | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & DocTypeBase
-  | { kind: 'callable_interface'; properties: DocProp[]; signatures: DocSig[] } & DocTypeBase
+  | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & Raw
+  | { kind: 'callable_interface'; properties: DocProp[]; signatures: DocSig[] } & Raw
 
 // prettier-ignore
 export type IndexableNode =
   | DocTypeAlias
   | DocTypeInterface
 
+export type TypeNode =
+  | DocUnion
+  | DocTypePrimitive
+  | DocTypeLiteral
+  | DocTypeAlias
+  | DocTypeInterface
+  | DocTypeCallable
+  | DocTypeArray
+  | DocTypeObject
+
+export type Expor = {
+  kind: 'export'
+  name: string
+  isTerm: boolean
+  isType: boolean
+  type: Node
+}
+
 export type DocModule = {
   name: string
   mainExport: null | Node
-  namedExports: {
-    name: string
-    isTerm: boolean
-    isType: boolean
-    type: Node
-  }[]
+  namedExports: Expor[]
 }
 
 export type TypeIndex = Index<IndexableNode>
@@ -139,7 +152,13 @@ export type DocPackage = {
   typeIndex: TypeIndex
 }
 
-type DocTypeBase = {}
+export type Raw = {
+  raw: {
+    typeText: string
+    nodeText: string
+    nodeFullText: string
+  }
+}
 // type DocTypeBase = { checkerText: string }
 
 // prettier-ignore
@@ -151,33 +170,34 @@ export function array(innerType: Node): DocTypeArray {
   return { kind: 'array', innerType }
 }
 // prettier-ignore
-export type DocTypeLiteral = { kind: 'literal'; base: string } & DocTypeBase
+export type DocTypeLiteral = { kind: 'literal'; base: string }
 
 export function literal(input: { name: string; base: string }): DocTypeLiteral {
   return { kind: 'literal', ...input }
 }
 // prettier-ignore
-export type DocTypePrimitive = { kind: 'primitive', type: string } & DocTypeBase
+export type DocTypePrimitive = { kind: 'primitive', type: string }
 
 export function prim(type: string): DocTypePrimitive {
   return { kind: 'primitive', type }
 }
 // prettier-ignore
-export type DocTypeIndexRef = { kind: 'typeIndexRef', link: string } & DocTypeBase
+export type DocTypeIndexRef = { kind: 'typeIndexRef', link: string }
 
 export function typeIndexRef(link: string): DocTypeIndexRef {
   return { kind: 'typeIndexRef', link }
 }
 // prettier-ignore
-export type DocTypeAlias = { kind: 'alias'; name: string, type: Node, checkerText: string } & DocTypeBase
+export type DocTypeAlias = { kind: 'alias'; name: string, type: Node  } & Raw
+type AliasInput = Omit<DocTypeAlias, 'kind'>
 // prettier-ignore
-export function alias(input: { name: string; type: Node, checkerText: string }): DocTypeAlias {
+export function alias(input: AliasInput): DocTypeAlias {
   return { kind: 'alias', ...input }
 }
 // prettier-ignore
-export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[], raw: { text: string } }
+export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] } & Raw
 // prettier-ignore
-type InterInput = { name: string; props: DocProp[], raw: { text: string } }
+type InterInput = Omit<DocTypeInterface, 'kind'>
 // prettier-ignore
 export function inter(input: InterInput): DocTypeInterface {
   return { kind: 'interface', ...input}
@@ -187,20 +207,24 @@ export function prop(input: { name: string, type: Node }): DocProp {
   return { kind: 'prop', ...input }
 }
 // prettier-ignore
-export type DocTypeObject = { kind: 'object'; props: DocProp[] }
+export type DocTypeObject = { kind: 'object'; props: DocProp[] } & Raw
 // prettier-ignore
-export function obj(input: { props: DocProp[] }): DocTypeObject {
+type objInput = Omit<DocTypeObject, 'kind'>
+// prettier-ignore
+export function obj(input: objInput ): DocTypeObject {
   return { kind: 'object', ...input }
 }
 // prettier-ignore
-export type DocTypeCallable = { kind: 'callable', isOverloaded: boolean, hasProps:boolean, sigs: DocSig[], props: DocProp[] } & DocTypeBase
+export type DocTypeCallable = { kind: 'callable', isOverloaded: boolean, hasProps:boolean, sigs: DocSig[], props: DocProp[] } & Raw
 // prettier-ignore
-export function callable(input: { sigs: DocSig[], props: DocProp[] }): DocTypeCallable {
+type callableInput = Omit<DocTypeCallable, 'kind' | 'isOverloaded' | 'hasProps'>
+// prettier-ignore
+export function callable(input: callableInput): DocTypeCallable {
   return { kind: 'callable', isOverloaded: input.sigs.length > 1, hasProps: input.props.length > 0, ...input }
 }
 
 export type DocSig = { kind: 'sig'; params: DocSigParam[]; return: Node }
-// prettier-ignorp
+// prettier-ignore
 export function sig(input: { params: DocSigParam[]; return: Node }): DocSig {
   return { kind: 'sig', ...input }
 }
@@ -217,15 +241,17 @@ export function unsupported(checkerText: string): DocUnsupported {
   return { kind: 'unsupported', checkerText }
 }
 // prettier-ignore
-export type DocUnion = { kind:'union', isDiscriminated: boolean, discriminantProperties: null | string[], types: Node[] }
-// prettier-ignorp
-export function union(types: Node[]): DocUnion {
-  const discriminantProperties = findDiscriminant(types)
+export type DocUnion = { kind:'union', isDiscriminated: boolean, discriminantProperties: null | string[], types: Node[] } & Raw
+
+type UnionInput = { types: Node[] } & Raw
+
+export function union(input: UnionInput): DocUnion {
+  const discriminantProperties = findDiscriminant(input.types)
   return {
     kind: 'union',
     isDiscriminated: discriminantProperties !== null,
     discriminantProperties,
-    types,
+    ...input,
   }
 }
 

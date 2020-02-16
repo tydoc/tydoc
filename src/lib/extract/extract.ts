@@ -88,6 +88,7 @@ export function extractDocsFromModule(
       continue
     }
     mod.namedExports.push({
+      kind: 'export',
       name: exportName,
       type: typeDoc,
       isType: isType,
@@ -126,7 +127,9 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     debugVisible('-> type is indexable')
     const fqtn = Doc.getFullyQualifiedTypeName(t)
     if (manager.isIndexed(fqtn)) {
-      debugVisible('-> cache hit on index')
+      debugVisible(
+        '-> type is being documented as link to the type index (aka. cache hit)'
+      )
       return Doc.typeIndexRef(fqtn)
     }
   } else {
@@ -158,10 +161,8 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     return manager.indexIfApplicable(t, () =>
       Doc.inter({
         name: s.getName(),
-        raw: {
-          text: t.getText(),
-        },
         props: extractPropertyDocsFromType(manager, t),
+        ...getRaw(t),
       })
     )
   }
@@ -174,6 +175,7 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
         Doc.callable({
           props: extractPropertyDocsFromType(manager, t),
           sigs: extractSigDocsFromType(manager, t),
+          ...getRaw(t),
         })
       )
     )
@@ -186,6 +188,7 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
         t,
         Doc.obj({
           props: extractPropertyDocsFromType(manager, t),
+          ...getRaw(t),
         })
       )
     )
@@ -195,19 +198,30 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     return manager.indexIfApplicable(t, () =>
       extractAliasIfOne(
         t,
-        Doc.union(
-          t.getUnionTypes().map(tm => {
+        Doc.union({
+          types: t.getUnionTypes().map(tm => {
             debugVisible('-> handle union member %s', tm.getText())
-            return manager.indexIfApplicable(tm, () =>
-              extractAliasIfOne(tm, extractDocsFromType(manager, tm))
-            )
-          })
-        )
+            return extractAliasIfOne(tm, extractDocsFromType(manager, tm))
+          }),
+          ...getRaw(t),
+        })
       )
     )
   }
   debugVisible('unsupported kind of type %s', t.getText())
   return Doc.unsupported(t.getText())
+}
+
+function getRaw(t: tsm.Type): Doc.Raw {
+  const node = t.getSymbol()?.getDeclarations()[0]
+  if (!node) return { raw: { nodeFullText: '', nodeText: '', typeText: '' } }
+  return {
+    raw: {
+      typeText: t.getText(),
+      nodeText: node.getText(),
+      nodeFullText: node.getFullText(),
+    },
+  }
 }
 
 function isTypeFromDependencies(t: tsm.Type): boolean {
@@ -230,11 +244,11 @@ function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
     return doc
   }
   const as = t.getAliasSymbol()!
-  debug('-> found an alias to extract: %s', as.getName())
+  debug('-> type had alias %s (extracting a doc node for it)', as.getName())
   return Doc.alias({
     name: as.getName(),
-    checkerText: t.getText(),
     type: doc,
+    ...getRaw(t),
   })
 }
 function extractSigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
@@ -242,9 +256,7 @@ function extractSigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
     const tRet = sig.getReturnType()
     const params = sig.getParameters()
     return Doc.sig({
-      return: docs.indexIfApplicable(tRet, () =>
-        extractAliasIfOne(tRet, extractDocsFromType(docs, tRet))
-      ),
+      return: extractAliasIfOne(tRet, extractDocsFromType(docs, tRet)),
       params: params.map(p => {
         const node = p.getDeclarations()[0]
         const paramName = p.getName()
@@ -255,8 +267,9 @@ function extractSigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
         debugVisible('handle callable param: %s %s %s', node.getKindName(), paramName, paramType.getText())
         return Doc.sigParam({
           name: paramName,
-          type: docs.indexIfApplicable(paramType, () =>
-            extractAliasIfOne(paramType, extractDocsFromType(docs, paramType))
+          type: extractAliasIfOne(
+            paramType,
+            extractDocsFromType(docs, paramType)
           ),
         })
       }),

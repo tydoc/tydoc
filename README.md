@@ -2,7 +2,33 @@
 Work in progress 👷‍
 ```
 
-# jsdoc-extractor
+# jsdoc-extractor <!-- omit in toc -->
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Development](#development)
+- [API](#api)
+  - [`renderMarkdown`](#rendermarkdown)
+  - [`extractDocsFromProject`](#extractdocsfromproject)
+  - [`extractDocsFromModule`](#extractdocsfrommodule)
+  - [Exported Types](#exported-types)
+    - [`RenderMarkdownOptions` `I`](#rendermarkdownoptions-i)
+  - [Type Index](#type-index)
+    - [`Options` `I`](#options-i)
+    - [`DocPackage` `T`](#docpackage-t)
+    - [`Options` `I`](#options-i-1)
+    - [`Manager` `I`](#manager-i)
+    - [`Node` `U`](#node-u)
+    - [`DocTypePrimitive` `T`](#doctypeprimitive-t)
+    - [`DocTypeLiteral` `T`](#doctypeliteral-t)
+    - [`DocTypeArray` `T`](#doctypearray-t)
+    - [`DocTypeIndexRef` `T`](#doctypeindexref-t)
+    - [`DocUnsupported` `T`](#docunsupported-t)
+    - [`Thunk` `F`](#thunk-f)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Development
 
@@ -29,7 +55,7 @@ Work in progress 👷‍
 
 ### Exported Types
 
-#### `RenderMarkdownOptions`
+#### `RenderMarkdownOptions` `I`
 
 ```ts
 typeIndexRef
@@ -37,28 +63,102 @@ typeIndexRef
 
 ### Type Index
 
-#### `Options`
+#### `Options` `I`
 
 ```ts
-interface
+export interface Options {
+  /**
+   * Whether or not the API terms section should have a title and nest its term
+   * entries under it. If false, term entry titles are de-nested by one level.
+   */
+  flatTermsSection: boolean
+}
 ```
 
-#### `DocPackage`
+#### `DocPackage` `T`
 
 ```ts
-alias
+{
+  modules: DocModule[]
+  typeIndex: TypeIndex
+}
 ```
 
-#### `undefined`
+#### `Options` `I`
 
 ```ts
-typeIndexRef
+interface Options {
+  entrypoints: string[]
+  project?: tsm.Project
+}
 ```
 
-#### `undefined`
+#### `Manager` `I`
 
 ```ts
-typeIndexRef
+export interface Manager {
+  d: DocPackage
+  isIndexable(t: tsm.Type): boolean
+  isIndexed(name: string): boolean
+  getFromIndex(name: string): Node
+  indexIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
+}
+```
+
+#### `Node` `U`
+
+```ts
+type Node = 
+  | DocTypeAlias  
+  | DocTypeInterface  
+  | DocUnion  
+  | DocTypePrimitive  
+  | DocTypeLiteral  
+  | DocTypeCallable  
+  | DocTypeArray  
+  | DocTypeObject  
+  | DocTypeIndexRef  
+  | DocUnsupported  
+  | { kind: 'function'; signatures: DocSig[] }  
+  |   
+  | 
+```
+
+#### `DocTypePrimitive` `T`
+
+```ts
+{ kind: 'primitive', type: string }
+```
+
+#### `DocTypeLiteral` `T`
+
+```ts
+{ kind: 'literal'; base: string }
+```
+
+#### `DocTypeArray` `T`
+
+```ts
+{ kind: 'array'; innerType: Node }
+```
+
+#### `DocTypeIndexRef` `T`
+
+```ts
+{ kind: 'typeIndexRef', link: string }
+```
+
+#### `DocUnsupported` `T`
+
+```ts
+{ kind:'unsupported', checkerText: string }
+```
+
+#### `Thunk` `F`
+
+<!-- prettier-ignore -->
+```ts
+() => T
 ```
 
 <!-- END API DOCS --->
