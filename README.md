@@ -11,21 +11,24 @@ Work in progress 👷‍
 - [Development](#development)
 - [API](#api)
   - [`renderMarkdown`](#rendermarkdown)
-  - [`extractDocsFromProject`](#extractdocsfromproject)
-  - [`extractDocsFromModule`](#extractdocsfrommodule)
+  - [`fromProject`](#fromproject)
+  - [`fromModule`](#frommodule)
   - [Exported Types](#exported-types)
     - [`RenderMarkdownOptions` `I`](#rendermarkdownoptions-i)
   - [Type Index](#type-index)
     - [`Options` `I`](#options-i)
     - [`DocPackage` `T`](#docpackage-t)
-    - [`Options` `I`](#options-i-1)
-    - [`Manager` `I`](#manager-i)
-    - [`Node` `U`](#node-u)
+    - [`DocModule` `T`](#docmodule-t)
     - [`DocTypePrimitive` `T`](#doctypeprimitive-t)
     - [`DocTypeLiteral` `T`](#doctypeliteral-t)
     - [`DocTypeArray` `T`](#doctypearray-t)
+    - [`Node` `U`](#node-u)
     - [`DocTypeIndexRef` `T`](#doctypeindexref-t)
-    - [`DocUnsupported` `T`](#docunsupported-t)
+    - [`DocSig` `T`](#docsig-t)
+    - [`DocSigParam` `T`](#docsigparam-t)
+    - [`Expor` `T`](#expor-t)
+    - [`Options` `I`](#options-i-1)
+    - [`Manager` `I`](#manager-i)
     - [`Thunk` `F`](#thunk-f)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -47,10 +50,10 @@ Work in progress 👷‍
 ### `renderMarkdown`
 
 
-### `extractDocsFromProject`
+### `fromProject`
 
 
-### `extractDocsFromModule`
+### `fromModule`
 
 
 ### Exported Types
@@ -78,50 +81,29 @@ export interface Options {
 #### `DocPackage` `T`
 
 ```ts
+//
+// Package node
+//
+
 export type DocPackage = {
   modules: DocModule[]
   typeIndex: TypeIndex
 }
 ```
 
-#### `Options` `I`
+#### `DocModule` `T`
 
 ```ts
-interface Options {
-  entrypoints: string[]
-  project?: tsm.Project
+//
+// Module Node
+//
+
+export type DocModule = {
+  kind: 'module'
+  name: string
+  mainExport: null | Node
+  namedExports: Expor[]
 }
-```
-
-#### `Manager` `I`
-
-```ts
-export interface Manager {
-  d: DocPackage
-  isIndexable(t: tsm.Type): boolean
-  isIndexed(name: string): boolean
-  getFromIndex(name: string): Node
-  indexIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
-}
-```
-
-#### `Node` `U`
-
-```ts
-type Node = 
-  | DocTypeAlias  
-  | DocTypeInterface  
-  | DocUnion  
-  | DocTypePrimitive  
-  | DocTypeLiteral  
-  | DocTypeCallable  
-  | DocTypeArray  
-  | DocTypeObject  
-  | DocTypeIndexRef  
-  | DocUnsupported  
-  | { kind: 'function'; signatures: DocSig[] }  
-  |   
-  | 
 ```
 
 #### `DocTypePrimitive` `T`
@@ -142,6 +124,25 @@ export type DocTypeLiteral = { kind: 'literal'; base: string }
 
 ```ts
 export type DocTypeArray = { kind: 'array'; innerType: Node }
+```
+
+#### `Node` `U`
+
+```ts
+type Node = 
+  | DocUnion  
+  | DocTypePrimitive  
+  | DocTypeLiteral  
+  | DocTypeAlias  
+  | DocTypeInterface  
+  | DocTypeCallable  
+  | DocTypeArray  
+  | DocTypeObject  
+  | DocTypeIndexRef  
+  | DocUnsupported  
+  | { kind: 'function'; signatures: DocSig[] }  
+  |   
+  | 
 ```
 
 #### `DocTypeIndexRef` `T`
@@ -168,11 +169,54 @@ export type DocTypeIndexRef = {
 }
 ```
 
-#### `DocUnsupported` `T`
+#### `DocSig` `T`
+
+```ts
+export type DocSig = { kind: 'sig'; params: DocSigParam[]; return: Node }
+```
+
+#### `DocSigParam` `T`
 
 ```ts
 // prettier-ignore
-export type DocUnsupported = { kind:'unsupported', checkerText: string }
+export type DocSigParam = { kind:'sigParam', name: string; type: Node }
+```
+
+#### `Expor` `T`
+
+```ts
+//
+// Export Node
+//
+
+export type Expor = {
+  kind: 'export'
+  name: string
+  isTerm: boolean
+  isType: boolean
+  type: Node
+}
+```
+
+#### `Options` `I`
+
+```ts
+interface Options {
+  entrypoints: string[]
+  project?: tsm.Project
+}
+```
+
+#### `Manager` `I`
+
+```ts
+export interface Manager {
+  d: DocPackage
+  isIndexable(t: tsm.Type): boolean
+  isIndexed(name: string): boolean
+  getFromIndex(name: string): Node
+  indexIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
+}
 ```
 
 #### `Thunk` `F`
