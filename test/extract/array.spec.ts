@@ -33,7 +33,7 @@ it('passes smoke test', () => {
           "raw": Object {
             "nodeFullText": "export type StringList = string[];",
             "nodeText": "export type StringList = string[];",
-            "typeText": "import(\\"/a\\").StringList",
+            "typeText": "StringList",
           },
           "type": Object {
             "innerType": Object {

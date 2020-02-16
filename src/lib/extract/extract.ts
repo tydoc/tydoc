@@ -290,20 +290,34 @@ function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
 }
 
 function getRaw(t: tsm.Type): Doc.Raw {
+  /**
+   * The use-alias-outside-current-scope flag makes it so that the type for
+   * something imported is seen not as `import(...).<name>` but the actual type
+   * from the thing's origin.
+   */
+  const typeText = t
+    .getText(
+      undefined,
+      tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope
+    )
+    .trim()
+
   const node = getNodeFromTypePreferingAlias(t)
+
   if (!node) {
     return {
       raw: {
+        typeText: typeText,
         // todo null instead of empty string?
         nodeFullText: '',
         nodeText: '',
-        typeText: t.getText().trim(),
       },
     }
   }
+
   return {
     raw: {
-      typeText: t.getText().trim(),
+      typeText: typeText,
       nodeText: node.getText().trim(),
       nodeFullText: node.getFullText().trim(),
     },

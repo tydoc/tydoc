@@ -7,7 +7,6 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Development](#development)
 - [API](#api)
   - [`renderMarkdown`](#rendermarkdown)
@@ -58,26 +57,23 @@ Work in progress 👷‍
 
 ### `renderMarkdown`
 
+<!-- prettier-ignore -->
 ```ts
-typeof import(
-  "/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/render/markdown"
-).render;
+(docs: DocPackage, opts: Options) => string
 ```
 
 ### `fromProject`
 
+<!-- prettier-ignore -->
 ```ts
-typeof import(
-  "/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract"
-).fromProject;
+(opts: Options) => DocPackage
 ```
 
 ### `fromModule`
 
+<!-- prettier-ignore -->
 ```ts
-typeof import(
-  "/Users/jasonkuhrt/projects/prisma-labs/jsdoc-extractor/src/lib/extract/extract"
-).fromModule;
+(docs: Manager, sourceFile: SourceFile) => DocPackage
 ```
 
 ### Exported Types
@@ -85,7 +81,7 @@ typeof import(
 #### `I` `RenderMarkdownOptions`
 
 ```ts
-typeIndexRef;
+typeIndexRef
 ```
 
 ### Type Index
@@ -98,7 +94,7 @@ export interface Options {
    * Whether or not the API terms section should have a title and nest its term
    * entries under it. If false, term entry titles are de-nested by one level.
    */
-  flatTermsSection: boolean;
+  flatTermsSection: boolean
 }
 ```
 
@@ -110,9 +106,9 @@ export interface Options {
 //
 
 export type DocPackage = {
-  modules: DocModule[];
-  typeIndex: TypeIndex;
-};
+  modules: DocModule[]
+  typeIndex: TypeIndex
+}
 ```
 
 #### `T` `DocModule`
@@ -123,11 +119,11 @@ export type DocPackage = {
 //
 
 export type DocModule = {
-  kind: "module";
-  name: string;
-  mainExport: null | Node;
-  namedExports: Expor[];
-};
+  kind: 'module'
+  name: string
+  mainExport: null | Node
+  namedExports: Expor[]
+}
 ```
 
 #### `&` `DocTypeUnion`
@@ -138,11 +134,11 @@ export type DocModule = {
 //
 
 export type DocTypeUnion = {
-  kind: "union";
-  isDiscriminated: boolean;
-  discriminantProperties: null | string[];
-  types: Node[];
-} & Raw;
+  kind: 'union'
+  isDiscriminated: boolean
+  discriminantProperties: null | string[]
+  types: Node[]
+} & Raw
 ```
 
 #### `|` `Node`
@@ -161,35 +157,35 @@ export type Node =
   | DocUnsupported
   | DocTypeIntersection
   // todo unused?
-  | { kind: "function"; signatures: DocSig[] }
+  | { kind: 'function'; signatures: DocSig[] }
   | ({
-      kind: "callable_object";
-      signatures: DocSig[];
-      properties: DocProp[];
+      kind: 'callable_object'
+      signatures: DocSig[]
+      properties: DocProp[]
     } & Raw)
   | ({
-      kind: "callable_interface";
-      properties: DocProp[];
-      signatures: DocSig[];
-    } & Raw);
+      kind: 'callable_interface'
+      properties: DocProp[]
+      signatures: DocSig[]
+    } & Raw)
 ```
 
 #### `T` `DocTypePrimitive`
 
 ```ts
-export type DocTypePrimitive = { kind: "primitive"; type: string };
+export type DocTypePrimitive = { kind: 'primitive'; type: string }
 ```
 
 #### `T` `DocTypeLiteral`
 
 ```ts
-export type DocTypeLiteral = { kind: "literal"; base: string };
+export type DocTypeLiteral = { kind: 'literal'; base: string }
 ```
 
 #### `&` `DocTypeAlias`
 
 ```ts
-export type DocTypeAlias = { kind: "alias"; name: string; type: Node } & Raw;
+export type DocTypeAlias = { kind: 'alias'; name: string; type: Node } & Raw
 ```
 
 #### `T` `Raw`
@@ -197,63 +193,63 @@ export type DocTypeAlias = { kind: "alias"; name: string; type: Node } & Raw;
 ```ts
 export type Raw = {
   raw: {
-    typeText: string;
-    nodeText: string;
-    nodeFullText: string;
-  };
-};
+    typeText: string
+    nodeText: string
+    nodeFullText: string
+  }
+}
 ```
 
 #### `&` `DocTypeInterface`
 
 ```ts
 export type DocTypeInterface = {
-  kind: "interface";
-  name: string;
-  props: DocProp[];
-} & Raw;
+  kind: 'interface'
+  name: string
+  props: DocProp[]
+} & Raw
 ```
 
 #### `T` `DocProp`
 
 ```ts
-export type DocProp = { kind: "prop"; name: string; type: Node };
+export type DocProp = { kind: 'prop'; name: string; type: Node }
 ```
 
 #### `&` `DocTypeCallable`
 
 ```ts
 export type DocTypeCallable = {
-  kind: "callable";
-  isOverloaded: boolean;
-  hasProps: boolean;
-  sigs: DocSig[];
-  props: DocProp[];
-} & Raw;
+  kind: 'callable'
+  isOverloaded: boolean
+  hasProps: boolean
+  sigs: DocSig[]
+  props: DocProp[]
+} & Raw
 ```
 
 #### `T` `DocSig`
 
 ```ts
-export type DocSig = { kind: "sig"; params: DocSigParam[]; return: Node };
+export type DocSig = { kind: 'sig'; params: DocSigParam[]; return: Node }
 ```
 
 #### `T` `DocSigParam`
 
 ```ts
-export type DocSigParam = { kind: "sigParam"; name: string; type: Node };
+export type DocSigParam = { kind: 'sigParam'; name: string; type: Node }
 ```
 
 #### `T` `DocTypeArray`
 
 ```ts
-export type DocTypeArray = { kind: "array"; innerType: Node };
+export type DocTypeArray = { kind: 'array'; innerType: Node }
 ```
 
 #### `&` `DocTypeObject`
 
 ```ts
-export type DocTypeObject = { kind: "object"; props: DocProp[] } & Raw;
+export type DocTypeObject = { kind: 'object'; props: DocProp[] } & Raw
 ```
 
 #### `T` `DocTypeIndexRef`
@@ -266,7 +262,7 @@ export type DocTypeObject = { kind: "object"; props: DocProp[] } & Raw;
  *
  */
 export type DocTypeIndexRef = {
-  kind: "typeIndexRef";
+  kind: 'typeIndexRef'
   /**
    * An identifier that can be used to lookup the type in the type index.
    *
@@ -276,14 +272,14 @@ export type DocTypeIndexRef = {
    * docs.typeIndex[typeIndexRef.link]
    * ```
    */
-  link: string;
-};
+  link: string
+}
 ````
 
 #### `&` `DocUnsupported`
 
 ```ts
-export type DocUnsupported = { kind: "unsupported" } & Raw;
+export type DocUnsupported = { kind: 'unsupported' } & Raw
 ```
 
 #### `&` `DocTypeIntersection`
@@ -293,7 +289,7 @@ export type DocUnsupported = { kind: "unsupported" } & Raw;
 // Intersection Node
 //
 
-export type DocTypeIntersection = { kind: "intersection"; types: Node[] } & Raw;
+export type DocTypeIntersection = { kind: 'intersection'; types: Node[] } & Raw
 ```
 
 #### `T` `Expor`
@@ -304,20 +300,20 @@ export type DocTypeIntersection = { kind: "intersection"; types: Node[] } & Raw;
 //
 
 export type Expor = {
-  kind: "export";
-  name: string;
-  isTerm: boolean;
-  isType: boolean;
-  type: Node;
-};
+  kind: 'export'
+  name: string
+  isTerm: boolean
+  isType: boolean
+  type: Node
+}
 ```
 
 #### `I` `Options`
 
 ```ts
 interface Options {
-  entrypoints: string[];
-  project?: tsm.Project;
+  entrypoints: string[]
+  project?: tsm.Project
 }
 ```
 
@@ -325,11 +321,11 @@ interface Options {
 
 ```ts
 export interface Manager {
-  d: DocPackage;
-  isIndexable(t: tsm.Type): boolean;
-  isIndexed(name: string): boolean;
-  getFromIndex(name: string): Node;
-  indexIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node;
+  d: DocPackage
+  isIndexable(t: tsm.Type): boolean
+  isIndexed(name: string): boolean
+  getFromIndex(name: string): Node
+  indexIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
 }
 ```
 
@@ -339,4 +335,5 @@ export interface Manager {
 ```ts
 export type Thunk<T> = () => T
 ```
+
 <!-- END API DOCS --->

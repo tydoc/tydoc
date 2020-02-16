@@ -124,7 +124,7 @@ Object {
       "raw": Object {
         "nodeFullText": "export type A = 1 | ({ s: string } & { b: boolean });",
         "nodeText": "export type A = 1 | ({ s: string } & { b: boolean });",
-        "typeText": "import(\\"/a\\").A",
+        "typeText": "A",
       },
       "type": Object {
         "discriminantProperties": null,
@@ -133,7 +133,7 @@ Object {
         "raw": Object {
           "nodeFullText": "export type A = 1 | ({ s: string } & { b: boolean });",
           "nodeText": "export type A = 1 | ({ s: string } & { b: boolean });",
-          "typeText": "import(\\"/a\\").A",
+          "typeText": "A",
         },
         "types": Array [
           Object {

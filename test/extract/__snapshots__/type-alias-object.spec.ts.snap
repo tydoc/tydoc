@@ -28,7 +28,7 @@ Object {
               "nodeText": "export function fa(): A {
   return undefined as any;
 }",
-              "typeText": "typeof import(\\"/a\\").fa",
+              "typeText": "() => A",
             },
             "sigs": Array [
               Object {
@@ -89,7 +89,7 @@ Object {
       "raw": Object {
         "nodeFullText": "export type B = { a: string };",
         "nodeText": "export type B = { a: string };",
-        "typeText": "import(\\"/a\\").B",
+        "typeText": "B",
       },
       "type": Object {
         "kind": "object",
@@ -106,7 +106,7 @@ Object {
         "raw": Object {
           "nodeFullText": "export type B = { a: string };",
           "nodeText": "export type B = { a: string };",
-          "typeText": "import(\\"/a\\").B",
+          "typeText": "B",
         },
       },
     },
@@ -155,7 +155,7 @@ Object {
       "raw": Object {
         "nodeFullText": "export type A = { a: { aa: B } };",
         "nodeText": "export type A = { a: { aa: B } };",
-        "typeText": "import(\\"/a\\").A",
+        "typeText": "A",
       },
       "type": Object {
         "kind": "object",
@@ -178,7 +178,7 @@ Object {
               "raw": Object {
                 "nodeFullText": "{ aa: B }",
                 "nodeText": "{ aa: B }",
-                "typeText": "{ aa: import(\\"/a\\").B; }",
+                "typeText": "{ aa: B; }",
               },
             },
           },
@@ -186,7 +186,7 @@ Object {
         "raw": Object {
           "nodeFullText": "export type A = { a: { aa: B } };",
           "nodeText": "export type A = { a: { aa: B } };",
-          "typeText": "import(\\"/a\\").A",
+          "typeText": "A",
         },
       },
     },
@@ -196,7 +196,7 @@ Object {
       "raw": Object {
         "nodeFullText": "export type B = { b: { bb: A } };",
         "nodeText": "export type B = { b: { bb: A } };",
-        "typeText": "import(\\"/a\\").B",
+        "typeText": "B",
       },
       "type": Object {
         "kind": "object",
@@ -219,7 +219,7 @@ Object {
               "raw": Object {
                 "nodeFullText": "{ bb: A }",
                 "nodeText": "{ bb: A }",
-                "typeText": "{ bb: import(\\"/a\\").A; }",
+                "typeText": "{ bb: A; }",
               },
             },
           },
@@ -227,7 +227,7 @@ Object {
         "raw": Object {
           "nodeFullText": "export type B = { b: { bb: A } };",
           "nodeText": "export type B = { b: { bb: A } };",
-          "typeText": "import(\\"/a\\").B",
+          "typeText": "B",
         },
       },
     },
@@ -266,7 +266,7 @@ Object {
       "raw": Object {
         "nodeFullText": "export type A = { a: A };",
         "nodeText": "export type A = { a: A };",
-        "typeText": "import(\\"/a\\").A",
+        "typeText": "A",
       },
       "type": Object {
         "kind": "object",
@@ -283,7 +283,7 @@ Object {
         "raw": Object {
           "nodeFullText": "export type A = { a: A };",
           "nodeText": "export type A = { a: A };",
-          "typeText": "import(\\"/a\\").A",
+          "typeText": "A",
         },
       },
     },

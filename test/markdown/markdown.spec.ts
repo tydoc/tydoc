@@ -11,8 +11,9 @@ describe('options', () => {
       ).toMatchInlineSnapshot(`
         "### \`foo\`
 
+        <!-- prettier-ignore -->
         \`\`\`ts
-        typeof import(\\"/a\\").foo;
+        () => void
         \`\`\`
 
         ### Exported Types
@@ -35,8 +36,9 @@ describe('options', () => {
 
         #### \`foo\`
 
+        <!-- prettier-ignore -->
         \`\`\`ts
-        typeof import(\\"/a\\").foo;
+        () => void
         \`\`\`
 
         ### Exported Types

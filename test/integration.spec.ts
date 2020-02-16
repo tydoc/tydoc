@@ -1,6 +1,8 @@
 const sources = [
   `
-    import { D } from './b'
+    import { D, fooFromB } from './b'
+
+    export { fooFromB }
 
     /**
      * Toto
@@ -8,7 +10,9 @@ const sources = [
     export function foo(a:string, b:number) {}
     export function bar() {}
     export const toto = () => {}
-    export const fofo = function fofo2() {}
+    export const fofo = function fofo2(): number {
+      return 1
+    }
     export { A as AAlias }
     interface A {
       /**
@@ -29,6 +33,10 @@ const sources = [
       a: string
       b: string
     }
+
+    export function fooFromB(n: number): boolean {
+      return false
+    }
   `,
 ]
 
@@ -37,26 +45,37 @@ it('dox can render markdown', () => {
     .toMatchInlineSnapshot(`
     "### \`foo\`
 
+    <!-- prettier-ignore -->
     \`\`\`ts
-    typeof import(\\"/a\\").foo;
+    (a: string, b: number) => void
     \`\`\`
 
     ### \`bar\`
 
+    <!-- prettier-ignore -->
     \`\`\`ts
-    typeof import(\\"/a\\").bar;
+    () => void
+    \`\`\`
+
+    ### \`fooFromB\`
+
+    <!-- prettier-ignore -->
+    \`\`\`ts
+    (n: number) => boolean
     \`\`\`
 
     ### \`toto\`
 
+    <!-- prettier-ignore -->
     \`\`\`ts
     () => void
     \`\`\`
 
     ### \`fofo\`
 
+    <!-- prettier-ignore -->
     \`\`\`ts
-    () => void
+    () => number
     \`\`\`
 
     ### Exported Types
@@ -64,7 +83,7 @@ it('dox can render markdown', () => {
     #### \`I\` \`AAlias\`
 
     \`\`\`ts
-    typeIndexRef;
+    typeIndexRef
     \`\`\`
 
     ### Type Index
@@ -76,10 +95,10 @@ it('dox can render markdown', () => {
       /**
        * About a...
        */
-      a: string;
-      b: number;
-      c: C;
-      d: D;
+      a: string
+      b: number
+      c: C
+      d: D
     }
     \`\`\`
 
@@ -87,8 +106,8 @@ it('dox can render markdown', () => {
 
     \`\`\`ts
     interface C {
-      d: number;
-      e: string;
+      d: number
+      e: string
     }
     \`\`\`
 
@@ -96,8 +115,8 @@ it('dox can render markdown', () => {
 
     \`\`\`ts
     export interface D {
-      a: string;
-      b: string;
+      a: string
+      b: string
     }
     \`\`\`
     "
@@ -106,284 +125,328 @@ it('dox can render markdown', () => {
 
 it('dox can extract data', () => {
   expect(ctx.extract(...sources)).toMatchInlineSnapshot(`
-Object {
-  "modules": Array [
     Object {
-      "kind": "module",
-      "location": Object {
-        "absoluteFilePath": "/a.ts",
-      },
-      "mainExport": null,
-      "name": "a",
-      "namedExports": Array [
+      "modules": Array [
         Object {
-          "isTerm": true,
-          "isType": false,
-          "kind": "export",
-          "name": "foo",
-          "type": Object {
-            "hasProps": false,
-            "isOverloaded": false,
-            "kind": "callable",
-            "props": Array [],
-            "raw": Object {
-              "nodeFullText": "/**
- * Toto
- */
-export function foo(a: string, b: number) {}",
-              "nodeText": "export function foo(a: string, b: number) {}",
-              "typeText": "typeof import(\\"/a\\").foo",
-            },
-            "sigs": Array [
-              Object {
-                "kind": "sig",
-                "params": Array [
+          "kind": "module",
+          "location": Object {
+            "absoluteFilePath": "/a.ts",
+          },
+          "mainExport": null,
+          "name": "a",
+          "namedExports": Array [
+            Object {
+              "isTerm": true,
+              "isType": false,
+              "kind": "export",
+              "name": "foo",
+              "type": Object {
+                "hasProps": false,
+                "isOverloaded": false,
+                "kind": "callable",
+                "props": Array [],
+                "raw": Object {
+                  "nodeFullText": "/**
+     * Toto
+     */
+    export function foo(a: string, b: number) {}",
+                  "nodeText": "export function foo(a: string, b: number) {}",
+                  "typeText": "(a: string, b: number) => void",
+                },
+                "sigs": Array [
                   Object {
-                    "kind": "sigParam",
-                    "name": "a",
-                    "type": Object {
+                    "kind": "sig",
+                    "params": Array [
+                      Object {
+                        "kind": "sigParam",
+                        "name": "a",
+                        "type": Object {
+                          "kind": "primitive",
+                          "type": "string",
+                        },
+                      },
+                      Object {
+                        "kind": "sigParam",
+                        "name": "b",
+                        "type": Object {
+                          "kind": "primitive",
+                          "type": "number",
+                        },
+                      },
+                    ],
+                    "return": Object {
                       "kind": "primitive",
-                      "type": "string",
+                      "type": "void",
                     },
                   },
+                ],
+              },
+            },
+            Object {
+              "isTerm": true,
+              "isType": false,
+              "kind": "export",
+              "name": "bar",
+              "type": Object {
+                "hasProps": false,
+                "isOverloaded": false,
+                "kind": "callable",
+                "props": Array [],
+                "raw": Object {
+                  "nodeFullText": "export function bar() {}",
+                  "nodeText": "export function bar() {}",
+                  "typeText": "() => void",
+                },
+                "sigs": Array [
                   Object {
-                    "kind": "sigParam",
-                    "name": "b",
-                    "type": Object {
+                    "kind": "sig",
+                    "params": Array [],
+                    "return": Object {
+                      "kind": "primitive",
+                      "type": "void",
+                    },
+                  },
+                ],
+              },
+            },
+            Object {
+              "isTerm": true,
+              "isType": false,
+              "kind": "export",
+              "name": "fooFromB",
+              "type": Object {
+                "hasProps": false,
+                "isOverloaded": false,
+                "kind": "callable",
+                "props": Array [],
+                "raw": Object {
+                  "nodeFullText": "export function fooFromB(n: number): boolean {
+      return false;
+    }",
+                  "nodeText": "export function fooFromB(n: number): boolean {
+      return false;
+    }",
+                  "typeText": "(n: number) => boolean",
+                },
+                "sigs": Array [
+                  Object {
+                    "kind": "sig",
+                    "params": Array [
+                      Object {
+                        "kind": "sigParam",
+                        "name": "n",
+                        "type": Object {
+                          "kind": "primitive",
+                          "type": "number",
+                        },
+                      },
+                    ],
+                    "return": Object {
+                      "kind": "primitive",
+                      "type": "boolean",
+                    },
+                  },
+                ],
+              },
+            },
+            Object {
+              "isTerm": true,
+              "isType": false,
+              "kind": "export",
+              "name": "toto",
+              "type": Object {
+                "hasProps": false,
+                "isOverloaded": false,
+                "kind": "callable",
+                "props": Array [],
+                "raw": Object {
+                  "nodeFullText": "() => {}",
+                  "nodeText": "() => {}",
+                  "typeText": "() => void",
+                },
+                "sigs": Array [
+                  Object {
+                    "kind": "sig",
+                    "params": Array [],
+                    "return": Object {
+                      "kind": "primitive",
+                      "type": "void",
+                    },
+                  },
+                ],
+              },
+            },
+            Object {
+              "isTerm": true,
+              "isType": false,
+              "kind": "export",
+              "name": "fofo",
+              "type": Object {
+                "hasProps": false,
+                "isOverloaded": false,
+                "kind": "callable",
+                "props": Array [],
+                "raw": Object {
+                  "nodeFullText": "function fofo2(): number {
+      return 1;
+    }",
+                  "nodeText": "function fofo2(): number {
+      return 1;
+    }",
+                  "typeText": "() => number",
+                },
+                "sigs": Array [
+                  Object {
+                    "kind": "sig",
+                    "params": Array [],
+                    "return": Object {
                       "kind": "primitive",
                       "type": "number",
                     },
                   },
                 ],
-                "return": Object {
-                  "kind": "primitive",
-                  "type": "void",
-                },
               },
-            ],
-          },
-        },
-        Object {
-          "isTerm": true,
-          "isType": false,
-          "kind": "export",
-          "name": "bar",
-          "type": Object {
-            "hasProps": false,
-            "isOverloaded": false,
-            "kind": "callable",
-            "props": Array [],
-            "raw": Object {
-              "nodeFullText": "export function bar() {}",
-              "nodeText": "export function bar() {}",
-              "typeText": "typeof import(\\"/a\\").bar",
             },
-            "sigs": Array [
-              Object {
-                "kind": "sig",
-                "params": Array [],
-                "return": Object {
-                  "kind": "primitive",
-                  "type": "void",
-                },
+            Object {
+              "isTerm": false,
+              "isType": true,
+              "kind": "export",
+              "name": "AAlias",
+              "type": Object {
+                "kind": "typeIndexRef",
+                "link": "(\\"/a\\").A",
               },
-            ],
-          },
-        },
-        Object {
-          "isTerm": true,
-          "isType": false,
-          "kind": "export",
-          "name": "toto",
-          "type": Object {
-            "hasProps": false,
-            "isOverloaded": false,
-            "kind": "callable",
-            "props": Array [],
-            "raw": Object {
-              "nodeFullText": "() => {}",
-              "nodeText": "() => {}",
-              "typeText": "() => void",
             },
-            "sigs": Array [
-              Object {
-                "kind": "sig",
-                "params": Array [],
-                "return": Object {
-                  "kind": "primitive",
-                  "type": "void",
-                },
-              },
-            ],
-          },
+          ],
         },
-        Object {
-          "isTerm": true,
-          "isType": false,
-          "kind": "export",
-          "name": "fofo",
-          "type": Object {
-            "hasProps": false,
-            "isOverloaded": false,
-            "kind": "callable",
-            "props": Array [],
-            "raw": Object {
-              "nodeFullText": "function fofo2() {}",
-              "nodeText": "function fofo2() {}",
-              "typeText": "() => void",
+      ],
+      "typeIndex": Object {
+        "(\\"/a\\").A": Object {
+          "kind": "interface",
+          "name": "A",
+          "props": Array [
+            Object {
+              "kind": "prop",
+              "name": "a",
+              "type": Object {
+                "kind": "primitive",
+                "type": "string",
+              },
             },
-            "sigs": Array [
-              Object {
-                "kind": "sig",
-                "params": Array [],
-                "return": Object {
-                  "kind": "primitive",
-                  "type": "void",
-                },
+            Object {
+              "kind": "prop",
+              "name": "b",
+              "type": Object {
+                "kind": "primitive",
+                "type": "number",
               },
-            ],
+            },
+            Object {
+              "kind": "prop",
+              "name": "c",
+              "type": Object {
+                "kind": "typeIndexRef",
+                "link": "(\\"/a\\").C",
+              },
+            },
+            Object {
+              "kind": "prop",
+              "name": "d",
+              "type": Object {
+                "kind": "typeIndexRef",
+                "link": "(\\"/b\\").D",
+              },
+            },
+          ],
+          "raw": Object {
+            "nodeFullText": "interface A {
+      /**
+       * About a...
+       */
+      a: string;
+      b: number;
+      c: C;
+      d: D;
+    }",
+            "nodeText": "interface A {
+      /**
+       * About a...
+       */
+      a: string;
+      b: number;
+      c: C;
+      d: D;
+    }",
+            "typeText": "A",
           },
         },
-        Object {
-          "isTerm": false,
-          "isType": true,
-          "kind": "export",
-          "name": "AAlias",
-          "type": Object {
-            "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+        "(\\"/a\\").C": Object {
+          "kind": "interface",
+          "name": "C",
+          "props": Array [
+            Object {
+              "kind": "prop",
+              "name": "d",
+              "type": Object {
+                "kind": "primitive",
+                "type": "number",
+              },
+            },
+            Object {
+              "kind": "prop",
+              "name": "e",
+              "type": Object {
+                "kind": "primitive",
+                "type": "string",
+              },
+            },
+          ],
+          "raw": Object {
+            "nodeFullText": "interface C {
+      d: number;
+      e: string;
+    }",
+            "nodeText": "interface C {
+      d: number;
+      e: string;
+    }",
+            "typeText": "C",
           },
         },
-      ],
-    },
-  ],
-  "typeIndex": Object {
-    "(\\"/a\\").A": Object {
-      "kind": "interface",
-      "name": "A",
-      "props": Array [
-        Object {
-          "kind": "prop",
-          "name": "a",
-          "type": Object {
-            "kind": "primitive",
-            "type": "string",
+        "(\\"/b\\").D": Object {
+          "kind": "interface",
+          "name": "D",
+          "props": Array [
+            Object {
+              "kind": "prop",
+              "name": "a",
+              "type": Object {
+                "kind": "primitive",
+                "type": "string",
+              },
+            },
+            Object {
+              "kind": "prop",
+              "name": "b",
+              "type": Object {
+                "kind": "primitive",
+                "type": "string",
+              },
+            },
+          ],
+          "raw": Object {
+            "nodeFullText": "export interface D {
+      a: string;
+      b: string;
+    }",
+            "nodeText": "export interface D {
+      a: string;
+      b: string;
+    }",
+            "typeText": "D",
           },
         },
-        Object {
-          "kind": "prop",
-          "name": "b",
-          "type": Object {
-            "kind": "primitive",
-            "type": "number",
-          },
-        },
-        Object {
-          "kind": "prop",
-          "name": "c",
-          "type": Object {
-            "kind": "typeIndexRef",
-            "link": "(\\"/a\\").C",
-          },
-        },
-        Object {
-          "kind": "prop",
-          "name": "d",
-          "type": Object {
-            "kind": "typeIndexRef",
-            "link": "(\\"/b\\").D",
-          },
-        },
-      ],
-      "raw": Object {
-        "nodeFullText": "interface A {
-  /**
-   * About a...
-   */
-  a: string;
-  b: number;
-  c: C;
-  d: D;
-}",
-        "nodeText": "interface A {
-  /**
-   * About a...
-   */
-  a: string;
-  b: number;
-  c: C;
-  d: D;
-}",
-        "typeText": "import(\\"/a\\").AAlias",
       },
-    },
-    "(\\"/a\\").C": Object {
-      "kind": "interface",
-      "name": "C",
-      "props": Array [
-        Object {
-          "kind": "prop",
-          "name": "d",
-          "type": Object {
-            "kind": "primitive",
-            "type": "number",
-          },
-        },
-        Object {
-          "kind": "prop",
-          "name": "e",
-          "type": Object {
-            "kind": "primitive",
-            "type": "string",
-          },
-        },
-      ],
-      "raw": Object {
-        "nodeFullText": "interface C {
-  d: number;
-  e: string;
-}",
-        "nodeText": "interface C {
-  d: number;
-  e: string;
-}",
-        "typeText": "C",
-      },
-    },
-    "(\\"/b\\").D": Object {
-      "kind": "interface",
-      "name": "D",
-      "props": Array [
-        Object {
-          "kind": "prop",
-          "name": "a",
-          "type": Object {
-            "kind": "primitive",
-            "type": "string",
-          },
-        },
-        Object {
-          "kind": "prop",
-          "name": "b",
-          "type": Object {
-            "kind": "primitive",
-            "type": "string",
-          },
-        },
-      ],
-      "raw": Object {
-        "nodeFullText": "export interface D {
-  a: string;
-  b: string;
-}",
-        "nodeText": "export interface D {
-  a: string;
-  b: string;
-}",
-        "typeText": "import(\\"/b\\").D",
-      },
-    },
-  },
-}
-`)
+    }
+  `)
 })

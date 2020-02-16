@@ -41,7 +41,7 @@ it('raw is based on type alias declaration node', () => {
      */
     type A = {};",
             "nodeText": "type A = {};",
-            "typeText": "import(\\"/a\\").A",
+            "typeText": "A",
           },
           "type": Object {
             "kind": "object",
@@ -52,7 +52,7 @@ it('raw is based on type alias declaration node', () => {
      */
     type A = {};",
               "nodeText": "type A = {};",
-              "typeText": "import(\\"/a\\").A",
+              "typeText": "A",
             },
           },
         },

@@ -42,11 +42,17 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
   debug('prettier start')
   const formattedDocsString = Prettier.format(docsString, {
+    semi: false,
+    singleQuote: true,
     parser: 'markdown',
   })
   debug('prettier done')
 
   return formattedDocsString
+
+  //
+  // helpers
+  //
 
   /**
    * Render one module of the package.
@@ -57,6 +63,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
     ti: Doc.TypeIndex
   ): Node[] {
     debugModule('start')
+
     const exportedTypes = mod.namedExports.filter(ex => ex.isType)
     const exportedTerms = mod.namedExports.filter(ex => ex.isTerm)
 
@@ -65,7 +72,13 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
     const els = []
     const exportedTermsContent = exportedTerms.map(ex => {
       const c = section(codeSpan(ex.name))
-      c.add(tsCodeBlock((ex.type as any)?.raw.typeText))
+      // Use type text for terms. Using node text would render uninteresting and
+      // potentially massive implementation source code.
+      if (ex.type.kind === 'callable') {
+        c.add(...sigCodeBlock((ex.type as any)?.raw.typeText))
+      } else {
+        c.add(tsCodeBlock((ex.type as any)?.raw.typeText))
+      }
       return c
     })
 
@@ -94,17 +107,26 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       section('Type Index').add(
         ...Object.values(ti).map(t => {
           const c = section(typeTitle(t))
-          // prevent prettier adding a leading `;`
+          // Use type node text because type text for types is just names it
+          // seems, not informative.
           if (t.kind === 'alias' && t.type.kind === 'callable') {
-            c.add('<!-- prettier-ignore -->')
+            c.add(...sigCodeBlock(t.raw.nodeFullText))
+          } else {
+            c.add(tsCodeBlock(t.raw.nodeFullText))
           }
-          c.add(tsCodeBlock(t.raw.nodeFullText))
           return c
         })
       )
     )
 
     return els
+  }
+
+  /**
+   * prevent prettier adding a leading `;`
+   */
+  function sigCodeBlock(sig: string) {
+    return ['<!-- prettier-ignore -->', tsCodeBlock(sig)]
   }
 
   // todo need type modelling for concept of "named" type
