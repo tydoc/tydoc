@@ -11,6 +11,10 @@ it('raw is based on type alias declaration node', () => {
     Object {
       "modules": Array [
         Object {
+          "kind": "module",
+          "location": Object {
+            "absoluteFilePath": "/a.ts",
+          },
           "mainExport": null,
           "name": "a",
           "namedExports": Array [

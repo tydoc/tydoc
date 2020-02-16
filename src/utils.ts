@@ -12,6 +12,9 @@ export function casesHandled(x: never): never {
   throw new Error(`A case was not handled for value: ${x}`)
 }
 
+/**
+ * Quick and dirty logging. Not for production.
+ */
 export function dump(...args: any[]) {
   const argsInspected = args.map(a => inspect(a, { depth: 20 }))
   console.error(...argsInspected)

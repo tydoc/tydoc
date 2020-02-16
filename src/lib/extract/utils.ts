@@ -25,19 +25,7 @@ export function isPrimitive(t: tsm.Type): boolean {
   )
 }
 
-function isNode(x: unknown): x is tsm.Node {
-  return x instanceof tsm.Node
-}
-
-function isString(x: unknown): x is string {
-  return typeof x === 'string'
-}
-
-function isUndefined(x: unknown): x is undefined {
-  return x === undefined
-}
-
-export function isNodeAtTypeLevel(node: tsm.Node): boolean {
+export function isTypeLevelNode(node: tsm.Node): boolean {
   return (
     tsm.Node.isTypeAliasDeclaration(node) ||
     tsm.Node.isInterfaceDeclaration(node) ||
@@ -54,12 +42,40 @@ export function getNodeFromTypePreferingAlias(t: tsm.Type): null | tsm.Node {
 }
 
 export function isTypeFromDependencies(t: tsm.Type): boolean {
-  return (
-    t
-      .getSymbol()
-      ?.getDeclarations()[0]
-      ?.getSourceFile()
-      .getFilePath()
-      .includes('/node_modules/') ?? false
-  )
+  return getLocationKind(t) === 'dep'
+}
+
+type LocationKind =
+  | 'typeScriptCore'
+  | 'typeScriptStandardLibrary'
+  | 'dep'
+  | 'app'
+  | 'inline'
+  | 'unknown'
+
+export function getLocationKind(t: tsm.Type): LocationKind {
+  if (isPrimitive(t)) {
+    return 'typeScriptCore'
+  }
+
+  if (t.isLiteral()) {
+    return 'inline'
+  }
+
+  // todo does the order of symbol we choose matter in case of both being present?
+  const filePath = (t.getSymbol() ?? t.getAliasSymbol())
+    ?.getDeclarations()[0]
+    ?.getSourceFile()
+    .getFilePath()
+
+  if (filePath) {
+    if (filePath.includes('/node_modules/typescript/lib/'))
+      return 'typeScriptStandardLibrary'
+    if (filePath.includes('/node_modules/')) return 'dep'
+    return 'app'
+  }
+
+  // todo is ok to consider all other cases as "inline" ?
+  // example of valid case here is type of "{}" as return type from function like `() => {}`
+  if (!filePath) return 'inline'
 }

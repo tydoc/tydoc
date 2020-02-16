@@ -1,9 +1,9 @@
 import * as fs from 'fs-jetpack'
 import * as path from 'path'
 import { inspect } from 'util'
-import { extractDocsFromProject, renderMarkdown } from '../src'
+import { fromProject, renderMarkdown } from '../src'
 
-const docsData = extractDocsFromProject({ entrypoints: ['index'] })
+const docsData = fromProject({ entrypoints: ['index'] })
 
 if (process.argv[2] === '--json') {
   console.log(inspect(docsData, { depth: null }))

@@ -30,7 +30,7 @@ function createContextt() {
           })
         )
 
-      return jsde.extractDocsFromProject({
+      return jsde.fromProject({
         entrypoints: ['a'],
         project: project,
       })

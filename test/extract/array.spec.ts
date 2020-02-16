@@ -6,16 +6,21 @@ it('passes smoke test', () => {
     Object {
       "modules": Array [
         Object {
+          "kind": "module",
+          "location": Object {
+            "absoluteFilePath": "/a.ts",
+          },
           "mainExport": null,
           "name": "a",
           "namedExports": Array [
             Object {
               "isTerm": false,
               "isType": true,
+              "kind": "export",
               "name": "StringList",
               "type": Object {
-                "kind": "typeref",
-                "name": "(\\"/a\\").StringList",
+                "kind": "typeIndexRef",
+                "link": "(\\"/a\\").StringList",
               },
             },
           ],
@@ -23,12 +28,17 @@ it('passes smoke test', () => {
       ],
       "typeIndex": Object {
         "(\\"/a\\").StringList": Object {
-          "kind": "aliasAlias",
-          "name": "(\\"/a\\").StringList",
-          "refType": Object {
+          "kind": "alias",
+          "name": "StringList",
+          "raw": Object {
+            "nodeFullText": "export type StringList = string[];",
+            "nodeText": "export type StringList = string[];",
+            "typeText": "import(\\"/a\\").StringList",
+          },
+          "type": Object {
             "innerType": Object {
               "kind": "primitive",
-              "name": "string",
+              "type": "string",
             },
             "kind": "array",
           },

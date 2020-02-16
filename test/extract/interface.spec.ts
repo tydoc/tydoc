@@ -18,8 +18,8 @@ it('prop refing another interface is linked to other with a type index ref', () 
   expect(docs).toMatchObject({
     typeIndex: {
       '("/a").A': {
-        properties: [
-          { name: 'b', type: { kind: 'typeref', name: '("/a").B' } },
+        props: [
+          { name: 'b', type: { kind: 'typeIndexRef', link: '("/a").B' } },
         ],
       },
     },
@@ -32,10 +32,10 @@ it('prop inlining structure causes strcture to be documented inline', () => {
   expect(docs).toMatchObject({
     typeIndex: {
       '("/a").A': {
-        properties: [
+        props: [
           {
             name: 'b',
-            type: { properties: [{ name: 'c', type: { name: 'boolean' } }] },
+            type: { props: [{ name: 'c', type: { type: 'boolean' } }] },
           },
         ],
       },
@@ -50,9 +50,7 @@ describe('inline structure', () => {
     expect(docs).toMatchObject({
       typeIndex: {
         '("/a").A': {
-          properties: [
-            { name: 'b', type: { name: '__INLINE__', kind: 'object' } },
-          ],
+          props: [{ name: 'b', type: { kind: 'object', props: [{}] } }],
         },
       },
     })
@@ -74,7 +72,7 @@ describe('can be a named export', () => {
   it('references the type index', () => {
     const docs = ctx.extract(`export interface Foo {}`)
     expect(docs.modules[0].namedExports).toMatchObject([
-      { name: 'Foo', type: { kind: 'typeref', name: '("/a").Foo' } },
+      { name: 'Foo', type: { kind: 'typeIndexRef', link: '("/a").Foo' } },
     ])
   })
 })

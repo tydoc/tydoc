@@ -1,5 +1,5 @@
 import Command, { flags } from '@oclif/command'
-import { extractDocsFromProject, renderMarkdown } from '../../'
+import { fromProject, renderMarkdown } from '../../'
 
 export class Project extends Command {
   static strict = false
@@ -28,7 +28,7 @@ export class Project extends Command {
     //   docs = extractDocsFromProject(args.filePath)
     // }
 
-    const docs = extractDocsFromProject({ entrypoints: argv })
+    const docs = fromProject({ entrypoints: argv })
 
     if (flags.json) {
       this.log(JSON.stringify(docs, null, 2))

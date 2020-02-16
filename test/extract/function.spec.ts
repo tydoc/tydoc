@@ -2,7 +2,7 @@ describe('can be a named export', () => {
   const docs = ctx.extract(`export function fa () {}`)
   it('shows up as a named export', () => {
     expect(docs.modules[0].namedExports).toMatchObject([
-      { name: 'fa', type: { kind: 'function' } },
+      { name: 'fa', type: { kind: 'callable' } },
     ])
   })
   it('is not added to the type index', () => {
@@ -19,7 +19,7 @@ describe('parameters', () => {
           namedExports: [
             {
               type: {
-                signatures: [{ parameters: [{ name: 'pa' }, { name: 'pb' }] }],
+                sigs: [{ params: [{ name: 'pa' }, { name: 'pb' }] }],
               },
             },
           ],
@@ -35,11 +35,11 @@ describe('parameters', () => {
           namedExports: [
             {
               type: {
-                signatures: [
+                sigs: [
                   {
-                    parameters: [
-                      { name: 'pa', type: { name: 'boolean' } },
-                      { name: 'pb', type: { name: 'string' } },
+                    params: [
+                      { name: 'pa', type: { type: 'boolean' } },
+                      { name: 'pb', type: { type: 'string' } },
                     ],
                   },
                 ],
@@ -69,9 +69,7 @@ describe('parameters', () => {
             namedExports: [
               {
                 type: {
-                  signatures: [
-                    { parameters: [{ type: { name: '("/a").A' } }] },
-                  ],
+                  sigs: [{ params: [{ type: { link: '("/a").A' } }] }],
                 },
               },
             ],
@@ -89,20 +87,20 @@ describe('parameters', () => {
             namedExports: [
               {
                 type: {
-                  signatures: [
+                  sigs: [
                     {
-                      parameters: [
+                      params: [
                         {
                           name: 'pa',
                           type: {
-                            properties: [
+                            props: [
                               {
                                 name: 'a',
-                                type: { kind: 'primitive', name: 'boolean' },
+                                type: { kind: 'primitive', type: 'boolean' },
                               },
                               {
                                 name: 'b',
-                                type: { kind: 'object', properties: [] },
+                                type: { kind: 'object', props: [] },
                               },
                             ],
                           },
@@ -133,22 +131,22 @@ describe('parameters', () => {
             namedExports: [
               {
                 type: {
-                  signatures: [
+                  sigs: [
                     {
-                      parameters: [
+                      params: [
                         {
                           name: 'pa',
                           type: {
-                            properties: [
+                            props: [
                               {
                                 name: 'a',
                                 type: {
-                                  properties: [
+                                  props: [
                                     {
                                       name: 'a2',
                                       type: {
-                                        kind: 'typeref',
-                                        name: '("/a").A2',
+                                        kind: 'typeIndexRef',
+                                        link: '("/a").A2',
                                       },
                                     },
                                   ],
@@ -157,8 +155,8 @@ describe('parameters', () => {
                               {
                                 name: 'b',
                                 type: {
-                                  properties: [
-                                    { name: 'b2', type: { name: 'string' } },
+                                  props: [
+                                    { name: 'b2', type: { type: 'string' } },
                                   ],
                                 },
                               },
@@ -184,7 +182,7 @@ describe('return', () => {
     expect(docs.modules[0].namedExports).toMatchObject([
       {
         type: {
-          signatures: [{ return: { kind: 'primitive', name: 'void' } }],
+          sigs: [{ return: { kind: 'primitive', type: 'void' } }],
         },
       },
     ])
@@ -211,7 +209,7 @@ describe('return', () => {
           namedExports: [
             {
               type: {
-                signatures: [{ return: { kind: 'typeref', name: '("/a").A' } }],
+                sigs: [{ return: { kind: 'typeIndexRef', link: '("/a").A' } }],
               },
             },
           ],

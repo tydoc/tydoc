@@ -3,7 +3,7 @@ import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { Index, Thunk } from '../../utils'
-import { hasAlias, isPrimitive } from './utils'
+import { hasAlias, isPrimitive, isTypeLevelNode } from './utils'
 
 const debug = Debug('dox:doc')
 
@@ -131,6 +131,10 @@ export type TypeNode =
   | DocTypeArray
   | DocTypeObject
 
+//
+// Export Node
+//
+
 export type Expor = {
   kind: 'export'
   name: string
@@ -139,13 +143,61 @@ export type Expor = {
   type: Node
 }
 
+type ExporInput = { type: Node; name: string; node: tsm.ExportedDeclarations }
+
+export function expor(input: ExporInput): Expor {
+  const isType = isTypeLevelNode(input.node)
+  return {
+    kind: 'export',
+    name: input.name,
+    type: input.type,
+    isType: isType,
+    isTerm: !isType,
+  }
+}
+
+export type TypeIndex = Index<IndexableNode>
+
+//
+// Module Node
+//
+
 export type DocModule = {
+  kind: 'module'
   name: string
   mainExport: null | Node
   namedExports: Expor[]
 }
 
-export type TypeIndex = Index<IndexableNode>
+type ModInput = Partial<Pick<DocModule, 'mainExport' | 'namedExports'>> & {
+  name: string
+  location: {
+    absoluteFilePath: string
+    // projectRelativeFilePath: string // todo
+  }
+}
+
+export function mod(input: ModInput): DocModule {
+  return {
+    kind: 'module',
+    mainExport: null,
+    namedExports: [],
+    ...input,
+  }
+}
+
+export function modFromSourceFile(sourceFile: tsm.SourceFile): DocModule {
+  return mod({
+    name: sourceFile.getBaseNameWithoutExtension(),
+    location: {
+      absoluteFilePath: sourceFile.getFilePath(),
+    },
+  })
+}
+
+//
+// Package node
+//
 
 export type DocPackage = {
   modules: DocModule[]
@@ -159,7 +211,6 @@ export type Raw = {
     nodeFullText: string
   }
 }
-// type DocTypeBase = { checkerText: string }
 
 // prettier-ignore
 export type DocProp = { kind: 'prop'; name: string; type: Node }
@@ -253,11 +304,12 @@ export function sigParam(input: { name: string; type: Node }): DocSigParam {
   return { kind: 'sigParam', ...input }
 }
 // prettier-ignore
-export type DocUnsupported = { kind:'unsupported', checkerText: string }
+export type DocUnsupported = { kind:'unsupported' } & Raw
 // prettier-ignorp
-export function unsupported(checkerText: string): DocUnsupported {
-  return { kind: 'unsupported', checkerText }
+export function unsupported(raw: Raw): DocUnsupported {
+  return { kind: 'unsupported', ...raw }
 }
+
 // prettier-ignore
 export type DocUnion = { kind:'union', isDiscriminated: boolean, discriminantProperties: null | string[], types: Node[] } & Raw
 
