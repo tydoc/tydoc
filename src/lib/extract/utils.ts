@@ -77,5 +77,5 @@ export function getLocationKind(t: tsm.Type): LocationKind {
 
   // todo is ok to consider all other cases as "inline" ?
   // example of valid case here is type of "{}" as return type from function like `() => {}`
-  if (!filePath) return 'inline'
+  return 'inline'
 }
