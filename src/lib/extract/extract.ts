@@ -2,7 +2,14 @@ import Debug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import * as Doc from './doc'
-import { hasAlias, isCallable, isNodeAtTypeLevel, isPrimitive } from './utils'
+import {
+  getNodeFromTypePreferingAlias,
+  hasAlias,
+  isCallable,
+  isNodeAtTypeLevel,
+  isPrimitive,
+  isTypeFromDependencies,
+} from './utils'
 
 const debug = Debug('dox:extract')
 const debugExport = Debug('dox:extract:export')
@@ -213,29 +220,27 @@ function extractDocsFromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
 }
 
 function getRaw(t: tsm.Type): Doc.Raw {
-  const node = t.getSymbol()?.getDeclarations()[0]
-  if (!node) return { raw: { nodeFullText: '', nodeText: '', typeText: '' } }
+  const node = getNodeFromTypePreferingAlias(t)
+  if (!node) {
+    return {
+      raw: {
+        nodeFullText: '',
+        nodeText: '',
+        typeText: '',
+      },
+    }
+  }
   return {
     raw: {
-      typeText: t.getText(),
-      nodeText: node.getText(),
-      nodeFullText: node.getFullText(),
+      typeText: t.getText().trim(),
+      nodeText: node.getText().trim(),
+      nodeFullText: node.getFullText().trim(),
     },
   }
 }
 
-function isTypeFromDependencies(t: tsm.Type): boolean {
-  return (
-    t
-      .getSymbol()
-      ?.getDeclarations()[0]
-      ?.getSourceFile()
-      .getFilePath()
-      .includes('/node_modules/') ?? false
-  )
-}
-
 function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
+  // return doc
   // is it possible to get alias of aliases? It seems the checker "compacts"
   // these and if we __really__ wanted to "see" the chain we'd have to go the
   // node AST way.

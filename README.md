@@ -78,7 +78,7 @@ export interface Options {
 #### `DocPackage` `T`
 
 ```ts
-{
+export type DocPackage = {
   modules: DocModule[]
   typeIndex: TypeIndex
 }
@@ -127,38 +127,59 @@ type Node =
 #### `DocTypePrimitive` `T`
 
 ```ts
-{ kind: 'primitive', type: string }
+// prettier-ignore
+export type DocTypePrimitive = { kind: 'primitive', type: string }
 ```
 
 #### `DocTypeLiteral` `T`
 
 ```ts
-{ kind: 'literal'; base: string }
+// prettier-ignore
+export type DocTypeLiteral = { kind: 'literal'; base: string }
 ```
 
 #### `DocTypeArray` `T`
 
 ```ts
-{ kind: 'array'; innerType: Node }
+export type DocTypeArray = { kind: 'array'; innerType: Node }
 ```
 
 #### `DocTypeIndexRef` `T`
 
 ```ts
-{ kind: 'typeIndexRef', link: string }
+/**
+ * A link to the type index. All named types go into the type index. When a type
+ * or export includes a named type, rather than documenting it inline, a
+ * reference to the type index is created.
+ *
+ */
+export type DocTypeIndexRef = {
+  kind: 'typeIndexRef'
+  /**
+   * An identifier that can be used to lookup the type in the type index.
+   *
+   * @example
+   *
+   * ```ts
+   * docs.typeIndex[typeIndexRef.link]
+   * ```
+   */
+  link: string
+}
 ```
 
 #### `DocUnsupported` `T`
 
 ```ts
-{ kind:'unsupported', checkerText: string }
+// prettier-ignore
+export type DocUnsupported = { kind:'unsupported', checkerText: string }
 ```
 
 #### `Thunk` `F`
 
 <!-- prettier-ignore -->
 ```ts
-() => T
+export type Thunk<T> = () => T
 ```
 
 <!-- END API DOCS --->

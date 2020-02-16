@@ -44,3 +44,22 @@ export function isNodeAtTypeLevel(node: tsm.Node): boolean {
     tsm.Node.isPropertySignature(node)
   )
 }
+
+export function getNodeFromTypePreferingAlias(t: tsm.Type): null | tsm.Node {
+  const as = t.getAliasSymbol()
+  if (as) return as.getDeclarations()[0]
+  const s = t.getSymbol()
+  if (s) return s.getDeclarations()[0]
+  return null
+}
+
+export function isTypeFromDependencies(t: tsm.Type): boolean {
+  return (
+    t
+      .getSymbol()
+      ?.getDeclarations()[0]
+      ?.getSourceFile()
+      .getFilePath()
+      .includes('/node_modules/') ?? false
+  )
+}

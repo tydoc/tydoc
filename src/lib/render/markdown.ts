@@ -86,12 +86,12 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
               tsCodeBlock(
                 `type ${t.name} = \n  | ` +
                   t.type.types
-                    .map((t: any) => t.name ?? t?.raw?.nodeText ?? '')
+                    .map((t: any) => t.name ?? t?.raw?.nodeFullText ?? '')
                     .join('  \n  | ')
               )
             )
           } else {
-            c.add(tsCodeBlock(t.raw.nodeText))
+            c.add(tsCodeBlock(t.raw.nodeFullText))
           }
           return c
         })

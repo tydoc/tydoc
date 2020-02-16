@@ -181,8 +181,26 @@ export type DocTypePrimitive = { kind: 'primitive', type: string }
 export function prim(type: string): DocTypePrimitive {
   return { kind: 'primitive', type }
 }
-// prettier-ignore
-export type DocTypeIndexRef = { kind: 'typeIndexRef', link: string }
+
+/**
+ * A link to the type index. All named types go into the type index. When a type
+ * or export includes a named type, rather than documenting it inline, a
+ * reference to the type index is created.
+ *
+ */
+export type DocTypeIndexRef = {
+  kind: 'typeIndexRef'
+  /**
+   * An identifier that can be used to lookup the type in the type index.
+   *
+   * @example
+   *
+   * ```ts
+   * docs.typeIndex[typeIndexRef.link]
+   * ```
+   */
+  link: string
+}
 
 export function typeIndexRef(link: string): DocTypeIndexRef {
   return { kind: 'typeIndexRef', link }
