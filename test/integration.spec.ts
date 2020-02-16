@@ -37,27 +37,39 @@ it('dox can render markdown', () => {
     .toMatchInlineSnapshot(`
     "### \`foo\`
 
+    \`\`\`ts
+    typeof import(\\"/a\\").foo;
+    \`\`\`
 
     ### \`bar\`
 
+    \`\`\`ts
+    typeof import(\\"/a\\").bar;
+    \`\`\`
 
     ### \`toto\`
 
+    \`\`\`ts
+    () => void
+    \`\`\`
 
     ### \`fofo\`
 
+    \`\`\`ts
+    () => void
+    \`\`\`
 
     ### Exported Types
 
-    #### \`AAlias\` \`I\`
+    #### \`I\` \`AAlias\`
 
     \`\`\`ts
-    typeIndexRef
+    typeIndexRef;
     \`\`\`
 
     ### Type Index
 
-    #### \`A\` \`I\`
+    #### \`I\` \`A\`
 
     \`\`\`ts
     interface A {
@@ -71,7 +83,7 @@ it('dox can render markdown', () => {
     }
     \`\`\`
 
-    #### \`C\` \`I\`
+    #### \`I\` \`C\`
 
     \`\`\`ts
     interface C {
@@ -80,7 +92,7 @@ it('dox can render markdown', () => {
     }
     \`\`\`
 
-    #### \`D\` \`I\`
+    #### \`I\` \`D\`
 
     \`\`\`ts
     export interface D {
@@ -88,7 +100,6 @@ it('dox can render markdown', () => {
       b: string;
     }
     \`\`\`
-
     "
   `)
 })

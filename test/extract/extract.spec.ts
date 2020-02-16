@@ -652,7 +652,7 @@ Object {
               "raw": Object {
                 "nodeFullText": "",
                 "nodeText": "",
-                "typeText": "",
+                "typeText": "{}",
               },
             },
           },

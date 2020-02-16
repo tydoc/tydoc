@@ -11,13 +11,13 @@ describe('options', () => {
       ).toMatchInlineSnapshot(`
         "### \`foo\`
 
+        \`\`\`ts
+        typeof import(\\"/a\\").foo;
+        \`\`\`
 
         ### Exported Types
 
-
         ### Type Index
-
-
         "
       `)
     })
@@ -35,13 +35,13 @@ describe('options', () => {
 
         #### \`foo\`
 
+        \`\`\`ts
+        typeof import(\\"/a\\").foo;
+        \`\`\`
 
         ### Exported Types
 
-
         ### Type Index
-
-
         "
       `)
     })

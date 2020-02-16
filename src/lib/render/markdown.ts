@@ -65,7 +65,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
     const els = []
     const exportedTermsContent = exportedTerms.map(ex => {
       const c = section(codeSpan(ex.name))
-      c.add(tsCodeBlock((ex.type as any)?.raw.typeText()))
+      c.add(tsCodeBlock((ex.type as any)?.raw.typeText))
       return c
     })
 
