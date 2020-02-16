@@ -6,40 +6,34 @@ function createContextt() {
   const project = new tsm.Project({
     addFilesFromTsConfig: false,
     useInMemoryFileSystem: true,
-    skipLoadingLibFiles: true,
   })
 
   const api = {
     markdown(opts: jsde.RenderMarkdownOptions, ...sources: string[]) {
-      return jsde.renderMarkdown(api.given(...sources), opts)
+      return jsde.renderMarkdown(api.extract(...sources), opts)
     },
     /**
      * Pass a set of synthetic source files. The first source is considered the
      * entrypoint. Files are named by alphabet letters, starting from "a",
      * incrementing toward "z".
      */
-    given(...sources: string[]) {
+    extract(...sources: string[]) {
       const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
       const sourcesFormatted = sources.map(source =>
         Prettier.format(source, { parser: 'typescript' })
       )
-      const sourceFiles = sourcesFormatted
+      sourcesFormatted
         .map(source => [letters.shift()!, source])
-        .map(([moduleName, source]) =>
+        .forEach(([moduleName, source]) =>
           project.createSourceFile(`${moduleName}.ts`, source, {
             overwrite: true,
           })
         )
-      const entrypoint = sourceFiles[0]
-      return jsde.extractDocsFromModule(entrypoint)
-    },
-    givenVariables(source: string) {
-      return api.given(source) as {
-        terms: jsde.DocVariable[]
-        types: any
-        hybrids: any
-        length: number
-      }
+
+      return jsde.fromProject({
+        entrypoints: ['a'],
+        project: project,
+      })
     },
   }
 

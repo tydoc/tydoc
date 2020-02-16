@@ -1,517 +1,325 @@
+import Debug from 'debug'
+import * as path from 'path'
 import * as tsm from 'ts-morph'
-import { inspect } from 'util'
-import { casesHandled } from '../../utils'
+import * as Doc from './doc'
+import {
+  getLocationKind,
+  getNodeFromTypePreferingAlias,
+  hasAlias,
+  isCallable,
+  isPrimitive,
+} from './utils'
 
-/**
- * The root of documentation data.
- */
-export interface Docs {
-  terms: (DocFunction | DocVariable)[]
-  /**
-   * todo
-   */
-  types: (DocTypeAlias | DocInterface)[]
-  typeIndex: Record<string, DocTypeAlias | DocInterface>
-  hybrids: any[]
-  length: number
-}
+const debug = Debug('dox:extract')
+const debugExport = Debug('dox:extract:export')
+const debugVisible = Debug('dox:extract:visible')
+const debugWarn = Debug('dox:warn')
 
-interface DocsManager {
-  add(docItem: DocItem): DocsManager
-  getTypeDoc(name: string): null | DocTypeAlias | DocInterface
-  addTypeDoc(docItem: DocTypeAlias | DocInterface): DocsManager
-  data(): Docs
+interface Options {
+  entrypoints: string[]
+  project?: tsm.Project
 }
 
 /**
- * Create a new set of docs.
+ * Recursively extract docs from the given project starting from the exports of
+ * the given list of entrypoint modules. Everything that is reachable from the
+ * exports will be considered part of the API.
  */
-function createDocs(): DocsManager {
-  const data: Docs = {
-    terms: [],
-    hybrids: [],
-    types: [],
-    typeIndex: {},
-    length: 0,
+export function fromProject(opts: Options): Doc.DocPackage {
+  const project =
+    opts.project ??
+    new tsm.Project({
+      tsConfigFilePath: path.join(process.cwd(), 'tsconfig.json'),
+    })
+
+  // If the project is in a bad state don't bother trying to extract docs from it
+  const diagnostics = project.getPreEmitDiagnostics()
+  if (diagnostics.length) {
+    const message = project.formatDiagnosticsWithColorAndContext(diagnostics)
+    throw new Error(message)
   }
 
-  const api: DocsManager = {
-    /**
-     * Add a doc item to docs.
-     */
-    add(doc) {
-      data[
-        doc.languageLevel === 'term'
-          ? 'terms'
-          : doc.languageLevel === 'type'
-          ? 'types'
-          : doc.languageLevel === 'hybrid'
-          ? 'hybrids'
-          : casesHandled(doc.languageLevel)
-      ].push(doc)
-      data.length++
-      return api
-    },
-    getTypeDoc(name) {
-      return data.typeIndex[name] ?? null
-    },
-    addTypeDoc(docItem) {
-      data.typeIndex[docItem.name] = docItem
-      return api
-    },
-    data() {
-      return data
-    },
+  const sourceFiles = project.getSourceFiles()
+  if (sourceFiles.length === 0) {
+    throw new Error('No source files found in project to document.')
   }
+  debug(
+    'found project source files ',
+    sourceFiles.map(sf => sf.getFilePath())
+  )
 
-  return api
-}
-
-interface JSDocBlock {
-  source: string
-}
-
-/**
- * It is possible for multiple jsDoc blocks to appear in succession. When
- * source code is authored that way, the jsDoc blocks _after_ the one closest
- * to the code item appear here. For example:
- *
- *    /**
- *     *   foo 2           <-- Goes into additional jsDoc blocks group
- *     *\/
- *    /**
- *     *   foo 1           <-- Considered the primary jsDoc block
- *     *\/
- *     const a = 1
- *
- */
-interface JSDocContent {
-  /**
-   * The jsDoc block closest to the code.
-   */
-  primary: JSDocBlock
-  additional: JSDocBlock[]
-}
-
-interface TypeData {
-  name: string
-}
-
-// todo separate concepts exported vs not exported
-// term
-// exported term
-// type
-// exported type
-// hybrid
-// exported hybrid
-
-interface DocBase {
-  name: string
-  jsDoc: null | JSDocContent
-  text: string
-  textWithJSDoc: string
-  /**
-   * This is about if the item is from the JavaScript language or the TypeScript
-   * type system. "term" refers to JavaScript values. "type" refers to
-   * TypeSript types. "hybrid" refers to constructs span both levels, such as classes.
-   */
-  languageLevel: 'term' | 'type' | 'hybrid'
-  sourceLocation: {
-    filePath: string
-    fileLine: number
-  }
-}
-
-type SignatureData = {
-  parameters: { name: string; type: TypeData }[]
-  return: TypeData
-}
-
-export interface DocFunction extends DocBase {
-  kind: 'function'
-  signature: SignatureData & {
-    text: string
-  }
-}
-
-export interface DocVariable extends DocBase {
-  kind: 'variable'
-  type: TypeData
-}
-
-export interface DocTypeAlias extends DocBase {
-  kind: 'typeAlias'
-  exported: null | { name: string }
-  properties: {
-    jsDoc: null | JSDocContent
-    name: string
-    type: { name: string }
-  }[]
-}
-
-export interface DocInterface extends DocBase {
-  kind: 'interface'
-  exported: null | { name: string }
-  properties: {
-    jsDoc: null | JSDocContent
-    name: string
-    type: {
-      name: string
+  const sourceFileEntrypoints = []
+  for (const findEntryPoint of opts.entrypoints) {
+    const sf = sourceFiles.find(
+      sf => sf.getBaseNameWithoutExtension() === findEntryPoint
+    )
+    if (!sf) {
+      throw new Error(
+        `Given entrypoint not found in project: ${findEntryPoint}`
+      )
     }
-  }[]
-}
-
-export interface DocObject extends DocBase {
-  kind: 'object'
-  properties: { name: string; type: TypeData }[]
-}
-
-export type DocItem =
-  | DocObject
-  | DocFunction
-  | DocVariable
-  | DocTypeAlias
-  | DocInterface
-
-type TypeIndex = Record<string, DocItem>
-
-/**
- * Extract docs from the module found at the given file path.
- */
-export function extractDocsFromModuleAtPath(filePath: string) {
-  const project = new tsm.Project({ addFilesFromTsConfig: true })
-
-  project.addSourceFileAtPathIfExists(filePath)
-
-  const source = project.getSourceFile(filePath)
-
-  if (!source) {
-    throw new Error(`No file at ${filePath}`)
+    sourceFileEntrypoints.push(sf)
   }
 
-  return extractDocsFromModule(source)
+  const docman = Doc.createManager()
+  sourceFileEntrypoints.forEach(sf => {
+    fromModule(docman, sf)
+  })
+
+  return docman.d
 }
-
-function extractExportedInterface(
-  docs: DocsManager,
-  exportName: string,
-  dec: tsm.InterfaceDeclaration
-): void {
-  extractInterface(exportName, docs, dec)
-}
-
-function extractInterface(
-  exportName: null | string,
-  docs: DocsManager,
-  dec: tsm.InterfaceDeclaration
-): void {
-  if (docs.getTypeDoc(dec.getName())) return
-
-  const docItem: DocInterface = {
-    ...extractCommon(dec),
-    kind: 'interface',
-    languageLevel: 'type',
-    exported: exportName ? { name: exportName } : null,
-    text: dec.getText(),
-    textWithJSDoc: dec.getFullText().trim(),
-    name: dec.getName(),
-    jsDoc: extractJSDoc(dec),
-    properties: dec.getProperties().map(propSig => {
-      const type = propSig.getType()
-      if (type.isInterface()) {
-        extractInterface(
-          null,
-          docs,
-          type.getSymbol()!.getDeclarations()[0]! as tsm.InterfaceDeclaration
-        )
-      }
-      const doc = {
-        jsDoc: extractJSDoc(propSig),
-        name: propSig.getName(),
-        type: {
-          name: type.getText(),
-          isPrimitive: !type.isObject(),
-        },
-      }
-      return doc
-    }),
-  }
-
-  docs.addTypeDoc(docItem)
-}
-
-// function extractObject(
-//   exportName: string,
-//   docs: DocsManager,
-//   node: tsm.ObjectLiteralExpression
-// ) {
-//   type.getProperties().map(prop => {})
-//   docs.add({
-//     ...extractCommon(dec),
-//     kind: 'object',
-//     jsDoc,
-//     languageLevel: 'term',
-//     name: dec.getName(),
-//     text: dec.getText(),
-//     textWithJSDoc: dec.getFullText(),
-//     properties: initializer
-//       .getType()
-//       .getProperties()
-//       .map(prop => {
-//         return {
-//           name: prop.getName(),
-//           type: {
-//             name: prop.getType().getText(),
-//           },
-//         }
-//       }),
-//   })
-// }
 
 /**
- * Extract docs from the given module.
+ * Recursively extract docs starting from exports of the given module.
+ * Everything that is reachable will be considered.
  */
-export function extractDocsFromModule(sourceFile: tsm.SourceFile): Docs {
-  const exs = sourceFile.getExportedDeclarations()
-  const docs = createDocs()
+export function fromModule(
+  docs: Doc.Manager,
+  sourceFile: tsm.SourceFile
+): Doc.DocPackage {
+  const mod = Doc.modFromSourceFile(sourceFile)
 
-  for (const [name, decs] of exs) {
-    const dec = decs[0]
-
-    if (tsm.Node.isFunctionDeclaration(dec)) {
-      const doc = extractFunction(dec) as DocFunction
-      doc.name = name
-      docs.add(doc)
+  for (const ex of sourceFile.getExportedDeclarations()) {
+    const exportName = ex[0]
+    const n = ex[1][0]
+    debugExport('start')
+    debugExport('-> node kind is %s', n.getKindName())
+    debugExport('-> type text is %j', n.getType().getText())
+    const doc = fromType(docs, n.getType())
+    if (exportName === 'default') {
+      mod.mainExport = doc
       continue
     }
-
-    if (tsm.Node.isInterfaceDeclaration(dec)) {
-      extractExportedInterface(docs, name, dec)
-      continue
-    }
-
-    if (tsm.Node.isTypeAliasDeclaration(dec)) {
-      docs.add({
-        ...extractCommon(dec),
-        kind: 'typeAlias',
-        languageLevel: 'type',
-        exported: {
-          name,
-        },
-        properties: dec
-          .getType()
-          .getProperties()
-          .map(sym => {
-            // todo easier to work with prop sig... see interface example
-            const type = sym.getTypeAtLocation(dec)
-            let jsDoc = null
-            const valDec = sym.getValueDeclaration()
-            if (valDec && tsm.Node.isPropertySignature(valDec)) {
-              jsDoc = extractJSDoc(valDec)
-            }
-            return {
-              jsDoc,
-              name: sym.getName(),
-              type: {
-                name: type.getText(),
-                isPrimitive: !type.isObject(),
-              },
-            }
-          }),
-        name,
-        text: dec.getText(false),
-        textWithJSDoc: dec.getText(true),
-        jsDoc: extractJSDoc(dec),
+    mod.namedExports.push(
+      Doc.expor({
+        name: exportName,
+        type: doc,
+        node: n,
       })
-      continue
-    }
-
-    if (tsm.Node.isVariableDeclaration(dec)) {
-      // jsDoc lives at var statement level
-      const statement = dec.getParent().getParent()
-      const jsDoc = tsm.Node.isVariableStatement(statement)
-        ? extractJSDoc(statement)
-        : null
-
-      // If the variable is pointing to a function we will treat it like as if
-      // it were a function declaration.
-      const initializer = dec.getInitializer()
-      if (initializer) {
-        if (
-          tsm.Node.isArrowFunction(initializer) ||
-          tsm.Node.isFunctionExpression(initializer)
-        ) {
-          const doc = extractFunction(initializer) as DocFunction
-          doc.name = name
-          docs.add(doc)
-          continue
-        }
-        // if (tsm.Node.isObjectLiteralExpression(initializer)) {
-        //   extractObject(name, docs, initializer)
-        //   continue
-        // }
-      }
-
-      const typeName = dec.getType().getText()
-
-      docs.add({
-        ...extractCommon(dec),
-        kind: 'variable',
-        languageLevel: 'term',
-        name,
-        // type: type && extractTypeData(type),
-        type: {
-          name: typeName,
-        },
-        text: dec.getText(false),
-        textWithJSDoc: dec.getText(true),
-        jsDoc,
-      })
-      continue
-    }
-
-    // todo
-    // casesHandled(declaration)
-
-    throw new Error(
-      `unknown kind of declaration or declaration scenario\n\n${inspect(dec)}`
     )
   }
 
-  return docs.data()
+  docs.d.modules.push(mod)
+  return docs.d
 }
 
-// function extractObjectLiteral(node:tsm.object){}
+function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
+  debugVisible('start')
+  debugVisible('-> type text is %j', t.getText())
+  const locationKind = getLocationKind(t)
+  debugVisible('-> type location is %s', locationKind)
 
-/**
- * Extract doc data that is common to all doc items from the given declaration.
- */
-function extractCommon(dec: tsm.ExportedDeclarations) {
-  const sourceFile = dec.getSourceFile()
-  const filePath = sourceFile.getFilePath()
-  const fileLine = dec.getStartLineNumber()
-  const commonDocData = {
-    sourceLocation: {
-      filePath,
-      fileLine,
-    },
+  if (locationKind === 'dep') {
+    debugVisible('-> location is a dependency, stopping here')
+    return Doc.unsupported(getRaw(t))
   }
-  return commonDocData
+  if (locationKind === 'typeScriptStandardLibrary') {
+    // we handle arrays specially below
+    if (!t.isArray()) {
+      debugVisible('-> location is standard lib and not array, stopping here')
+      return Doc.unsupported(getRaw(t))
+    }
+  }
+  if (locationKind === 'unknown') {
+    debugWarn(
+      '-> location is unknown, stopping here to be safe (code needs to be updated to handle this case)'
+    )
+    return Doc.unsupported(getRaw(t))
+  }
+  if (manager.isIndexable(t)) {
+    debugVisible('-> type is indexable')
+    const fqtn = Doc.getFullyQualifiedTypeName(t)
+    if (manager.isIndexed(fqtn)) {
+      debugVisible(
+        '-> type is being documented as link to the type index (aka. cache hit)'
+      )
+      return Doc.typeIndexRef(fqtn)
+    }
+  } else {
+    debugVisible('-> type is not indexable')
+  }
+  if (t.isLiteral()) {
+    debugVisible('-> type is literal')
+    return Doc.literal({
+      name: t.getText(),
+      base: t.getBaseTypeOfLiteralType().getText(),
+    })
+  }
+  if (isPrimitive(t)) {
+    debugVisible('-> type is primitive')
+    return Doc.prim(t.getText())
+  }
+  if (t.isArray()) {
+    debugVisible('-> type is array')
+    const innerType = t.getArrayElementTypeOrThrow()
+    debugVisible('-> handle array inner type %s', innerType.getText())
+    return manager.indexIfApplicable(t, () =>
+      extractAliasIfOne(t, Doc.array(fromType(manager, innerType)))
+    )
+  }
+  if (t.isInterface()) {
+    debugVisible('-> type is interface')
+    const s = t.getSymbolOrThrow()
+    return manager.indexIfApplicable(t, () =>
+      Doc.inter({
+        name: s.getName(),
+        props: propertyDocsFromType(manager, t),
+        ...getRaw(t),
+      })
+    )
+  }
+  // Place before object becuase objects are superset.
+  if (isCallable(t)) {
+    debugVisible('-> type is callable')
+    return manager.indexIfApplicable(t, () =>
+      extractAliasIfOne(
+        t,
+        Doc.callable({
+          props: propertyDocsFromType(manager, t),
+          sigs: sigDocsFromType(manager, t),
+          ...getRaw(t),
+        })
+      )
+    )
+  }
+  // Place after callable check because objects are superset.
+  if (t.isObject()) {
+    debugVisible('-> type is object')
+    return manager.indexIfApplicable(t, () =>
+      extractAliasIfOne(
+        t,
+        Doc.obj({
+          props: propertyDocsFromType(manager, t),
+          ...getRaw(t),
+        })
+      )
+    )
+  }
+  if (t.isUnion()) {
+    debugVisible('-> type is union')
+    return manager.indexIfApplicable(t, () =>
+      extractAliasIfOne(
+        t,
+        Doc.union({
+          ...getRaw(t),
+          types: t.getUnionTypes().map(tm => {
+            debugVisible('-> handle union member %s', tm.getText())
+            // todo no extract alias here ...
+            return extractAliasIfOne(tm, fromType(manager, tm))
+          }),
+        })
+      )
+    )
+  }
+  if (t.isIntersection()) {
+    debugVisible('-> type is intersection')
+    return manager.indexIfApplicable(t, () =>
+      extractAliasIfOne(
+        t,
+        Doc.intersection({
+          ...getRaw(t),
+          types: t.getIntersectionTypes().map(tm => {
+            debugVisible('-> handle intersection member %s', tm.getText())
+            return fromType(manager, tm)
+          }),
+        })
+      )
+    )
+  }
+  debugWarn('unsupported kind of type %s', t.getText())
+  return Doc.unsupported(getRaw(t))
 }
 
-/**
- * Extract docs from the given Function like node. This does not quite return
- * full doc data because jsDoc is kept on variable declarations and name should
- * be the exported one not the maybe-present explicit function expression name.
- */
-function extractFunction(
-  node: tsm.ArrowFunction | tsm.FunctionExpression | tsm.FunctionDeclaration
-): Omit<DocFunction, 'name'> {
-  // todo anything useful we can by revealing explicitly named function expressions?
-  // let maybeName = ''
-  // if (dec instanceof tsm.FunctionExpression) {
-  //   maybeName = dec.getName() ?? ''
-  // }
+function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
+  return t.getCallSignatures().map(sig => {
+    const tRet = sig.getReturnType()
+    const params = sig.getParameters()
+    debugVisible('handle callable return: %s', tRet.getText())
+    return Doc.sig({
+      return: fromType(docs, tRet),
+      params: params.map(p => {
+        const node = p.getDeclarations()[0]
+        const paramName = p.getName()
+        const paramType = node.getType()
+        // what is this method for then? It was just returning an `any` type
+        // const paramType = p.getDeclaredType()
+        // prettier-ignore
+        debugVisible('handle callable param: %s %s %s', node.getKindName(), paramName, paramType.getText())
+        return Doc.sigParam({
+          name: paramName,
+          type: fromType(docs, paramType),
+        })
+      }),
+    })
+  })
+}
 
-  let jsDoc = null
-  if (tsm.Node.isFunctionDeclaration(node)) {
-    jsDoc = extractJSDoc(node)
-  } else {
-    // An ArrowFunction or FunctionExpression can be within an exported
-    // variable. jsDoc lives at the variable statement level. Try to find it.
-    //
-    // The ast scenario supported here is:
-    //    var statement > var dec list > var dec > (arrow func|func exp)
-    //
-    const maybeVarDec = node
-      .getParent()
-      .getParent()
-      ?.getParent()
-    if (maybeVarDec && tsm.Node.isVariableDeclaration(maybeVarDec)) {
-      jsDoc = extractJSDoc(node)
+function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
+  return t.getProperties().map(p => {
+    // prettier-ignore
+    const node = p.getDeclarations()[0] as tsm.PropertySignature | tsm.MethodSignature
+    const propName = p.getName()
+    const propType = node.getType()
+    // what is this method for then? It was just returning an `any` type
+    // const propType = p.getDeclaredType()
+    // prettier-ignore
+    debugVisible('handle property: %s %s %s', node.getKindName(), propName, propType.getText())
+    // Do not try to index type here. Must come after index lookup.
+    return Doc.prop({
+      name: propName,
+      type: fromType(docs, propType),
+    })
+  })
+}
+
+function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
+  // is it possible to get alias of aliases? It seems the checker "compacts"
+  // these and if we __really__ wanted to "see" the chain we'd have to go the
+  // node AST way.
+  // debug(as?.getAliasedSymbol()?.getName())
+  if (!hasAlias(t)) {
+    return doc
+  }
+  const as = t.getAliasSymbol()!
+  debug('-> type had alias %s (extracting a doc node for it)', as.getName())
+  return Doc.alias({
+    name: as.getName(),
+    type: doc,
+    ...getRaw(t),
+  })
+}
+
+function getRaw(t: tsm.Type): Doc.Raw {
+  /**
+   * The use-alias-outside-current-scope flag makes it so that the type for
+   * something imported is seen not as `import(...).<name>` but the actual type
+   * from the thing's origin.
+   */
+  const typeText = t
+    .getText(
+      undefined,
+      tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope
+    )
+    .trim()
+
+  const node = getNodeFromTypePreferingAlias(t)
+
+  if (!node) {
+    return {
+      raw: {
+        typeText: typeText,
+        // todo null instead of empty string?
+        nodeFullText: '',
+        nodeText: '',
+      },
     }
   }
 
-  const signatureData = {
-    parameters: node
-      .getParameters()
-      .map(p => ({ name: p.getName(), type: getTypeData(p.getType()) })),
-    return: getTypeData(node.getReturnType()),
-  }
-
-  const doc = {
-    kind: 'function',
-    languageLevel: 'term',
-    text: node.getText(false),
-    textWithJSDoc: node.getText(true),
-    signature: {
-      // todo bespoke, there are tools available in TS api to get signatures.
-      // Check if they offer better solution. We use them for example in the
-      // Nexus addToContext API. Check it out for reference.
-      ...signatureData,
-      text: renderSignature(signatureData),
-    },
-    jsDoc,
-    ...extractCommon(node),
-  } as Omit<DocFunction, 'name'>
-
-  return doc
-}
-
-/**
- * Render signature for the given signature data.
- */
-function renderSignature(sig: SignatureData): string {
-  let s = ''
-
-  s += '('
-  if (sig.parameters.length > 0) {
-    s += sig.parameters
-      .map(p => {
-        return p.name + ': ' + p.type.name
-      })
-      .join(', ')
-  }
-  s += ')'
-
-  s += ` => ${sig.return.name}`
-
-  return s
-}
-
-/**
- * Extract JSDoc from node. Tease apart primary block from additional blocks.
- */
-function extractJSDoc(node: tsm.JSDocableNode): null | JSDocContent {
-  const jsDocs = node.getJsDocs().map(doc => ({ source: doc.getInnerText() }))
-
-  if (jsDocs.length === 0) return null
-  if (jsDocs.length === 1) return { primary: jsDocs[0], additional: [] }
-
-  return { primary: jsDocs.pop()!, additional: jsDocs }
-}
-
-function getTypeData(type: tsm.Type): TypeData {
   return {
-    name: type.getText(undefined, tsm.ts.TypeFormatFlags.None),
+    raw: {
+      typeText: typeText,
+      nodeText: node.getText().trim(),
+      nodeFullText: node.getFullText().trim(),
+    },
   }
 }
-
-// type TypeMetaData = {
-//   text: string
-//   properties: {
-//     name: string
-//     type: any // todo TypeMetaData
-//   }[]
-// }
-
-// function extractTypeData(type: tsm.Type<tsm.ts.Type>): TypeMetaData {
-//   const properties = type.getApparentProperties()
-//   return {
-//     text: type.getText(),
-//     properties: properties.map(p => ({
-//       name: p.getName(),
-//       type: extractTypeData(p.getDeclaredType()),
-//     })),
-//   }
-// }

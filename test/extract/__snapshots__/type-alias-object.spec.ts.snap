@@ -1,0 +1,292 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`can be a return type ref 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": true,
+          "isType": false,
+          "kind": "export",
+          "name": "fa",
+          "type": Object {
+            "hasProps": false,
+            "isOverloaded": false,
+            "kind": "callable",
+            "props": Array [],
+            "raw": Object {
+              "nodeFullText": "export function fa(): A {
+  return undefined as any;
+}",
+              "nodeText": "export function fa(): A {
+  return undefined as any;
+}",
+              "typeText": "() => A",
+            },
+            "sigs": Array [
+              Object {
+                "kind": "sig",
+                "params": Array [],
+                "return": Object {
+                  "kind": "typeIndexRef",
+                  "link": "(\\"/a\\").A",
+                },
+              },
+            ],
+          },
+        },
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "B",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(\\"/a\\").B",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "type A = { b: B };",
+        "nodeText": "type A = { b: B };",
+        "typeText": "A",
+      },
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "b",
+            "type": Object {
+              "kind": "typeIndexRef",
+              "link": "(\\"/a\\").B",
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "type A = { b: B };",
+          "nodeText": "type A = { b: B };",
+          "typeText": "A",
+        },
+      },
+    },
+    "(\\"/a\\").B": Object {
+      "kind": "alias",
+      "name": "B",
+      "raw": Object {
+        "nodeFullText": "export type B = { a: string };",
+        "nodeText": "export type B = { a: string };",
+        "typeText": "B",
+      },
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "a",
+            "type": Object {
+              "kind": "primitive",
+              "type": "string",
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "export type B = { a: string };",
+          "nodeText": "export type B = { a: string };",
+          "typeText": "B",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`can be recursive within inline objects 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(\\"/a\\").A",
+          },
+        },
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "B",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(\\"/a\\").B",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "export type A = { a: { aa: B } };",
+        "nodeText": "export type A = { a: { aa: B } };",
+        "typeText": "A",
+      },
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "a",
+            "type": Object {
+              "kind": "object",
+              "props": Array [
+                Object {
+                  "kind": "prop",
+                  "name": "aa",
+                  "type": Object {
+                    "kind": "typeIndexRef",
+                    "link": "(\\"/a\\").B",
+                  },
+                },
+              ],
+              "raw": Object {
+                "nodeFullText": "{ aa: B }",
+                "nodeText": "{ aa: B }",
+                "typeText": "{ aa: B; }",
+              },
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "export type A = { a: { aa: B } };",
+          "nodeText": "export type A = { a: { aa: B } };",
+          "typeText": "A",
+        },
+      },
+    },
+    "(\\"/a\\").B": Object {
+      "kind": "alias",
+      "name": "B",
+      "raw": Object {
+        "nodeFullText": "export type B = { b: { bb: A } };",
+        "nodeText": "export type B = { b: { bb: A } };",
+        "typeText": "B",
+      },
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "b",
+            "type": Object {
+              "kind": "object",
+              "props": Array [
+                Object {
+                  "kind": "prop",
+                  "name": "bb",
+                  "type": Object {
+                    "kind": "typeIndexRef",
+                    "link": "(\\"/a\\").A",
+                  },
+                },
+              ],
+              "raw": Object {
+                "nodeFullText": "{ bb: A }",
+                "nodeText": "{ bb: A }",
+                "typeText": "{ bb: A; }",
+              },
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "export type B = { b: { bb: A } };",
+          "nodeText": "export type B = { b: { bb: A } };",
+          "typeText": "B",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`can be self recursive 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(\\"/a\\").A",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "export type A = { a: A };",
+        "nodeText": "export type A = { a: A };",
+        "typeText": "A",
+      },
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "a",
+            "type": Object {
+              "kind": "typeIndexRef",
+              "link": "(\\"/a\\").A",
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "export type A = { a: A };",
+          "nodeText": "export type A = { a: A };",
+          "typeText": "A",
+        },
+      },
+    },
+  },
+}
+`;

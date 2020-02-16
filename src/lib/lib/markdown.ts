@@ -8,23 +8,23 @@ interface Renderable {
 
 type SectionData = {
   title: string
-  children: RenderLike[]
+  children: Node[]
 }
 
 interface Section extends Renderable {
-  add(...content: RenderLike[]): Section
+  add(...content: Node[]): Section
 }
 
 interface CodeBlock extends Renderable {}
 
 type DocumentData = {
-  children: RenderLike[]
+  children: Node[]
 }
 
-type RenderLike = Renderable | string
+export type Node = Renderable | string
 
 interface Document extends Renderable {
-  add(...content: RenderLike[]): Section
+  add(...content: Node[]): Section
 }
 
 /**
@@ -102,6 +102,8 @@ export function codeBlock(languageType: string, content: string): CodeBlock {
   }
 }
 
+export const tsCodeBlock = codeBlock.bind(null, 'ts')
+
 /**
  * Create a markdown heading.
  */
@@ -121,3 +123,32 @@ export function heading(n: number, content: string): string {
 export function codeSpan(content: string): string {
   return `\`${content}\``
 }
+
+interface Group {
+  add(...elements: Node[]): Group
+  render(state: RenderState): string
+}
+
+// /**
+//  * Create a flat grouping of content. This is just a little wrapper around
+//  * effectively an array of elements. This is handy to be able to easily go
+//  * between flat and non-flat content without having to go through potentially
+//  * unwanted refactoring.
+//  */
+// export function group(): Group {
+//   const data = {
+//     elements: [],
+//   }
+//   const api: Group = {
+//     add(...elements) {
+//       elements.push(...elements)
+//       return api
+//     },
+//     render(state){
+//       return data.elements.map((c,el) => {
+//         if (typeof el === 'string') c +
+//       })
+//     }
+//   }
+//   return api
+// }

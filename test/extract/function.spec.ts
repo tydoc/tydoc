@@ -1,145 +1,229 @@
-it('extracts docs', () => {
-  expect(
-    ctx.given(
-      `
-        export function a() {}
-        export function b(a:boolean) {}
-        export function c(a:string): number {}
-      `
-    )
-  ).toMatchSnapshot()
+describe('can be a named export', () => {
+  const docs = ctx.extract(`export function fa () {}`)
+  it('shows up as a named export', () => {
+    expect(docs.modules[0].namedExports).toMatchObject([
+      { name: 'fa', type: { kind: 'callable' } },
+    ])
+  })
+  it('is not added to the type index', () => {
+    expect(docs.typeIndex).toEqual({})
+  })
 })
 
-it('treats a variable declaration initialized to a function as a function', () => {
-  expect(
-    ctx.given(`
-      export const foo = function () {}
+describe('parameters', () => {
+  it('names are documented', () => {
+    const docs = ctx.extract(`export function fa (pa: boolean, pb: string) {}`)
+    expect(docs).toMatchObject({
+      modules: [
+        {
+          namedExports: [
+            {
+              type: {
+                sigs: [{ params: [{ name: 'pa' }, { name: 'pb' }] }],
+              },
+            },
+          ],
+        },
+      ],
+    })
+  })
+  it('of primitive types are documented inline', () => {
+    const docs = ctx.extract(`export function fa (pa: boolean, pb: string) {}`)
+    expect(docs).toMatchObject({
+      modules: [
+        {
+          namedExports: [
+            {
+              type: {
+                sigs: [
+                  {
+                    params: [
+                      { name: 'pa', type: { type: 'boolean' } },
+                      { name: 'pb', type: { type: 'string' } },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    })
+  })
+  describe('refed interfaces', () => {
+    const docs = ctx.extract(`
+        export function fa (a: A) {}
+        interface A {}
+      `)
+    it('cause the interface type to be added to the type index', () => {
+      expect(docs).toMatchObject({
+        typeIndex: {
+          '("/a").A': {},
+        },
+      })
+    })
+    it('ref the interface in the type index', () => {
+      expect(docs).toMatchObject({
+        modules: [
+          {
+            namedExports: [
+              {
+                type: {
+                  sigs: [{ params: [{ type: { link: '("/a").A' } }] }],
+                },
+              },
+            ],
+          },
+        ],
+      })
+    })
+    it('inline interfaces are documented inline', () => {
+      const docs = ctx.extract(
+        `export function fa (pa: { a: boolean, b: {} }) {}`
+      )
+      expect(docs).toMatchObject({
+        modules: [
+          {
+            namedExports: [
+              {
+                type: {
+                  sigs: [
+                    {
+                      params: [
+                        {
+                          name: 'pa',
+                          type: {
+                            props: [
+                              {
+                                name: 'a',
+                                type: { kind: 'primitive', type: 'boolean' },
+                              },
+                              {
+                                name: 'b',
+                                type: { kind: 'object', props: [] },
+                              },
+                            ],
+                          },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+      })
+    })
+    it('refed/inline mixes are handled accordingly', () => {
+      const docs = ctx.extract(
+        `
+          export function fa (pa: { a: { a2: A2 }, b: { b2: string } }) {}
+          interface A2 {}
+          `
+      )
+      expect(docs).toMatchObject({
+        typeIndex: {
+          '("/a").A2': {},
+        },
+        modules: [
+          {
+            namedExports: [
+              {
+                type: {
+                  sigs: [
+                    {
+                      params: [
+                        {
+                          name: 'pa',
+                          type: {
+                            props: [
+                              {
+                                name: 'a',
+                                type: {
+                                  props: [
+                                    {
+                                      name: 'a2',
+                                      type: {
+                                        kind: 'typeIndexRef',
+                                        link: '("/a").A2',
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
+                              {
+                                name: 'b',
+                                type: {
+                                  props: [
+                                    { name: 'b2', type: { type: 'string' } },
+                                  ],
+                                },
+                              },
+                            ],
+                          },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+      })
+    })
+  })
+})
+
+describe('return', () => {
+  it('if no return type specified, assumes void', () => {
+    const docs = ctx.extract(`export function fa () {}`)
+    expect(docs.modules[0].namedExports).toMatchObject([
+      {
+        type: {
+          sigs: [{ return: { kind: 'primitive', type: 'void' } }],
+        },
+      },
+    ])
+  })
+  it('if inlining structure, does not add to the type index', () => {
+    const docs = ctx.extract(`
+      export function fa (): { a: string } {
+        return { a: '' }
+      }
     `)
-  ).toMatchSnapshot()
-})
-
-it('treats a variable declaration initialized to an arrow function as a function', () => {
-  expect(
-    ctx.given(`
-      export const foo = () => {}
-    `)
-  ).toMatchSnapshot()
-})
-
-it('if function expression given name different than variable, is ignored', () => {
-  expect(
-    ctx.given(`
-      export const foo = function foo2 () {}
-    `).terms[0].name
-  ).toEqual('foo')
-})
-
-it('signature text does not render param types in fully qualified style (import("...").<...>)', () => {
-  expect(
-    ctx.given(
-      `
-        import { A } from './b'
-        export function foo (a: A) {}
-      `,
-      `
-        export interface A {}
-      `
-    )
-  ).toMatchSnapshot()
-})
-
-it.todo('sig param type from dep is is qualified if option set so')
-it.todo(
-  'sig param type in qualified style shows path relative to package root basd on real package main setting'
-)
-it.todo(
-  "sig param type in qualified style that is of dep's main module shows only the package name"
-)
-it.todo(
-  'externally visible types from deps make those types part of the api type index'
-)
-it.todo(
-  'if two types from different modules would conflict in the type index then they are qualified by module name pascal-case named'
-)
-
-it('signature text does render param types in fully qualified style (import("...").<...>) for types from dependencies', () => {
-  expect(
-    ctx.given(
-      `
-        import { SourceFile } from 'ts-morph'
-        export function foo (a: SourceFile) {}
-      `
-    )
-  ).toMatchSnapshot()
-})
-
-describe('jsdoc', () => {
-  it('is null when no jsDoc is present', () => {
-    expect(
-      ctx.given(
-        `
-          export function a() {}
-        `
-      ).terms[0].jsDoc
-    ).toBeNull()
+    expect(docs.typeIndex).toEqual({})
   })
-
-  it('extracts doc from a variable statement', () => {
-    expect(
-      ctx.given(
-        `
-          /**
-           * primary
-           */
-          export function a() {}
-        `
-      ).terms[0].jsDoc!.primary
-    ).toMatchSnapshot()
+  it('if refing an interface, brings interface into the type index', () => {
+    const docs = ctx.extract(`
+        export function fa (): A {
+          return {}
+        }
+        interface A {}
+      `)
+    expect(docs).toMatchObject({
+      typeIndex: { '("/a").A': {} },
+      modules: [
+        {
+          namedExports: [
+            {
+              type: {
+                sigs: [{ return: { kind: 'typeIndexRef', link: '("/a").A' } }],
+              },
+            },
+          ],
+        },
+      ],
+    })
   })
+  it.todo('if no return type specified, uses the type inferred by TS')
+})
 
-  it('splits multiple jsDoc blocks by primary and additional (closest to code is primary)', () => {
-    expect(
-      ctx.given(
-        `
-          /**
-           * additional 2
-           */
-          /**
-           * additional 1
-           */
-          /**
-           * primary
-           */
-          export function a() {}
-        `
-      ).terms[0].jsDoc
-    ).toMatchSnapshot()
-  })
+describe('when type-lifted by TS typeof then treated as if inline', () => {
+  it.todo('todo')
+})
 
-  it('whitespace and comments between multiple jsDoc blocks are ignored', () => {
-    expect(
-      ctx.given(
-        `
-          /**
-           * additional 2
-           */
-
-           // boo 2
-
-          /**
-           * additional 1
-           */
-
-           // boo 1
-
-          /**
-           * primary
-           */
-          export function a() {}
-        `
-      ).terms[0].jsDoc
-    ).toMatchSnapshot()
-  })
-
-  it.todo('keeps malformed jsdoc in raw form')
+describe('overloads ', () => {
+  it.todo('todo')
 })
