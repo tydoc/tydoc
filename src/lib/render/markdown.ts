@@ -1,7 +1,14 @@
 import * as Debug from 'Debug'
 import * as Prettier from 'prettier'
 import * as Doc from '../extract/doc'
-import { codeSpan, document, Node, section, tsCodeBlock } from '../lib/markdown'
+import {
+  codeSpan,
+  document,
+  frag,
+  Node,
+  section,
+  tsCodeBlock,
+} from '../lib/markdown'
 const debug = Debug('tydoc:markdown')
 const debugModule = Debug('tydoc:markdown:module')
 
@@ -61,7 +68,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
     opts: Options,
     mod: Doc.DocModule,
     ti: Doc.TypeIndex
-  ): Node[] {
+  ): Node {
     debugModule('start')
 
     const exportedTypes = mod.namedExports.filter(ex => ex.isType)
@@ -69,7 +76,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     debugModule('start exported terms')
 
-    const els = []
+    const c = frag()
     const exportedTermsContent = exportedTerms.map(ex => {
       const c = section(codeSpan(ex.name))
       // Use type text for terms. Using node text would render uninteresting and
@@ -86,11 +93,11 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       ? exportedTermsContent
       : [section('Exported Terms').add(exportedTermsContent)]
 
-    els.push(...exportedTermsSection)
+    c.add(...exportedTermsSection)
 
     debugModule('start exported types')
 
-    els.push(
+    c.add(
       section('Exported Types').add(
         exportedTypes.map(ext => {
           const type = ext.type
@@ -103,7 +110,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     debugModule('start type index')
 
-    els.push(
+    c.add(
       section('Type Index').add(
         Object.values(ti).map(t => {
           const c = section(typeTitle(t))
@@ -119,7 +126,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       )
     )
 
-    return els
+    return c
   }
 
   /**

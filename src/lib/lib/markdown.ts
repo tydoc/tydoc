@@ -1,39 +1,35 @@
 import * as lo from 'lodash'
+
 interface RenderState {
   level: number
 }
 
 interface Renderable {
-  render(state: RenderState): string
-}
-
-type SectionData = {
-  title: string
-  children: Node[]
-}
-
-interface Section extends Renderable {
-  add(content: Node[]): Section
-  add(...content: Node[]): Section
+  render(state: RenderState): string | string[]
 }
 
 interface CodeBlock extends Renderable {}
 
-type DocumentData = {
-  children: Node[]
-}
-
 export type Node = Renderable | string
-
-interface Document extends Renderable {
-  add(content: Node[]): Section
-  add(...content: Node[]): Section
-}
 
 /**
  * A newline constant.
  */
 const NL = '\n'
+
+//
+// Document
+//
+
+type DocumentData = {
+  children: Node[]
+}
+
+interface Document {
+  add(content: Node[]): Section
+  add(...content: Node[]): Section
+  render(state: RenderState): string
+}
 
 /**
  * Create a new markdown document.
@@ -49,15 +45,29 @@ export function document(): Document {
     },
     render(state) {
       return (
-        data.children
-          .map(content =>
-            typeof content === 'string' ? content : content.render({ ...state })
-          )
+        lo
+          .flatMap(data.children, n => {
+            return typeof n === 'string' ? n : n.render({ ...state })
+          })
           .join('\n') + NL
       )
     },
   }
   return api
+}
+
+//
+// Section
+//
+
+type SectionData = {
+  title: string
+  children: Node[]
+}
+
+interface Section extends Renderable {
+  add(content: Node[]): Section
+  add(...content: Node[]): Section
 }
 
 /**
@@ -89,6 +99,47 @@ export function section(title: string): Section {
   }
   return api
 }
+
+//
+// Group
+//
+
+interface Group extends Renderable {
+  add(nodes: Node[]): Group
+  add(...nodes: Node[]): Group
+}
+
+type GroupData = {
+  nodes: Node[]
+}
+
+/**
+ * Create a flat grouping of content. This is just a little wrapper around
+ * effectively an array of elements. This is handy to be able to easily go
+ * between flat and non-flat content without having to go through potentially
+ * unwanted refactoring.
+ */
+export function frag(): Group {
+  const data: GroupData = {
+    nodes: [],
+  }
+  const api: Group = {
+    add(...nodes: Node[] | [Node[]]) {
+      data.nodes.push(...lo.flatten(nodes))
+      return api
+    },
+    render(state) {
+      return lo.flatMap(data.nodes, n => {
+        return typeof n === 'string' ? n : n.render(state)
+      })
+    },
+  }
+  return api
+}
+
+//
+// Helpers
+//
 
 /**
  * Create a markdown code block.
@@ -126,32 +177,3 @@ export function heading(n: number, content: string): string {
 export function codeSpan(content: string): string {
   return `\`${content}\``
 }
-
-interface Group {
-  add(...elements: Node[]): Group
-  render(state: RenderState): string
-}
-
-// /**
-//  * Create a flat grouping of content. This is just a little wrapper around
-//  * effectively an array of elements. This is handy to be able to easily go
-//  * between flat and non-flat content without having to go through potentially
-//  * unwanted refactoring.
-//  */
-// export function group(): Group {
-//   const data = {
-//     elements: [],
-//   }
-//   const api: Group = {
-//     add(...elements) {
-//       elements.push(...elements)
-//       return api
-//     },
-//     render(state){
-//       return data.elements.map((c,el) => {
-//         if (typeof el === 'string') c +
-//       })
-//     }
-//   }
-//   return api
-// }
