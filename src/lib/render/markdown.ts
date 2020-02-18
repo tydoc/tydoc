@@ -2,8 +2,8 @@ import * as Debug from 'Debug'
 import * as Prettier from 'prettier'
 import * as Doc from '../extract/doc'
 import { codeSpan, document, Node, section, tsCodeBlock } from '../lib/markdown'
-const debug = Debug('dox:markdown')
-const debugModule = Debug('dox:markdown:module')
+const debug = Debug('tydoc:markdown')
+const debugModule = Debug('tydoc:markdown:module')
 
 export interface Options {
   /**

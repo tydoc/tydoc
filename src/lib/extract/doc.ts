@@ -5,7 +5,7 @@ import * as tsm from 'ts-morph'
 import { Index, Thunk } from '../../utils'
 import { hasAlias, isPrimitive, isTypeLevelNode } from './utils'
 
-const debug = Debug('dox:doc')
+const debug = Debug('tydoc:doc')
 
 export interface Manager {
   d: DocPackage

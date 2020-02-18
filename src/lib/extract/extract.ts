@@ -10,10 +10,10 @@ import {
   isPrimitive,
 } from './utils'
 
-const debug = Debug('dox:extract')
-const debugExport = Debug('dox:extract:export')
-const debugVisible = Debug('dox:extract:visible')
-const debugWarn = Debug('dox:warn')
+const debug = Debug('tydoc:extract')
+const debugExport = Debug('tydoc:extract:export')
+const debugVisible = Debug('tydoc:extract:visible')
+const debugWarn = Debug('tydoc:warn')
 
 interface Options {
   entrypoints: string[]

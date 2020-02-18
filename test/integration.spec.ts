@@ -40,7 +40,7 @@ const sources = [
   `,
 ]
 
-it('dox can render markdown', () => {
+it('tydoc can render markdown', () => {
   expect(ctx.markdown({ flatTermsSection: true }, ...sources))
     .toMatchInlineSnapshot(`
     "### \`foo\`
@@ -123,7 +123,7 @@ it('dox can render markdown', () => {
   `)
 })
 
-it('dox can extract data', () => {
+it('tydoc can extract data', () => {
   expect(ctx.extract(...sources)).toMatchInlineSnapshot(`
     Object {
       "modules": Array [
