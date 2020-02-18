@@ -1,3 +1,4 @@
+import * as lo from 'lodash'
 interface RenderState {
   level: number
 }
@@ -12,6 +13,7 @@ type SectionData = {
 }
 
 interface Section extends Renderable {
+  add(content: Node[]): Section
   add(...content: Node[]): Section
 }
 
@@ -24,6 +26,7 @@ type DocumentData = {
 export type Node = Renderable | string
 
 interface Document extends Renderable {
+  add(content: Node[]): Section
   add(...content: Node[]): Section
 }
 
@@ -40,8 +43,8 @@ export function document(): Document {
     children: [],
   }
   const api: Document = {
-    add(...sections: Section[]) {
-      data.children.push(...sections)
+    add(...sections: Node[] | [Node[]]) {
+      data.children.push(...lo.flatten(sections))
       return api
     },
     render(state) {
@@ -66,8 +69,8 @@ export function section(title: string): Section {
     children: [],
   }
   const api: Section = {
-    add(...sections) {
-      data.children.push(...sections)
+    add(...sections: Node[] | [Node[]]) {
+      data.children.push(...lo.flatten(sections))
       return api
     },
     render(state) {

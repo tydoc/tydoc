@@ -24,12 +24,12 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
   if (docs.modules.length === 0) {
     // do nothing
   } else if (docs.modules.length === 1) {
-    c.add(...renderModule(opts, docs.modules[0], docs.typeIndex))
+    c.add(renderModule(opts, docs.modules[0], docs.typeIndex))
   } else {
     c.add(
-      ...docs.modules.map(mod => {
+      docs.modules.map(mod => {
         return section(codeSpan(mod.name)).add(
-          ...renderModule(opts, mod, docs.typeIndex)
+          renderModule(opts, mod, docs.typeIndex)
         )
       })
     )
@@ -75,7 +75,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       // Use type text for terms. Using node text would render uninteresting and
       // potentially massive implementation source code.
       if (ex.type.kind === 'callable') {
-        c.add(...sigCodeBlock((ex.type as any)?.raw.typeText))
+        c.add(sigCodeBlock((ex.type as any)?.raw.typeText))
       } else {
         c.add(tsCodeBlock((ex.type as any)?.raw.typeText))
       }
@@ -84,7 +84,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     const exportedTermsSection = opts.flatTermsSection
       ? exportedTermsContent
-      : [section('Exported Terms').add(...exportedTermsContent)]
+      : [section('Exported Terms').add(exportedTermsContent)]
 
     els.push(...exportedTermsSection)
 
@@ -92,7 +92,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     els.push(
       section('Exported Types').add(
-        ...exportedTypes.map(ext => {
+        exportedTypes.map(ext => {
           const type = ext.type
           const c = section(typeTitle(ext))
           c.add(tsCodeBlock(type.kind))
@@ -105,12 +105,12 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     els.push(
       section('Type Index').add(
-        ...Object.values(ti).map(t => {
+        Object.values(ti).map(t => {
           const c = section(typeTitle(t))
           // Use type node text because type text for types is just names it
           // seems, not informative.
           if (t.kind === 'alias' && t.type.kind === 'callable') {
-            c.add(...sigCodeBlock(t.raw.nodeFullText))
+            c.add(sigCodeBlock(t.raw.nodeFullText))
           } else {
             c.add(tsCodeBlock(t.raw.nodeFullText))
           }
