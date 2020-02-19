@@ -4,7 +4,6 @@ import * as Doc from '../extract/doc'
 import {
   codeSpan,
   lines,
-  Node,
   PRETTIER_IGNORE,
   render as renderMarkdown,
   section,
@@ -67,11 +66,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
   /**
    * Render one module of the package.
    */
-  function renderModule(
-    opts: Options,
-    mod: Doc.DocModule,
-    ti: Doc.TypeIndex
-  ): Node {
+  function renderModule(opts: Options, mod: Doc.DocModule, ti: Doc.TypeIndex) {
     debugModule('start')
 
     const exportedTypes = mod.namedExports.filter(ex => ex.isType)
