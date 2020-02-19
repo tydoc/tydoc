@@ -74,7 +74,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
  * Everything that is reachable will be considered.
  */
 export function fromModule(
-  docs: Doc.Manager,
+  manager: Doc.Manager,
   sourceFile: tsm.SourceFile
 ): Doc.DocPackage {
   const mod = Doc.modFromSourceFile(sourceFile)
@@ -82,10 +82,31 @@ export function fromModule(
   for (const ex of sourceFile.getExportedDeclarations()) {
     const exportName = ex[0]
     const n = ex[1][0]
+    const t = n.getType()
     debugExport('start')
     debugExport('-> node kind is %s', n.getKindName())
     debugExport('-> type text is %j', n.getType().getText())
-    const doc = fromType(docs, n.getType())
+    let doc
+    // if the node is a type alias and the type of the type alias cannot be
+    // traced back to the node then we are forced to run extraction logic here
+    if (
+      tsm.Node.isTypeAliasDeclaration(n) &&
+      !getNodeFromTypePreferingAlias(t)
+    ) {
+      debugExport(
+        'type alias pointing to type that cannot back reference %s',
+        n.getText()
+      )
+      doc = manager.indexTypeAliasNode(n, () =>
+        Doc.alias({
+          name: n.getName(),
+          ...getRaw(n.getType()),
+          type: fromType(manager, t),
+        })
+      )
+    } else {
+      doc = fromType(manager, t)
+    }
     if (exportName === 'default') {
       mod.mainExport = doc
       continue
@@ -99,8 +120,8 @@ export function fromModule(
     )
   }
 
-  docs.d.modules.push(mod)
-  return docs.d
+  manager.d.modules.push(mod)
+  return manager.d
 }
 
 function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
@@ -128,7 +149,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   }
   if (manager.isIndexable(t)) {
     debugVisible('-> type is indexable')
-    const fqtn = Doc.getFullyQualifiedTypeName(t)
+    const fqtn = Doc.getFQTNFromType(t)
     if (manager.isIndexed(fqtn)) {
       debugVisible(
         '-> type is being documented as link to the type index (aka. cache hit)'
@@ -138,6 +159,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   } else {
     debugVisible('-> type is not indexable')
   }
+
   if (t.isLiteral()) {
     debugVisible('-> type is literal')
     return Doc.literal({
@@ -153,14 +175,14 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     debugVisible('-> type is array')
     const innerType = t.getArrayElementTypeOrThrow()
     debugVisible('-> handle array inner type %s', innerType.getText())
-    return manager.indexIfApplicable(t, () =>
+    return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(t, Doc.array(fromType(manager, innerType)))
     )
   }
   if (t.isInterface()) {
     debugVisible('-> type is interface')
     const s = t.getSymbolOrThrow()
-    return manager.indexIfApplicable(t, () =>
+    return manager.indexTypeIfApplicable(t, () =>
       Doc.inter({
         name: s.getName(),
         props: propertyDocsFromType(manager, t),
@@ -171,7 +193,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   // Place before object becuase objects are superset.
   if (isCallable(t)) {
     debugVisible('-> type is callable')
-    return manager.indexIfApplicable(t, () =>
+    return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(
         t,
         Doc.callable({
@@ -185,7 +207,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   // Place after callable check because objects are superset.
   if (t.isObject()) {
     debugVisible('-> type is object')
-    return manager.indexIfApplicable(t, () =>
+    return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(
         t,
         Doc.obj({
@@ -197,7 +219,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   }
   if (t.isUnion()) {
     debugVisible('-> type is union')
-    return manager.indexIfApplicable(t, () =>
+    return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(
         t,
         Doc.union({
@@ -213,7 +235,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   }
   if (t.isIntersection()) {
     debugVisible('-> type is intersection')
-    return manager.indexIfApplicable(t, () =>
+    return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(
         t,
         Doc.intersection({
@@ -271,7 +293,6 @@ function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
     })
   })
 }
-
 function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
   // is it possible to get alias of aliases? It seems the checker "compacts"
   // these and if we __really__ wanted to "see" the chain we'd have to go the

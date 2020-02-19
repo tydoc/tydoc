@@ -1,6 +1,6 @@
 let docs: any
 
-it('can be self recursive', () => {
+it.only('can be self recursive', () => {
   const docs = ctx.extract(`
     export type A = { a: A }
   `)

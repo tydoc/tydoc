@@ -12,7 +12,8 @@ export interface Manager {
   isIndexable(t: tsm.Type): boolean
   isIndexed(name: string): boolean
   getFromIndex(name: string): Node
-  indexIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
+  indexTypeAliasNode(n: tsm.TypeAliasDeclaration, doc: Thunk<Node>): Node
+  indexTypeIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
 }
 
 /**
@@ -44,9 +45,16 @@ export function createManager(): Manager {
     getFromIndex(name) {
       return d.typeIndex[name]
     },
-    indexIfApplicable(t, doc) {
+    indexTypeAliasNode(n, doc) {
+      const fqtn = getFQTNFromTypeAliasNode(n)
+      api.d.typeIndex[fqtn] = {} as any
+      const result = doc() as IndexableNode
+      api.d.typeIndex[fqtn] = result
+      return typeIndexRef(fqtn)
+    },
+    indexTypeIfApplicable(t, doc) {
       if (api.isIndexable(t)) {
-        const fqtn = getFullyQualifiedTypeName(t)
+        const fqtn = getFQTNFromType(t)
         if (!api.isIndexed(fqtn)) {
           // register then hydrate, this prevents infinite loops
           debug('provisioning entry in type index: %s', fqtn)
@@ -63,7 +71,13 @@ export function createManager(): Manager {
   return api
 }
 
-export function getFullyQualifiedTypeName(t: tsm.Type): string {
+export function getFQTNFromTypeAliasNode(n: tsm.TypeAliasDeclaration): string {
+  const typePath = getPathFromProjectRoot(n.getSourceFile())
+  const fqtn = formatFQTN(typePath, n.getName())
+  return fqtn
+}
+
+export function getFQTNFromType(t: tsm.Type): string {
   // It can happen that a type has no symbol but does have alias symbol, for
   // example union types.
   const s = t.getSymbol()
@@ -84,8 +98,12 @@ export function getFullyQualifiedTypeName(t: tsm.Type): string {
     )
   }
   const typePath = getPathFromProjectRoot(sourceFile)
-  const fqtn = `("${typePath}").${typeName}`
+  const fqtn = formatFQTN(typePath, typeName)
   return fqtn
+}
+
+function formatFQTN(typePath: string, typeName: string): string {
+  return `("${typePath}").${typeName}`
 }
 
 function getPathFromProjectRoot(sourceFile: tsm.SourceFile): string {
