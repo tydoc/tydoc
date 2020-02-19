@@ -6,6 +6,7 @@ import {
   document,
   frag,
   Node,
+  PRETTIER_IGNORE,
   section,
   tsCodeBlock,
 } from '../lib/markdown'
@@ -133,7 +134,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
    * prevent prettier adding a leading `;`
    */
   function sigCodeBlock(sig: string) {
-    return ['<!-- prettier-ignore -->', tsCodeBlock(sig)]
+    return frag(PRETTIER_IGNORE, tsCodeBlock(sig))
   }
 
   // todo need type modelling for concept of "named" type

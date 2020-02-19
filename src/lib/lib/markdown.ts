@@ -17,6 +17,8 @@ export type Node = Renderable | string
  */
 const NL = '\n'
 
+export const PRETTIER_IGNORE = '<!-- prettier-ignore -->'
+
 //
 // Document
 //
@@ -104,12 +106,12 @@ export function section(title: string): Section {
 // Group
 //
 
-interface Group extends Renderable {
-  add(nodes: Node[]): Group
-  add(...nodes: Node[]): Group
+interface Frag extends Renderable {
+  add(nodes: Node[]): Frag
+  add(...nodes: Node[]): Frag
 }
 
-type GroupData = {
+type FragData = {
   nodes: Node[]
 }
 
@@ -119,11 +121,11 @@ type GroupData = {
  * between flat and non-flat content without having to go through potentially
  * unwanted refactoring.
  */
-export function frag(): Group {
-  const data: GroupData = {
-    nodes: [],
+export function frag(...nodes: Node[] | [Node[]]): Frag {
+  const data: FragData = {
+    nodes: lo.flatten(nodes),
   }
-  const api: Group = {
+  const api: Frag = {
     add(...nodes: Node[] | [Node[]]) {
       data.nodes.push(...lo.flatten(nodes))
       return api
