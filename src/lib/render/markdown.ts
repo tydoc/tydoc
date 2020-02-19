@@ -3,11 +3,12 @@ import * as Prettier from 'prettier'
 import * as Doc from '../extract/doc'
 import {
   codeSpan,
-  document,
-  frag,
+  lines,
   Node,
   PRETTIER_IGNORE,
+  render as renderMarkdown,
   section,
+  span,
   tsCodeBlock,
 } from '../lib/markdown'
 const debug = Debug('tydoc:markdown')
@@ -27,14 +28,14 @@ export interface Options {
 export function render(docs: Doc.DocPackage, opts: Options): string {
   debug('start')
 
-  const c = document()
+  const md = lines()
 
   if (docs.modules.length === 0) {
     // do nothing
   } else if (docs.modules.length === 1) {
-    c.add(renderModule(opts, docs.modules[0], docs.typeIndex))
+    md.add(renderModule(opts, docs.modules[0], docs.typeIndex))
   } else {
-    c.add(
+    md.add(
       docs.modules.map(mod => {
         return section(codeSpan(mod.name)).add(
           renderModule(opts, mod, docs.typeIndex)
@@ -44,9 +45,10 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
   }
 
   // .replace() hack until we have jsdoc extraction
-  const docsString = c
-    .render({ level: 3 })
-    .replace(/\/\/ prettier-ignore\n/g, '')
+  const docsString = renderMarkdown({ level: 3 }, md).replace(
+    /\/\/ prettier-ignore\n/g,
+    ''
+  )
 
   debug('prettier start')
   const formattedDocsString = Prettier.format(docsString, {
@@ -77,28 +79,28 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     debugModule('start exported terms')
 
-    const c = frag()
+    const md = lines()
     const exportedTermsContent = exportedTerms.map(ex => {
-      const c = section(codeSpan(ex.name))
+      const md = section(codeSpan(ex.name))
       // Use type text for terms. Using node text would render uninteresting and
       // potentially massive implementation source code.
       if (ex.type.kind === 'callable') {
-        c.add(sigCodeBlock((ex.type as any)?.raw.typeText))
+        md.add(sigCodeBlock((ex.type as any)?.raw.typeText))
       } else {
-        c.add(tsCodeBlock((ex.type as any)?.raw.typeText))
+        md.add(tsCodeBlock((ex.type as any)?.raw.typeText))
       }
-      return c
+      return md
     })
 
-    const exportedTermsSection = opts.flatTermsSection
-      ? exportedTermsContent
-      : [section('Exported Terms').add(exportedTermsContent)]
-
-    c.add(...exportedTermsSection)
+    if (opts.flatTermsSection) {
+      md.add(exportedTermsContent)
+    } else {
+      md.add(section('Exported Terms').add(exportedTermsContent))
+    }
 
     debugModule('start exported types')
 
-    c.add(
+    md.add(
       section('Exported Types').add(
         exportedTypes.map(ext => {
           const type = ext.type
@@ -111,49 +113,48 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     debugModule('start type index')
 
-    c.add(
+    md.add(
       section('Type Index').add(
         Object.values(ti).map(t => {
-          const c = section(typeTitle(t))
+          const md = section(typeTitle(t))
           // Use type node text because type text for types is just names it
           // seems, not informative.
           if (t.kind === 'alias' && t.type.kind === 'callable') {
-            c.add(sigCodeBlock(t.raw.nodeFullText))
+            md.add(sigCodeBlock(t.raw.nodeFullText))
           } else {
-            c.add(tsCodeBlock(t.raw.nodeFullText))
+            md.add(tsCodeBlock(t.raw.nodeFullText))
           }
-          return c
+          return md
         })
       )
     )
 
-    return c
+    return md
   }
 
   /**
    * prevent prettier adding a leading `;`
    */
   function sigCodeBlock(sig: string) {
-    return frag(PRETTIER_IGNORE, tsCodeBlock(sig))
+    return lines(PRETTIER_IGNORE, tsCodeBlock(sig))
   }
 
   // todo need type modelling for concept of "named" type
   // todo need type modelling for concept of "type" export
   function typeTitle(et: Doc.TypeNode | Doc.Expor) {
-    let icon = ''
+    const md = span()
+
     if (et.kind === 'export') {
-      icon = typeIcon(et.type)
+      md.add(codeSpan(typeIcon(et.type)))
     } else {
-      icon = typeIcon(et)
+      md.add(codeSpan(typeIcon(et)))
     }
 
-    if (icon) icon = codeSpan(icon) + ' '
-
     if (et.kind === 'export') {
-      return icon + codeSpan(et.name)
+      return md.add(codeSpan(et.name))
     } else {
       // @ts-ignore
-      return icon + codeSpan(et.name)
+      return md.add(codeSpan(et.name))
     }
   }
 

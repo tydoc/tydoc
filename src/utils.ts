@@ -1,5 +1,9 @@
 import { inspect } from 'util'
 
+export type ArrayOrVarg<T> = T[] | [T[]]
+
+export type MaybeArray<T> = T | T[]
+
 export type Index<T> = Record<string, T>
 
 export type Thunk<T> = () => T
