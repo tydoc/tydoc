@@ -4,6 +4,7 @@ import * as Doc from '../extract/doc'
 import {
   codeSpan,
   lines,
+  link,
   PRETTIER_IGNORE,
   render as renderMarkdown,
   section,
@@ -76,15 +77,26 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     const md = lines()
     const exportedTermsContent = exportedTerms.map(ex => {
-      const md = section(codeSpan(ex.name))
+      const termSection = section(codeSpan(ex.name))
       // Use type text for terms. Using node text would render uninteresting and
       // potentially massive implementation source code.
+
       if (ex.type.kind === 'callable') {
-        md.add(sigCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
+        termSection.add(sigCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
+      } else if (ex.type.kind === 'typeIndexRef') {
+        termSection.add(
+          span(
+            'Of type',
+            link(
+              codeSpan(ti[ex.type.link].name),
+              typeTitleAnchorLink(ti[ex.type.link])
+            )
+          )
+        )
       } else {
-        md.add(tsCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
+        termSection.add(tsCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
       }
-      return md
+      return termSection
     })
 
     if (opts.flatTermsSection) {
@@ -153,6 +165,10 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
     }
   }
 
+  function typeTitleAnchorLink(et: Doc.TypeNode | Doc.Expor): string {
+    return '#' + slugify(renderMarkdown({ level: 0 }, typeTitle(et)))
+  }
+
   function typeIcon(t: Doc.Node): string {
     if (t.kind === 'interface') return 'I'
     if (t.kind === 'object') return 'T'
@@ -178,4 +194,20 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
   //           .join('  \n  | ')
   //     )
   //   }
+}
+
+/**
+ * Basic slugification. This should produce results consistent with the
+ * slugifier from the markdown-to-html rendering used by whatever system is
+ * transforming these markdown docs. This slugifier is intended to be used to
+ * create anchor links to other titles in the document which can only work if it
+ * matches how the host system creates anchor links from title text.
+ */
+function slugify(x: string) {
+  return x
+    .replace(/ +/g, '-')
+    .replace(/[^A-Za-z0-9-_]/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-|-$/, '')
+    .toLowerCase()
 }
