@@ -1,5 +1,6 @@
 import * as tsm from 'ts-morph'
 import { inspect } from 'util'
+import { dumpNode, dumpType } from './lib/extract/utils'
 
 export type ArrayOrVarg<T> = T[] | [T[]]
 
@@ -21,16 +22,9 @@ export function casesHandled(x: never): never {
  * Quick and dirty logging. Not for production.
  */
 export function dump(...args: any[]) {
+  if (args[0] instanceof tsm.Node) return dumpNode(args[0])
+  if (args[0] instanceof tsm.Type) return dumpType(args[0])
+
   const argsInspected = args.map(a => inspect(a, { depth: 20 }))
   console.error(...argsInspected)
-}
-
-export function dumpType(t: tsm.Type): void {
-  // prettier-ignore
-  console.error(`
-    t.getText()                                      = ${t.getText()}
-    t.getSymbol()?.getName()                         = ${t.getSymbol()?.getName()}
-    t.getAliasSymbol()?.getName()                    = ${t.getAliasSymbol()?.getName()}
-    t.getSymbol()?.getDeclarations()?.[0]?.getText() = ${t.getSymbol()?.getDeclarations()?.[0]?.getText()}
-  `)
 }

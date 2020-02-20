@@ -92,10 +92,11 @@ export function fromModule(
     if (
       tsm.Node.isTypeAliasDeclaration(n) &&
       (!getNodeFromTypePreferingAlias(t) ||
+        t.getSymbol()?.getName() === '__object' ||
         t.getSymbol()?.getName() === '__function')
     ) {
       debugExport(
-        'type alias pointing to type that cannot back reference or back references to an inline function %s',
+        'type alias pointing to type that cannot back reference or back references to an inline function/object %s',
         n.getText()
       )
       doc = manager.indexTypeAliasNode(n, () =>

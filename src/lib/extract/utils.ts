@@ -79,3 +79,25 @@ export function getLocationKind(t: tsm.Type): LocationKind {
   // example of valid case here is type of "{}" as return type from function like `() => {}`
   return 'inline'
 }
+
+export function dumpType(t: tsm.Type): void {
+  // prettier-ignore
+  console.error(`
+    t.getText()                                          = ${t.getText()}
+    t.getSymbol()?.getName()                             = ${t.getSymbol()?.getName()}
+    t.getAliasSymbol()?.getName()                        = ${t.getAliasSymbol()?.getName()}
+    t.getSymbol()?.getDeclarations()?.[0]?.getText()     = ${t.getSymbol()?.getDeclarations()?.[0]?.getText()}
+    t.getSymbol()?.getDeclarations()?.[0]?.getKindName() = ${t.getSymbol()?.getDeclarations()?.[0]?.getKindName()}
+  `)
+}
+
+export function dumpNode(n: tsm.Node): void {
+  // prettier-ignore
+  console.error(`
+    n.getKindName()                         = ${n.getKindName()}
+    n.getType().getText()                   = ${n.getType().getText()}
+    n.getText()                             = ${n.getText()}
+    n.getType().getSymbol()?.getName()      = ${n.getType().getSymbol()?.getName()}
+    n.getType().getAliasSymbol()?.getName() = ${n.getType().getAliasSymbol()?.getName()}
+  `)
+}

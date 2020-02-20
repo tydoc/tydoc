@@ -184,3 +184,13 @@ it('exported type alias of function via typeof is added to type index', () => {
 //   const fetch = ctx.extract(`const a = () => {}; export type A = typeof a`)
 //   expect(plain).toEqual(fetch)
 // })
+
+it('exported type alias of object is added to type index', () => {
+  expect(ctx.extract(`export type A = { b: 1 }`)).toMatchSnapshot()
+})
+
+it('exported type alias of object via typeof is added to type index', () => {
+  expect(
+    ctx.extract(`const a = { b: 1 }; export type A = typeof a`)
+  ).toMatchSnapshot()
+})

@@ -123,3 +123,117 @@ export type A = typeof a;",
   },
 }
 `;
+
+exports[`exported type alias of object is added to type index 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(\\"/a\\").A",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "export type A = { b: 1 };",
+        "nodeText": "export type A = { b: 1 };",
+        "typeText": "A",
+      },
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "b",
+            "type": Object {
+              "base": "number",
+              "kind": "literal",
+              "name": "1",
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "export type A = { b: 1 };",
+          "nodeText": "export type A = { b: 1 };",
+          "typeText": "A",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`exported type alias of object via typeof is added to type index 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(\\"/a\\").A",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "
+export type A = typeof a;",
+        "nodeText": "export type A = typeof a;",
+        "typeText": "{ b: number; }",
+      },
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "b",
+            "type": Object {
+              "kind": "primitive",
+              "type": "number",
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "{ b: 1 }",
+          "nodeText": "{ b: 1 }",
+          "typeText": "{ b: number; }",
+        },
+      },
+    },
+  },
+}
+`;
