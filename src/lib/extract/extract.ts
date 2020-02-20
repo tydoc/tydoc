@@ -254,6 +254,14 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   return Doc.unsupported(getRaw(t))
 }
 
+/**
+ * Extract docs from a type's call signatures. There may be multiple because of
+ * function overloading.
+ *
+ * Note not only functions and methods may have call signatures
+ * but anything callable which means objects too (in JS a function is an object
+ * and in TS this as modelled as object types being able to be made callable).
+ */
 function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
   return t.getCallSignatures().map(sig => {
     const tRet = sig.getReturnType()
@@ -278,6 +286,9 @@ function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
   })
 }
 
+/**
+ * Extract docs from the type's properties.
+ */
 function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
   return t.getProperties().map(p => {
     // prettier-ignore
@@ -295,6 +306,13 @@ function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
     })
   })
 }
+
+/**
+ * Extract doc for the type alias pointing to the given type, if any. The
+ * extracted doc node is then wrapped around the given doc node and returned.
+ * Thus the given doc node may be returned as-is if no alias found or returned
+ * wrapped in doc for the found alias.
+ */
 function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
   // is it possible to get alias of aliases? It seems the checker "compacts"
   // these and if we __really__ wanted to "see" the chain we'd have to go the
@@ -312,6 +330,9 @@ function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
   })
 }
 
+/**
+ * Get raw doc information for the given type.
+ */
 function getRaw(t: tsm.Type): Doc.Raw {
   /**
    * The use-alias-outside-current-scope flag makes it so that the type for

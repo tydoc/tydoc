@@ -80,9 +80,9 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       // Use type text for terms. Using node text would render uninteresting and
       // potentially massive implementation source code.
       if (ex.type.kind === 'callable') {
-        md.add(sigCodeBlock((ex.type as any)?.raw.typeText))
+        md.add(sigCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
       } else {
-        md.add(tsCodeBlock((ex.type as any)?.raw.typeText))
+        md.add(tsCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
       }
       return md
     })
