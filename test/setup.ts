@@ -4,6 +4,9 @@ import * as jsde from '../src'
 
 function createContextt() {
   const project = new tsm.Project({
+    compilerOptions: {
+      rootDir: '/',
+    },
     addFilesFromTsConfig: false,
     useInMemoryFileSystem: true,
   })

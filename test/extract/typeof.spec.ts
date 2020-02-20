@@ -23,7 +23,7 @@ it('inlines the type extracted from the term', () => {
               "name": "A",
               "type": Object {
                 "kind": "typeIndexRef",
-                "link": "(\\"/a\\").A",
+                "link": "(a).A",
               },
             },
             Object {
@@ -33,14 +33,14 @@ it('inlines the type extracted from the term', () => {
               "name": "B",
               "type": Object {
                 "kind": "typeIndexRef",
-                "link": "(\\"/a\\").B",
+                "link": "(a).B",
               },
             },
           ],
         },
       ],
       "typeIndex": Object {
-        "(\\"/a\\").A": Object {
+        "(a).A": Object {
           "kind": "interface",
           "name": "A",
           "props": Array [
@@ -67,7 +67,7 @@ it('inlines the type extracted from the term', () => {
                     "params": Array [],
                     "return": Object {
                       "kind": "typeIndexRef",
-                      "link": "(\\"/a\\").B",
+                      "link": "(a).B",
                     },
                   },
                 ],
@@ -84,7 +84,7 @@ it('inlines the type extracted from the term', () => {
             "typeText": "A",
           },
         },
-        "(\\"/a\\").B": Object {
+        "(a).B": Object {
           "kind": "interface",
           "name": "B",
           "props": Array [],

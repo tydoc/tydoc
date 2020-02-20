@@ -111,14 +111,14 @@ Object {
           "name": "A",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+            "link": "(a).A",
           },
         },
       ],
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {

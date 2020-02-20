@@ -5,8 +5,8 @@ it('prop refing another interface causes other to be in the type index', () => {
       `)
   expect(docs).toMatchObject({
     typeIndex: {
-      '("/a").A': {},
-      '("/a").B': {},
+      '(a).A': {},
+      '(a).B': {},
     },
   })
 })
@@ -17,10 +17,8 @@ it('prop refing another interface is linked to other with a type index ref', () 
       `)
   expect(docs).toMatchObject({
     typeIndex: {
-      '("/a").A': {
-        props: [
-          { name: 'b', type: { kind: 'typeIndexRef', link: '("/a").B' } },
-        ],
+      '(a).A': {
+        props: [{ name: 'b', type: { kind: 'typeIndexRef', link: '(a).B' } }],
       },
     },
   })
@@ -31,7 +29,7 @@ it('prop inlining structure causes strcture to be documented inline', () => {
     `)
   expect(docs).toMatchObject({
     typeIndex: {
-      '("/a").A': {
+      '(a).A': {
         props: [
           {
             name: 'b',
@@ -49,14 +47,14 @@ describe('inline structure', () => {
   it('is considered inline and of kind object (not interface)', () => {
     expect(docs).toMatchObject({
       typeIndex: {
-        '("/a").A': {
+        '(a).A': {
           props: [{ name: 'b', type: { kind: 'object', props: [{}] } }],
         },
       },
     })
   })
   it('does not register in the type index', () => {
-    expect(Object.keys(docs.typeIndex)).toEqual(['("/a").A'])
+    expect(Object.keys(docs.typeIndex)).toEqual(['(a).A'])
   })
 })
 
@@ -67,12 +65,12 @@ describe('can be a named export', () => {
   })
   it('has its type added to the type index', () => {
     const docs = ctx.extract(`export interface Foo {}`)
-    expect(docs).toMatchObject({ typeIndex: { '("/a").Foo': {} } })
+    expect(docs).toMatchObject({ typeIndex: { '(a).Foo': {} } })
   })
   it('references the type index', () => {
     const docs = ctx.extract(`export interface Foo {}`)
     expect(docs.modules[0].namedExports).toMatchObject([
-      { name: 'Foo', type: { kind: 'typeIndexRef', link: '("/a").Foo' } },
+      { name: 'Foo', type: { kind: 'typeIndexRef', link: '(a).Foo' } },
     ])
   })
 })

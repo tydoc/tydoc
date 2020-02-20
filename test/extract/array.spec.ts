@@ -20,14 +20,14 @@ it('passes smoke test', () => {
               "name": "StringList",
               "type": Object {
                 "kind": "typeIndexRef",
-                "link": "(\\"/a\\").StringList",
+                "link": "(a).StringList",
               },
             },
           ],
         },
       ],
       "typeIndex": Object {
-        "(\\"/a\\").StringList": Object {
+        "(a).StringList": Object {
           "kind": "alias",
           "name": "StringList",
           "raw": Object {

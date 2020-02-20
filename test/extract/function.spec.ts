@@ -58,7 +58,7 @@ describe('parameters', () => {
     it('cause the interface type to be added to the type index', () => {
       expect(docs).toMatchObject({
         typeIndex: {
-          '("/a").A': {},
+          '(a).A': {},
         },
       })
     })
@@ -69,7 +69,7 @@ describe('parameters', () => {
             namedExports: [
               {
                 type: {
-                  sigs: [{ params: [{ type: { link: '("/a").A' } }] }],
+                  sigs: [{ params: [{ type: { link: '(a).A' } }] }],
                 },
               },
             ],
@@ -124,7 +124,7 @@ describe('parameters', () => {
       )
       expect(docs).toMatchObject({
         typeIndex: {
-          '("/a").A2': {},
+          '(a).A2': {},
         },
         modules: [
           {
@@ -146,7 +146,7 @@ describe('parameters', () => {
                                       name: 'a2',
                                       type: {
                                         kind: 'typeIndexRef',
-                                        link: '("/a").A2',
+                                        link: '(a).A2',
                                       },
                                     },
                                   ],
@@ -203,13 +203,13 @@ describe('return', () => {
         interface A {}
       `)
     expect(docs).toMatchObject({
-      typeIndex: { '("/a").A': {} },
+      typeIndex: { '(a).A': {} },
       modules: [
         {
           namedExports: [
             {
               type: {
-                sigs: [{ return: { kind: 'typeIndexRef', link: '("/a").A' } }],
+                sigs: [{ return: { kind: 'typeIndexRef', link: '(a).A' } }],
               },
             },
           ],

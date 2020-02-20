@@ -16,6 +16,9 @@ const debugVisible = Debug('tydoc:extract:visible')
 const debugWarn = Debug('tydoc:warn')
 
 interface Options {
+  /**
+   * Paths to modules in project, relative to project root or absolute.
+   */
   entrypoints: string[]
   project?: tsm.Project
 }
@@ -32,13 +35,34 @@ export function fromProject(opts: Options): Doc.DocPackage {
       tsConfigFilePath: path.join(process.cwd(), 'tsconfig.json'),
     })
 
-  // If the project is in a bad state don't bother trying to extract docs from it
+  // Find the source dir
+  //
+  let sourceRoot: string
+  const compilerOptRootDir = project.getCompilerOptions().rootDir
+  if (compilerOptRootDir) {
+    if (path.isAbsolute(compilerOptRootDir)) {
+      sourceRoot = compilerOptRootDir
+    } else {
+      // todo there seems to be no way to get project dir from project instance??
+      // todo guard that cwd has tsconfig in it
+      sourceRoot = path.resolve(process.cwd(), compilerOptRootDir)
+    }
+    debug('found source root from tsconfig.json %s', sourceRoot)
+  } else {
+    sourceRoot = process.cwd()
+    debug('using source root fallback of CWD %s', sourceRoot)
+  }
+
+  // If the project is in a bad state don't bother trying to extract docs
+  //
   const diagnostics = project.getPreEmitDiagnostics()
   if (diagnostics.length) {
     const message = project.formatDiagnosticsWithColorAndContext(diagnostics)
     throw new Error(message)
   }
 
+  // If the project is empty dont' bother trying to extract docs
+  //
   const sourceFiles = project.getSourceFiles()
   if (sourceFiles.length === 0) {
     throw new Error('No source files found in project to document.')
@@ -50,18 +74,53 @@ export function fromProject(opts: Options): Doc.DocPackage {
 
   const sourceFileEntrypoints = []
   for (const findEntryPoint of opts.entrypoints) {
-    const sf = sourceFiles.find(
-      sf => sf.getBaseNameWithoutExtension() === findEntryPoint
-    )
-    if (!sf) {
-      throw new Error(
-        `Given entrypoint not found in project: ${findEntryPoint}`
+    let absoluteEntrypointModulePath: string
+    if (path.isAbsolute(findEntryPoint[0])) {
+      debug(
+        'considering given entrypoint as absolute, disregarding source root: %s',
+        findEntryPoint
+      )
+      absoluteEntrypointModulePath = path.join(
+        path.dirname(findEntryPoint),
+        path.basename(findEntryPoint, path.extname(findEntryPoint))
+      )
+    } else {
+      debug(
+        'considering given entrypoint relative to source root: %s',
+        findEntryPoint
+      )
+      absoluteEntrypointModulePath = path.join(
+        sourceRoot,
+        path.dirname(findEntryPoint),
+        path.basename(findEntryPoint, path.extname(findEntryPoint))
       )
     }
+
+    // todo if given entrypoint is a folder then infer that to mean looking for
+    // an index within it (just like how node module resolution works)
+
+    const tried: string[] = []
+    const sf = sourceFiles.find(sf => {
+      const absoluteModulePath = path.join(
+        path.dirname(sf.getFilePath()),
+        sf.getBaseNameWithoutExtension()
+      )
+      tried.push(absoluteModulePath)
+      return absoluteModulePath === absoluteEntrypointModulePath
+    })
+
+    if (!sf) {
+      throw new Error(
+        `Given entrypoint not found in project: ${absoluteEntrypointModulePath}. Source files were:\n\n${tried.join(
+          ', '
+        )}`
+      )
+    }
+
     sourceFileEntrypoints.push(sf)
   }
 
-  const docman = Doc.createManager()
+  const docman = Doc.createManager({ sourceRoot })
   sourceFileEntrypoints.forEach(sf => {
     fromModule(docman, sf)
   })
@@ -151,7 +210,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   }
   if (manager.isIndexable(t)) {
     debugVisible('-> type is indexable')
-    const fqtn = Doc.getFQTNFromType(t)
+    const fqtn = manager.getFQTN(t)
     if (manager.isIndexed(fqtn)) {
       debugVisible(
         '-> type is being documented as link to the type index (aka. cache hit)'

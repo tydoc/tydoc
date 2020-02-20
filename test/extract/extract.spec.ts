@@ -244,7 +244,7 @@ Object {
           "name": "d",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").D",
+            "link": "(a).D",
           },
         },
         Object {
@@ -254,7 +254,7 @@ Object {
           "name": "e",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").E",
+            "link": "(a).E",
           },
         },
         Object {
@@ -264,7 +264,7 @@ Object {
           "name": "f",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").F",
+            "link": "(a).F",
           },
         },
         Object {
@@ -284,7 +284,7 @@ Object {
           "name": "f3",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").F5",
+            "link": "(a).F5",
           },
         },
         Object {
@@ -294,7 +294,7 @@ Object {
           "name": "g",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").G",
+            "link": "(a).G",
           },
         },
         Object {
@@ -304,7 +304,7 @@ Object {
           "name": "h",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").H",
+            "link": "(a).H",
           },
         },
         Object {
@@ -314,7 +314,7 @@ Object {
           "name": "i",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").I",
+            "link": "(a).I",
           },
         },
         Object {
@@ -334,7 +334,7 @@ Object {
           "name": "k",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").K",
+            "link": "(a).K",
           },
         },
         Object {
@@ -344,7 +344,7 @@ Object {
           "name": "l",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").L",
+            "link": "(a).L",
           },
         },
         Object {
@@ -354,7 +354,7 @@ Object {
           "name": "m1",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").M",
+            "link": "(a).M",
           },
         },
         Object {
@@ -364,7 +364,7 @@ Object {
           "name": "m2",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").M",
+            "link": "(a).M",
           },
         },
         Object {
@@ -374,7 +374,7 @@ Object {
           "name": "n1",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").N1",
+            "link": "(a).N1",
           },
         },
         Object {
@@ -384,7 +384,7 @@ Object {
           "name": "n2",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").N2",
+            "link": "(a).N2",
           },
         },
         Object {
@@ -394,14 +394,14 @@ Object {
           "name": "n3",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").N3",
+            "link": "(a).N3",
           },
         },
       ],
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").D": Object {
+    "(a).D": Object {
       "kind": "interface",
       "name": "D",
       "props": Array [],
@@ -411,7 +411,7 @@ Object {
         "typeText": "D",
       },
     },
-    "(\\"/a\\").E": Object {
+    "(a).E": Object {
       "kind": "interface",
       "name": "E",
       "props": Array [
@@ -477,7 +477,7 @@ Object {
         "typeText": "E",
       },
     },
-    "(\\"/a\\").F": Object {
+    "(a).F": Object {
       "kind": "alias",
       "name": "F",
       "raw": Object {
@@ -495,7 +495,7 @@ Object {
         },
       },
     },
-    "(\\"/a\\").F5": Object {
+    "(a).F5": Object {
       "kind": "alias",
       "name": "F5",
       "raw": Object {
@@ -522,7 +522,7 @@ Object {
         },
       },
     },
-    "(\\"/a\\").G": Object {
+    "(a).G": Object {
       "kind": "alias",
       "name": "G",
       "raw": Object {
@@ -584,7 +584,7 @@ Object {
         },
       },
     },
-    "(\\"/a\\").H": Object {
+    "(a).H": Object {
       "kind": "alias",
       "name": "H",
       "raw": Object {
@@ -601,7 +601,7 @@ Object {
             "type": Object {
               "innerType": Object {
                 "kind": "typeIndexRef",
-                "link": "(\\"/a\\").H2",
+                "link": "(a).H2",
               },
               "kind": "array",
             },
@@ -614,7 +614,7 @@ Object {
         },
       },
     },
-    "(\\"/a\\").H2": Object {
+    "(a).H2": Object {
       "kind": "interface",
       "name": "H2",
       "props": Array [],
@@ -624,7 +624,7 @@ Object {
         "typeText": "H2",
       },
     },
-    "(\\"/a\\").I": Object {
+    "(a).I": Object {
       "kind": "alias",
       "name": "I",
       "raw": Object {
@@ -659,7 +659,7 @@ Object {
         ],
       },
     },
-    "(\\"/a\\").K": Object {
+    "(a).K": Object {
       "kind": "alias",
       "name": "K",
       "raw": Object {
@@ -709,7 +709,7 @@ Object {
         ],
       },
     },
-    "(\\"/a\\").L": Object {
+    "(a).L": Object {
       "kind": "alias",
       "name": "L",
       "raw": Object {
@@ -805,7 +805,7 @@ Object {
         ],
       },
     },
-    "(\\"/a\\").M": Object {
+    "(a).M": Object {
       "kind": "alias",
       "name": "M",
       "raw": Object {
@@ -823,7 +823,7 @@ Object {
         },
       },
     },
-    "(\\"/a\\").N1": Object {
+    "(a).N1": Object {
       "kind": "alias",
       "name": "N1",
       "raw": Object {
@@ -839,7 +839,7 @@ Object {
             "name": "n1",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(\\"/a\\").N1",
+              "link": "(a).N1",
             },
           },
         ],
@@ -850,7 +850,7 @@ Object {
         },
       },
     },
-    "(\\"/a\\").N2": Object {
+    "(a).N2": Object {
       "kind": "alias",
       "name": "N2",
       "raw": Object {
@@ -861,12 +861,12 @@ Object {
       "type": Object {
         "innerType": Object {
           "kind": "typeIndexRef",
-          "link": "(\\"/a\\").N2",
+          "link": "(a).N2",
         },
         "kind": "array",
       },
     },
-    "(\\"/a\\").N3": Object {
+    "(a).N3": Object {
       "kind": "alias",
       "name": "N3",
       "raw": Object {
@@ -897,7 +897,7 @@ Object {
                 "name": "n3",
                 "type": Object {
                   "kind": "typeIndexRef",
-                  "link": "(\\"/a\\").N3",
+                  "link": "(a).N3",
                 },
               },
             ],

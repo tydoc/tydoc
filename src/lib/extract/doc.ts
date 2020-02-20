@@ -9,17 +9,27 @@ const debug = Debug('tydoc:doc')
 
 export interface Manager {
   d: DocPackage
+  settings: Options
   isIndexable(t: tsm.Type): boolean
   isIndexed(name: string): boolean
   getFromIndex(name: string): Node
+  getFQTN(t: tsm.Type): string
   indexTypeAliasNode(n: tsm.TypeAliasDeclaration, doc: Thunk<Node>): Node
   indexTypeIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
+}
+
+interface Options {
+  /**
+   * Absolute path to the source root. This should match the path that rootDir
+   * resolves to from the project's tsconfig.json.
+   */
+  sourceRoot: string
 }
 
 /**
  * Create a new set of docs.
  */
-export function createManager(): Manager {
+export function createManager(opts: Options): Manager {
   const d: DocPackage = {
     modules: [],
     typeIndex: {},
@@ -27,6 +37,7 @@ export function createManager(): Manager {
 
   const api: Manager = {
     d: d,
+    settings: opts,
     isIndexable(t) {
       if (t.isLiteral()) return false
       if (isPrimitive(t)) return false
@@ -45,8 +56,11 @@ export function createManager(): Manager {
     getFromIndex(name) {
       return d.typeIndex[name]
     },
+    getFQTN(t) {
+      return getFQTNFromType(opts.sourceRoot, t)
+    },
     indexTypeAliasNode(n, doc) {
-      const fqtn = getFQTNFromTypeAliasNode(n)
+      const fqtn = getFQTNFromTypeAliasNode(opts.sourceRoot, n)
       api.d.typeIndex[fqtn] = {} as any
       const result = doc() as IndexableNode
       api.d.typeIndex[fqtn] = result
@@ -54,7 +68,7 @@ export function createManager(): Manager {
     },
     indexTypeIfApplicable(t, doc) {
       if (api.isIndexable(t)) {
-        const fqtn = getFQTNFromType(t)
+        const fqtn = getFQTNFromType(opts.sourceRoot, t)
         if (!api.isIndexed(fqtn)) {
           // register then hydrate, this prevents infinite loops
           debug('provisioning entry in type index: %s', fqtn)
@@ -71,13 +85,16 @@ export function createManager(): Manager {
   return api
 }
 
-export function getFQTNFromTypeAliasNode(n: tsm.TypeAliasDeclaration): string {
-  const typePath = getPathFromProjectRoot(n.getSourceFile())
+export function getFQTNFromTypeAliasNode(
+  sourceRoot: string,
+  n: tsm.TypeAliasDeclaration
+): string {
+  const typePath = getPathFromSourceRoot(sourceRoot, n.getSourceFile())
   const fqtn = formatFQTN(typePath, n.getName())
   return fqtn
 }
 
-export function getFQTNFromType(t: tsm.Type): string {
+export function getFQTNFromType(sourceRoot: string, t: tsm.Type): string {
   // It can happen that a type has no symbol but does have alias symbol, for
   // example union types.
   const s = t.getSymbol()
@@ -97,16 +114,19 @@ export function getFQTNFromType(t: tsm.Type): string {
       `Given type ${t.getText()} has neither symbol nor alias symbol`
     )
   }
-  const typePath = getPathFromProjectRoot(sourceFile)
+  const typePath = getPathFromSourceRoot(sourceRoot, sourceFile)
   const fqtn = formatFQTN(typePath, typeName)
   return fqtn
 }
 
 function formatFQTN(typePath: string, typeName: string): string {
-  return `("${typePath}").${typeName}`
+  return `(${typePath}).${typeName}`
 }
 
-function getPathFromProjectRoot(sourceFile: tsm.SourceFile): string {
+function getPathFromSourceRoot(
+  sourceRoot: string,
+  sourceFile: tsm.SourceFile
+): string {
   const filePath = sourceFile.getFilePath()
   const fileDirPath = path.dirname(filePath)
   const modulePath = path.join(
@@ -114,7 +134,7 @@ function getPathFromProjectRoot(sourceFile: tsm.SourceFile): string {
     sourceFile.getBaseNameWithoutExtension()
   )
   // todo relative to project root...
-  return modulePath
+  return path.relative(sourceRoot, modulePath)
 }
 
 // prettier-ignore

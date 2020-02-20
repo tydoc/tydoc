@@ -1,12 +1,26 @@
 import Command, { flags } from '@oclif/command'
-import { fromProject, renderMarkdown } from '../../'
+import * as TyDoc from '../../'
 
 export class Project extends Command {
   static strict = false
-  static args = [{ name: 'filePath', required: true }]
+  static args = [
+    {
+      name: 'filePath',
+      required: true,
+      description: 'Entrypoint(s) into the package',
+    },
+  ]
   static flags = {
-    markdown: flags.boolean({ default: true, char: 'm', exclusive: ['json'] }),
-    json: flags.boolean({ default: false, char: 'j', exclusive: ['markdown'] }),
+    markdown: flags.boolean({
+      default: true,
+      char: 'm',
+      exclusive: ['json'],
+    }),
+    json: flags.boolean({
+      default: false,
+      char: 'j',
+      exclusive: ['markdown'],
+    }),
     'flat-terms-section': flags.boolean({
       default: false,
       description:
@@ -15,20 +29,10 @@ export class Project extends Command {
   }
   async run() {
     const { flags, argv } = this.parse(Project)
-    // const existsResult = fs.exists(args.filePath)
 
-    // if (existsResult === false) {
-    //   return this.error(`No module found at ${args.filePath}`)
-    // }
-
-    // let docs
-    // if (existsResult === 'dir') {
-    //   docs = )
-    // } else {
-    //   docs = extractDocsFromProject(args.filePath)
-    // }
-
-    const docs = fromProject({ entrypoints: argv })
+    const docs = TyDoc.fromProject({
+      entrypoints: argv,
+    })
 
     if (flags.json) {
       this.log(JSON.stringify(docs, null, 2))
@@ -39,7 +43,7 @@ export class Project extends Command {
       const options = {
         flatTermsSection: flags['flat-terms-section'],
       }
-      this.log(renderMarkdown(docs, options))
+      this.log(TyDoc.renderMarkdown(docs, options))
       return
     }
   }
