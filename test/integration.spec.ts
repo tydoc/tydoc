@@ -4,6 +4,7 @@ const sources = [
 
     export { fooFromB }
 
+
     /**
      * Toto
      */

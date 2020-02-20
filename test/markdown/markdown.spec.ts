@@ -49,3 +49,30 @@ describe('options', () => {
     })
   })
 })
+
+it('term exports whose type is in the typeindex are linked to that typeindex entry', () => {
+  expect(
+    ctx.markdown(
+      { flatTermsSection: true },
+      `
+        export let a: A = {}
+        interface A {}
+      `
+    )
+  ).toMatchInlineSnapshot(`
+"### \`a\`
+
+Of type [\`A\`](#i-a)
+
+### Exported Types
+
+### Type Index
+
+#### \`I\` \`A\`
+
+\`\`\`ts
+interface A {}
+\`\`\`
+"
+`)
+})

@@ -53,6 +53,17 @@ export function codeSpan(n: Node): Renderable {
 }
 
 /**
+ * A markdown link.
+ */
+export function link(text: Node, url: string): Renderable {
+  return {
+    render(state) {
+      return `[${render(state, text)}](${url})`
+    },
+  }
+}
+
+/**
  * A heading.
  */
 export function heading(n: number, content: Node): Renderable {
