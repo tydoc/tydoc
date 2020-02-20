@@ -92,6 +92,7 @@ export function fromModule(
     if (
       tsm.Node.isTypeAliasDeclaration(n) &&
       (!getNodeFromTypePreferingAlias(t) ||
+        (t.isArray() && !hasAlias(t)) ||
         t.getSymbol()?.getName() === '__object' ||
         t.getSymbol()?.getName() === '__function')
     ) {

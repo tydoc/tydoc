@@ -86,8 +86,16 @@ export function dumpType(t: tsm.Type): void {
     t.getText()                                          = ${t.getText()}
     t.getSymbol()?.getName()                             = ${t.getSymbol()?.getName()}
     t.getAliasSymbol()?.getName()                        = ${t.getAliasSymbol()?.getName()}
-    t.getSymbol()?.getDeclarations()?.[0]?.getText()     = ${t.getSymbol()?.getDeclarations()?.[0]?.getText()}
+    t.getApparentType().getText()                        = ${t.getApparentType().getText()}
     t.getSymbol()?.getDeclarations()?.[0]?.getKindName() = ${t.getSymbol()?.getDeclarations()?.[0]?.getKindName()}
+    t.getSymbol()?.getDeclarations()?.[0]?.getText()     = ${t.getSymbol()?.getDeclarations()?.[0]?.getText()}
+
+    t.getText(undefined, tsm.ts.TypeFormatFlags.InTypeAlias)                           = ${t.getText(undefined, tsm.ts.TypeFormatFlags.InTypeAlias)}
+    t.getText(undefined, tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope)    = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope)}
+    t.getText(undefined, tsm.ts.TypeFormatFlags.UseTypeOfFunction)                     = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseTypeOfFunction)}
+    t.getText(undefined, tsm.ts.TypeFormatFlags.UseFullyQualifiedType)                 = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseFullyQualifiedType)}
+    t.getText(undefined, tsm.ts.TypeFormatFlags.NoTruncation)                          = ${t.getText(undefined, tsm.ts.TypeFormatFlags.NoTruncation)}
+    t.getText(undefined, tsm.ts.TypeFormatFlags.UseStructuralFallback)                 = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseStructuralFallback)}
   `)
 }
 
@@ -95,9 +103,10 @@ export function dumpNode(n: tsm.Node): void {
   // prettier-ignore
   console.error(`
     n.getKindName()                         = ${n.getKindName()}
-    n.getType().getText()                   = ${n.getType().getText()}
     n.getText()                             = ${n.getText()}
+    n.getType().getText()                   = ${n.getType().getText()}
     n.getType().getSymbol()?.getName()      = ${n.getType().getSymbol()?.getName()}
     n.getType().getAliasSymbol()?.getName() = ${n.getType().getAliasSymbol()?.getName()}
+    n.getType().getApparentType().getText() = ${n.getType().getApparentType().getText()}
   `)
 }
