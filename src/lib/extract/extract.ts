@@ -87,17 +87,12 @@ export function fromModule(
     debugExport('-> node kind is %s', n.getKindName())
     debugExport('-> type text is %j', n.getType().getText())
     let doc
-    // if the node is a type alias and the type of the type alias cannot be
-    // traced back to the node then we are forced to run extraction logic here
-    if (
-      tsm.Node.isTypeAliasDeclaration(n) &&
-      (!getNodeFromTypePreferingAlias(t) ||
-        (t.isArray() && !hasAlias(t)) ||
-        t.getSymbol()?.getName() === '__object' ||
-        t.getSymbol()?.getName() === '__function')
-    ) {
+    // if the node is a type alias and its type cannot find its way back to the
+    // type alias then we are forced to run type alias extraction logic here.
+    // So far we know this happens in typeof cases.
+    if (tsm.Node.isTypeAliasDeclaration(n) && !hasAlias(t)) {
       debugExport(
-        'type alias pointing to type that cannot back reference or back references to an inline function/object %s',
+        'type alias pointing to type that cannot back reference to the type alias %s',
         n.getText()
       )
       doc = manager.indexTypeAliasNode(n, () =>
