@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
-    "doc": "dist/cli/main.js"
+    "tydoc": "dist/cli/main.js"
   },
   "files": [
     "dist",
@@ -92,7 +92,7 @@
   },
   "oclif": {
     "commands": "./dist/cli/commands",
-    "bin": "doc",
+    "bin": "tydoc",
     "plugins": [
       "@oclif/plugin-help"
     ]
