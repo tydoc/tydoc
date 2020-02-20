@@ -1,0 +1,125 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`exported type alias of function is added to type index 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(\\"/a\\").A",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "export type A = () => {};",
+        "nodeText": "export type A = () => {};",
+        "typeText": "A",
+      },
+      "type": Object {
+        "hasProps": false,
+        "isOverloaded": false,
+        "kind": "callable",
+        "props": Array [],
+        "raw": Object {
+          "nodeFullText": "export type A = () => {};",
+          "nodeText": "export type A = () => {};",
+          "typeText": "A",
+        },
+        "sigs": Array [
+          Object {
+            "kind": "sig",
+            "params": Array [],
+            "return": Object {
+              "kind": "object",
+              "props": Array [],
+              "raw": Object {
+                "nodeFullText": "",
+                "nodeText": "",
+                "typeText": "{}",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`exported type alias of function via typeof is added to type index 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(\\"/a\\").A",
+          },
+        },
+      ],
+    },
+  ],
+  "typeIndex": Object {
+    "(\\"/a\\").A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "
+export type A = typeof a;",
+        "nodeText": "export type A = typeof a;",
+        "typeText": "() => void",
+      },
+      "type": Object {
+        "hasProps": false,
+        "isOverloaded": false,
+        "kind": "callable",
+        "props": Array [],
+        "raw": Object {
+          "nodeFullText": "() => {}",
+          "nodeText": "() => {}",
+          "typeText": "() => void",
+        },
+        "sigs": Array [
+          Object {
+            "kind": "sig",
+            "params": Array [],
+            "return": Object {
+              "kind": "primitive",
+              "type": "void",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;

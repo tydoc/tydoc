@@ -91,16 +91,21 @@ export function fromModule(
     // traced back to the node then we are forced to run extraction logic here
     if (
       tsm.Node.isTypeAliasDeclaration(n) &&
-      !getNodeFromTypePreferingAlias(t)
+      (!getNodeFromTypePreferingAlias(t) ||
+        t.getSymbol()?.getName() === '__function')
     ) {
       debugExport(
-        'type alias pointing to type that cannot back reference %s',
+        'type alias pointing to type that cannot back reference or back references to an inline function %s',
         n.getText()
       )
       doc = manager.indexTypeAliasNode(n, () =>
         Doc.alias({
           name: n.getName(),
-          ...getRaw(n.getType()),
+          raw: {
+            nodeFullText: n.getFullText(),
+            nodeText: n.getText(),
+            typeText: t.getText(),
+          },
           type: fromType(manager, t),
         })
       )

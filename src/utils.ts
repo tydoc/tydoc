@@ -1,3 +1,4 @@
+import * as tsm from 'ts-morph'
 import { inspect } from 'util'
 
 export type ArrayOrVarg<T> = T[] | [T[]]
@@ -22,4 +23,14 @@ export function casesHandled(x: never): never {
 export function dump(...args: any[]) {
   const argsInspected = args.map(a => inspect(a, { depth: 20 }))
   console.error(...argsInspected)
+}
+
+export function dumpType(t: tsm.Type): void {
+  // prettier-ignore
+  console.error(`
+    t.getText()                                      = ${t.getText()}
+    t.getSymbol()?.getName()                         = ${t.getSymbol()?.getName()}
+    t.getAliasSymbol()?.getName()                    = ${t.getAliasSymbol()?.getName()}
+    t.getSymbol()?.getDeclarations()?.[0]?.getText() = ${t.getSymbol()?.getDeclarations()?.[0]?.getText()}
+  `)
 }
