@@ -176,7 +176,7 @@ export type TypeNode =
 //
 
 export type JSDoc = {
-  jsdoc: null | string
+  jsdoc: null | { text: string; tags: { name: string; text: string }[] }
 }
 
 export type Raw = {
@@ -225,9 +225,11 @@ export type DocModule = JSDoc & {
   namedExports: Expor[]
 }
 
-type ModInput = Partial<Pick<DocModule, 'mainExport' | 'namedExports'>> & {
+type ModInput = {
   name: string
-  jsdoc: null | string
+  mainExport?: null | Node
+  namedExports?: Expor[]
+  jsdoc: JSDoc['jsdoc']
   location: {
     absoluteFilePath: string
     // projectRelativeFilePath: string // todo
@@ -261,7 +263,7 @@ export function modFromSourceFile(sourceFile: tsm.SourceFile): DocModule {
  * comment, actually). A non-import node that does not have its own JSDoc would
  * cause the one leading the module to be its doc.
  */
-function extractModuleLevelJSDoc(sf: tsm.SourceFile): null | string {
+function extractModuleLevelJSDoc(sf: tsm.SourceFile): JSDoc['jsdoc'] {
   const syntaxList = sf.getChildren()[0]
 
   if (!tsm.Node.isSyntaxList(syntaxList)) {
@@ -270,24 +272,26 @@ function extractModuleLevelJSDoc(sf: tsm.SourceFile): null | string {
     )
   }
 
-  if (syntaxList.getText() === '') {
-    return syntaxList.getLeadingCommentRanges()[0]?.getText() ?? null
-  }
-
-  // empty syntax list check above should guarnatee a value here
+  // Empty syntax list check above should guarnatee a value here
   const firstSyntax = syntaxList.getChildren()[0]
 
   if (
+    // Empty file
+    syntaxList.getText() === '' ||
+    // Import/export nodes
     tsm.Node.isImportDeclaration(firstSyntax) ||
-    tsm.Node.isExportDeclaration(firstSyntax)
+    tsm.Node.isExportDeclaration(firstSyntax) ||
+    // If there are multiple comment blocks then assume the first is for the
+    // module and the later one(s) are for the node.
+    syntaxList.getLeadingCommentRanges().length > 1
   ) {
-    return syntaxList.getLeadingCommentRanges()[0]?.getText() ?? null
-  }
-
-  // If there are multiple comment blocks then assume the first is for the
-  // module and the later one(s) are for the node.
-  if (syntaxList.getLeadingCommentRanges().length > 1) {
-    return syntaxList.getLeadingCommentRanges()[0]?.getText() ?? null
+    const comment = syntaxList.getLeadingCommentRanges()[0]
+    if (comment) {
+      return {
+        text: comment.getText(),
+        tags: [], // todo
+      }
+    }
   }
 
   return null
@@ -354,7 +358,7 @@ export function alias(input: AliasInput): DocTypeAlias {
   return { kind: 'alias', ...input }
 }
 // prettier-ignore
-export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] } & Raw
+export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] } & Raw & JSDoc
 // prettier-ignore
 type InterInput = Omit<DocTypeInterface, 'kind'>
 // prettier-ignore

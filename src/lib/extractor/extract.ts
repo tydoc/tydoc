@@ -250,6 +250,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
       Doc.inter({
         name: s.getName(),
         props: propertyDocsFromType(manager, t),
+        ...getJSDoc(t),
         ...getRaw(t),
       })
     )
@@ -427,5 +428,35 @@ function getRaw(t: tsm.Type): Doc.Raw {
       nodeText: node.getText().trim(),
       nodeFullText: node.getFullText().trim(),
     },
+  }
+}
+
+function getJSDoc(t: tsm.Type): Doc.JSDoc {
+  const n = getNodeFromTypePreferingAlias(t)
+  let docFragJSDoc: Doc.JSDoc['jsdoc']
+
+  if (!n) {
+    docFragJSDoc = null
+  } else if (!tsm.Node.isJSDocableNode(n)) {
+    docFragJSDoc = null
+  } else {
+    const tsJSDoc = n.getJsDocs()[0]
+    if (!tsJSDoc) {
+      docFragJSDoc = null
+    } else {
+      docFragJSDoc = {
+        text: tsJSDoc.getInnerText(),
+        tags: tsJSDoc.getTags().map(t => {
+          return {
+            name: t.getTagName(),
+            text: t.getComment() ?? '',
+          }
+        }),
+      }
+    }
+  }
+
+  return {
+    jsdoc: docFragJSDoc,
   }
 }

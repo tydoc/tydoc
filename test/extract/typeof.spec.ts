@@ -9,6 +9,7 @@ it('inlines the type extracted from the term', () => {
     Object {
       "modules": Array [
         Object {
+          "jsdoc": null,
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/a.ts",
@@ -41,6 +42,7 @@ it('inlines the type extracted from the term', () => {
       ],
       "typeIndex": Object {
         "(a).A": Object {
+          "jsdoc": null,
           "kind": "interface",
           "name": "A",
           "props": Array [
@@ -85,6 +87,7 @@ it('inlines the type extracted from the term', () => {
           },
         },
         "(a).B": Object {
+          "jsdoc": null,
           "kind": "interface",
           "name": "B",
           "props": Array [],

@@ -50,6 +50,7 @@ exports[`exported type alias of array via typeof is added to type index 1`] = `
 Object {
   "modules": Array [
     Object {
+      "jsdoc": null,
       "kind": "module",
       "location": Object {
         "absoluteFilePath": "/a.ts",

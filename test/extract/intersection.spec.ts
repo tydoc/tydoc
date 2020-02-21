@@ -97,6 +97,7 @@ it.only('gets each member of the intersection when inside a union', () => {
 Object {
   "modules": Array [
     Object {
+      "jsdoc": null,
       "kind": "module",
       "location": Object {
         "absoluteFilePath": "/a.ts",

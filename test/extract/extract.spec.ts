@@ -196,6 +196,7 @@ it.only('passes smoke test', () => {
 Object {
   "modules": Array [
     Object {
+      "jsdoc": null,
       "kind": "module",
       "location": Object {
         "absoluteFilePath": "/a.ts",
@@ -402,6 +403,7 @@ Object {
   ],
   "typeIndex": Object {
     "(a).D": Object {
+      "jsdoc": null,
       "kind": "interface",
       "name": "D",
       "props": Array [],
@@ -412,6 +414,7 @@ Object {
       },
     },
     "(a).E": Object {
+      "jsdoc": null,
       "kind": "interface",
       "name": "E",
       "props": Array [
@@ -615,6 +618,7 @@ Object {
       },
     },
     "(a).H2": Object {
+      "jsdoc": null,
       "kind": "interface",
       "name": "H2",
       "props": Array [],
