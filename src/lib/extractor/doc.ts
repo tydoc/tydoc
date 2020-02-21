@@ -7,18 +7,7 @@ import { hasAlias, isPrimitive, isTypeLevelNode } from './utils'
 
 const debug = Debug('tydoc:doc')
 
-export interface Manager {
-  data: DocPackage
-  settings: Options
-  isIndexable(t: tsm.Type): boolean
-  isIndexed(name: string): boolean
-  getFromIndex(name: string): Node
-  getFQTN(t: tsm.Type): string
-  indexTypeAliasNode(n: tsm.TypeAliasDeclaration, doc: Thunk<Node>): Node
-  indexTypeIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
-}
-
-interface Options {
+interface Settings {
   /**
    * Absolute path to the source root. This should match the path that rootDir
    * resolves to from the project's tsconfig.json.
@@ -29,60 +18,62 @@ interface Options {
 /**
  * Create a new set of docs.
  */
-export function createManager(opts: Options): Manager {
-  const d: DocPackage = {
+export class Manager {
+  constructor(public settings: Settings) {}
+
+  data: DocPackage = {
     modules: [],
     typeIndex: {},
   }
 
-  const api: Manager = {
-    data: d,
-    settings: opts,
-    isIndexable(t) {
-      if (t.isLiteral()) return false
-      if (isPrimitive(t)) return false
-      // something without a symbol must be inline since it means it is nameless
-      if (!t.getSymbol() && !t.getAliasSymbol()) return false
-      // an object with no alias means it must be inline
-      // note that interfaces are considered objects so we filter these out
-      if (!t.isInterface()) {
-        if (!hasAlias(t) && t.isObject()) return false
-      }
-      return true
-    },
-    isIndexed(name) {
-      return d.typeIndex[name] !== undefined
-    },
-    getFromIndex(name) {
-      return d.typeIndex[name]
-    },
-    getFQTN(t) {
-      return getFQTNFromType(opts.sourceRoot, t)
-    },
-    indexTypeAliasNode(n, doc) {
-      const fqtn = getFQTNFromTypeAliasNode(opts.sourceRoot, n)
-      api.data.typeIndex[fqtn] = {} as any
-      const result = doc() as IndexableNode
-      api.data.typeIndex[fqtn] = result
-      return typeIndexRef(fqtn)
-    },
-    indexTypeIfApplicable(t, doc) {
-      if (api.isIndexable(t)) {
-        const fqtn = getFQTNFromType(opts.sourceRoot, t)
-        if (!api.isIndexed(fqtn)) {
-          // register then hydrate, this prevents infinite loops
-          debug('provisioning entry in type index: %s', fqtn)
-          api.data.typeIndex[fqtn] = {} as any
-          const result = doc() as IndexableNode
-          debug('hydrating entry in type index: %s', fqtn)
-          api.data.typeIndex[fqtn] = result
-        }
-        return typeIndexRef(fqtn)
-      }
-      return doc()
-    },
+  isIndexable(t: tsm.Type): boolean {
+    if (t.isLiteral()) return false
+    if (isPrimitive(t)) return false
+    // something without a symbol must be inline since it means it is nameless
+    if (!t.getSymbol() && !t.getAliasSymbol()) return false
+    // an object with no alias means it must be inline
+    // note that interfaces are considered objects so we filter these out
+    if (!t.isInterface()) {
+      if (!hasAlias(t) && t.isObject()) return false
+    }
+    return true
   }
-  return api
+
+  isIndexed(name: string): boolean {
+    return this.data.typeIndex[name] !== undefined
+  }
+
+  getFromIndex(name: string): Node {
+    return this.data.typeIndex[name]
+  }
+
+  getFQTN(t: tsm.Type): string {
+    return getFQTNFromType(this.settings.sourceRoot, t)
+  }
+
+  indexTypeAliasNode(n: tsm.TypeAliasDeclaration, doc: Thunk<Node>): Node {
+    const fqtn = getFQTNFromTypeAliasNode(this.settings.sourceRoot, n)
+    this.data.typeIndex[fqtn] = {} as any
+    const result = doc() as IndexableNode
+    this.data.typeIndex[fqtn] = result
+    return typeIndexRef(fqtn)
+  }
+
+  indexTypeIfApplicable(t: tsm.Type, doc: Thunk<Node>) {
+    if (this.isIndexable(t)) {
+      const fqtn = getFQTNFromType(this.settings.sourceRoot, t)
+      if (!this.isIndexed(fqtn)) {
+        // register then hydrate, this prevents infinite loops
+        debug('provisioning entry in type index: %s', fqtn)
+        this.data.typeIndex[fqtn] = {} as any
+        const result = doc() as IndexableNode
+        debug('hydrating entry in type index: %s', fqtn)
+        this.data.typeIndex[fqtn] = result
+      }
+      return typeIndexRef(fqtn)
+    }
+    return doc()
+  }
 }
 
 export function getFQTNFromTypeAliasNode(

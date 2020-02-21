@@ -120,7 +120,8 @@ export function fromProject(opts: Options): Doc.DocPackage {
     sourceFileEntrypoints.push(sf)
   }
 
-  const docman = Doc.createManager({ sourceRoot })
+  const docman = new Doc.Manager({ sourceRoot })
+
   sourceFileEntrypoints.forEach(sf => {
     fromModule(docman, sf)
   })
