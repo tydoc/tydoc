@@ -1,6 +1,6 @@
 import * as Debug from 'Debug'
 import * as Prettier from 'prettier'
-import * as Doc from '../extract/doc'
+import * as Doc from '../extractor/doc'
 import {
   codeSpan,
   lines,

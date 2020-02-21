@@ -1,6 +1,6 @@
 import * as tsm from 'ts-morph'
 import { inspect } from 'util'
-import { dumpNode, dumpType } from './lib/extract/utils'
+import { dumpNode, dumpType } from './lib/extractor/utils'
 
 export type ArrayOrVarg<T> = T[] | [T[]]
 
