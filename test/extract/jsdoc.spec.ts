@@ -40,8 +40,23 @@ it('interfaces can have jsdoc', () => {
       "typeIndex": Object {
         "(a).A": Object {
           "jsdoc": Object {
-            "tags": Array [],
-            "text": "...",
+            "raw": "...
+
+    @a foo
+    @b
+
+    bar
+    ",
+            "tags": Array [
+              Object {
+                "name": "a",
+                "text": "foo",
+              },
+              Object {
+                "name": "b",
+                "text": "bar",
+              },
+            ],
           },
           "kind": "interface",
           "name": "A",
@@ -49,6 +64,12 @@ it('interfaces can have jsdoc', () => {
           "raw": Object {
             "nodeFullText": "/**
      * ...
+     *
+     * @a foo
+     * @b
+     *
+     * bar
+     *
      */
     export interface A {}",
             "nodeText": "export interface A {}",

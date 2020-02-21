@@ -12,10 +12,10 @@ it('extracts first comment in an empty file', () => {
       "modules": Array [
         Object {
           "jsdoc": Object {
-            "tags": Array [],
-            "text": "/**
+            "raw": "/**
      * ...
      */",
+            "tags": Array [],
           },
           "kind": "module",
           "location": Object {
@@ -49,10 +49,10 @@ it('extracts first comment above an import node', () => {
       "modules": Array [
         Object {
           "jsdoc": Object {
-            "tags": Array [],
-            "text": "/**
+            "raw": "/**
      * ...
      */",
+            "tags": Array [],
           },
           "kind": "module",
           "location": Object {
@@ -86,10 +86,10 @@ it('extracts first comment above an export node', () => {
       "modules": Array [
         Object {
           "jsdoc": Object {
-            "tags": Array [],
-            "text": "/**
+            "raw": "/**
      * ...
      */",
+            "tags": Array [],
           },
           "kind": "module",
           "location": Object {
@@ -135,10 +135,10 @@ it('extracts leadig comment above any node if node has own comment', () => {
       "modules": Array [
         Object {
           "jsdoc": Object {
-            "tags": Array [],
-            "text": "/**
+            "raw": "/**
      * ...
      */",
+            "tags": Array [],
           },
           "kind": "module",
           "location": Object {
