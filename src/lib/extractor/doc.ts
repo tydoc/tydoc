@@ -176,7 +176,7 @@ export type TypeNode =
 //
 
 export type JSDoc = {
-  jsdoc: null | { text: string; tags: { name: string; text: string }[] }
+  jsdoc: null | { raw: string; tags: { name: string; text: string }[] }
 }
 
 export type Raw = {
@@ -288,7 +288,7 @@ function extractModuleLevelJSDoc(sf: tsm.SourceFile): JSDoc['jsdoc'] {
     const comment = syntaxList.getLeadingCommentRanges()[0]
     if (comment) {
       return {
-        text: comment.getText(),
+        raw: comment.getText(),
         tags: [], // todo
       }
     }

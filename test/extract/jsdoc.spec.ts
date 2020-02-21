@@ -3,6 +3,12 @@ it('interfaces can have jsdoc', () => {
     ctx.extract(`
     /**
      * ...
+     * 
+     * @a foo
+     * @b
+     * 
+     * bar
+     * 
      */
     export interface A {}
   `)

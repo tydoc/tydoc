@@ -445,7 +445,7 @@ function getJSDoc(t: tsm.Type): Doc.JSDoc {
       docFragJSDoc = null
     } else {
       docFragJSDoc = {
-        text: tsJSDoc.getInnerText(),
+        raw: tsJSDoc.getInnerText(),
         tags: tsJSDoc.getTags().map(t => {
           return {
             name: t.getTagName(),
