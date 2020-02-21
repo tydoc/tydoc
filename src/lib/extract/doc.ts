@@ -8,7 +8,7 @@ import { hasAlias, isPrimitive, isTypeLevelNode } from './utils'
 const debug = Debug('tydoc:doc')
 
 export interface Manager {
-  d: DocPackage
+  data: DocPackage
   settings: Options
   isIndexable(t: tsm.Type): boolean
   isIndexed(name: string): boolean
@@ -36,7 +36,7 @@ export function createManager(opts: Options): Manager {
   }
 
   const api: Manager = {
-    d: d,
+    data: d,
     settings: opts,
     isIndexable(t) {
       if (t.isLiteral()) return false
@@ -61,9 +61,9 @@ export function createManager(opts: Options): Manager {
     },
     indexTypeAliasNode(n, doc) {
       const fqtn = getFQTNFromTypeAliasNode(opts.sourceRoot, n)
-      api.d.typeIndex[fqtn] = {} as any
+      api.data.typeIndex[fqtn] = {} as any
       const result = doc() as IndexableNode
-      api.d.typeIndex[fqtn] = result
+      api.data.typeIndex[fqtn] = result
       return typeIndexRef(fqtn)
     },
     indexTypeIfApplicable(t, doc) {
@@ -72,10 +72,10 @@ export function createManager(opts: Options): Manager {
         if (!api.isIndexed(fqtn)) {
           // register then hydrate, this prevents infinite loops
           debug('provisioning entry in type index: %s', fqtn)
-          api.d.typeIndex[fqtn] = {} as any
+          api.data.typeIndex[fqtn] = {} as any
           const result = doc() as IndexableNode
           debug('hydrating entry in type index: %s', fqtn)
-          api.d.typeIndex[fqtn] = result
+          api.data.typeIndex[fqtn] = result
         }
         return typeIndexRef(fqtn)
       }
@@ -172,6 +172,24 @@ export type TypeNode =
   | DocTypeObject
 
 //
+// Node Features
+//
+
+export type JSDoc = {
+  jsdoc: null | string
+}
+
+export type Raw = {
+  raw: {
+    typeText: string
+    nodeText: string
+    nodeFullText: string
+  }
+}
+
+export type TypeIndex = Index<IndexableNode>
+
+//
 // Export Node
 //
 
@@ -196,13 +214,11 @@ export function expor(input: ExporInput): Expor {
   }
 }
 
-export type TypeIndex = Index<IndexableNode>
-
 //
 // Module Node
 //
 
-export type DocModule = {
+export type DocModule = JSDoc & {
   kind: 'module'
   name: string
   mainExport: null | Node
@@ -211,6 +227,7 @@ export type DocModule = {
 
 type ModInput = Partial<Pick<DocModule, 'mainExport' | 'namedExports'>> & {
   name: string
+  jsdoc: null | string
   location: {
     absoluteFilePath: string
     // projectRelativeFilePath: string // todo
@@ -229,10 +246,51 @@ export function mod(input: ModInput): DocModule {
 export function modFromSourceFile(sourceFile: tsm.SourceFile): DocModule {
   return mod({
     name: sourceFile.getBaseNameWithoutExtension(),
+    jsdoc: extractModuleLevelJSDoc(sourceFile),
     location: {
       absoluteFilePath: sourceFile.getFilePath(),
     },
   })
+}
+
+/**
+ * Extract leading JSDoc that pertains to the module as a whole.
+ *
+ * Leading JSDoc is considered for the module if it is following by nothing,
+ * imports, or a node that has its own JSDoc annotation (or any other kind of
+ * comment, actually). A non-import node that does not have its own JSDoc would
+ * cause the one leading the module to be its doc.
+ */
+function extractModuleLevelJSDoc(sf: tsm.SourceFile): null | string {
+  const syntaxList = sf.getChildren()[0]
+
+  if (!tsm.Node.isSyntaxList(syntaxList)) {
+    throw new Error(
+      `First node of module is not a syntax list. This case is not supported. The node type was ${syntaxList.getKindName()}`
+    )
+  }
+
+  if (syntaxList.getText() === '') {
+    return syntaxList.getLeadingCommentRanges()[0]?.getText() ?? null
+  }
+
+  // empty syntax list check above should guarnatee a value here
+  const firstSyntax = syntaxList.getChildren()[0]
+
+  if (
+    tsm.Node.isImportDeclaration(firstSyntax) ||
+    tsm.Node.isExportDeclaration(firstSyntax)
+  ) {
+    return syntaxList.getLeadingCommentRanges()[0]?.getText() ?? null
+  }
+
+  // If there are multiple comment blocks then assume the first is for the
+  // module and the later one(s) are for the node.
+  if (syntaxList.getLeadingCommentRanges().length > 1) {
+    return syntaxList.getLeadingCommentRanges()[0]?.getText() ?? null
+  }
+
+  return null
 }
 
 //
@@ -242,14 +300,6 @@ export function modFromSourceFile(sourceFile: tsm.SourceFile): DocModule {
 export type DocPackage = {
   modules: DocModule[]
   typeIndex: TypeIndex
-}
-
-export type Raw = {
-  raw: {
-    typeText: string
-    nodeText: string
-    nodeFullText: string
-  }
 }
 
 // prettier-ignore

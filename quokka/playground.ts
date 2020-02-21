@@ -8,53 +8,32 @@ const project = new tsm.Project({
 const sourceFile = project.createSourceFile(
   'playground.ts',
   `
-    // bee
-    export type a = {
-      /**
-       * flip
-       */
-      a: string,
-      b: number
-      c: C
-    }
-    type C = {
-      d: number,
-      e: string
-    }
   `
 )
 
-// sourceFile.print()
-// sourceFile.getExportedDeclarations()
+const nodes = sourceFile.getChildren()
+nodes.length //?
+const node = nodes[0]
+node.getKindName() //?
+node.getText() //?
+node.getLeadingCommentRanges().map(cr => cr.getText())[0] //?
+node.getChildren().length //?
+node.getChildren()[0].getKindName() //?
+node.getChildren()[1].getKindName() //?
 
-const typeIndex = {}
-
-for (const [k, vs] of sourceFile.getExportedDeclarations()) {
-  const v = vs[0]
-  v.getText() //?
-  v.getFullText() //?
-  v.getType()
-    .getProperties()
-    .map(p => p.getName()) //?
-  v.getType()
-    .getProperties()
-    .map(p => {
-      // todo if not scalar then add to type index
-      const propSig = p.getDeclarations()[0]
-      let jsDoc = null
-      if (propSig instanceof tsm.PropertySignature) {
-        jsDoc = propSig.getJsDocs() //?
-      }
-      const fieldName = p.getName()
-      const fieldType = p.getTypeAtLocation(v)
-      return {
-        name: fieldName,
-        jsDoc,
-        // jsDoc: fieldType.js,
-        type: {
-          name: fieldType.getText(),
-          isPrimitive: !fieldType.isObject(),
-        },
-      }
-    }) //?
-}
+// sourceFile.getChildren().forEach(n => {
+//   n.getKindName() //?
+//   n.getText() //?
+//   n.getFullText() //?
+//   n.getLeadingCommentRanges().map(cr => {
+//     cr.getKind() //?
+//     cr.getText() //?
+//     cr.compilerObject.pos //?
+//     cr.getEnd() //?
+//     cr.getPos() //?
+//     cr.getPos() //?
+//   }) //?
+//   if (n.getKindName() === 'EndOfFileToken') {
+//     n.getFullText() //?
+//   }
+// })

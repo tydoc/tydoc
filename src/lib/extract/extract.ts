@@ -125,7 +125,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
     fromModule(docman, sf)
   })
 
-  return docman.d
+  return docman.data
 }
 
 /**
@@ -145,10 +145,11 @@ export function fromModule(
     debugExport('start')
     debugExport('-> node kind is %s', n.getKindName())
     debugExport('-> type text is %j', n.getType().getText())
-    let doc
+
     // if the node is a type alias and its type cannot find its way back to the
     // type alias then we are forced to run type alias extraction logic here.
     // So far we know this happens in typeof cases.
+    let doc
     if (tsm.Node.isTypeAliasDeclaration(n) && !hasAlias(t)) {
       debugExport(
         'type alias pointing to type that cannot back reference to the type alias %s',
@@ -168,10 +169,12 @@ export function fromModule(
     } else {
       doc = fromType(manager, t)
     }
+
     if (exportName === 'default') {
       mod.mainExport = doc
       continue
     }
+
     mod.namedExports.push(
       Doc.expor({
         name: exportName,
@@ -181,8 +184,8 @@ export function fromModule(
     )
   }
 
-  manager.d.modules.push(mod)
-  return manager.d
+  manager.data.modules.push(mod)
+  return manager.data
 }
 
 function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
