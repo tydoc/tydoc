@@ -1,3 +1,5 @@
+import * as tsdoc from '@microsoft/tsdoc'
+import { TSDocParser } from '@microsoft/tsdoc'
 import Debug from 'debug'
 import * as lo from 'lodash'
 import * as path from 'path'
@@ -7,24 +9,37 @@ import { hasAlias, isPrimitive, isTypeLevelNode } from './utils'
 
 const debug = Debug('tydoc:doc')
 
-interface Settings {
+export interface Settings {
   /**
    * Absolute path to the source root. This should match the path that rootDir
    * resolves to from the project's tsconfig.json.
    */
-  sourceRoot: string
+  srcDir: string
+  prjDir: string
+  mainModuleFilePathAbs: string
+  sourceModuleToPackagePathMappings?: Record<string, string>
 }
 
 /**
  * Create a new set of docs.
  */
 export class Manager {
-  constructor(public settings: Settings) {}
+  constructor(public settings: Settings) {
+    this.settings.sourceModuleToPackagePathMappings = Object.fromEntries(
+      Object.entries(this.settings.sourceModuleToPackagePathMappings ?? {}).map(
+        ([k, v]) => {
+          return [path.normalize(k), path.normalize(path.join('/', v))]
+        }
+      )
+    )
+  }
 
   data: DocPackage = {
     modules: [],
     typeIndex: {},
   }
+
+  tsdocParser: TSDocParser = new TSDocParser()
 
   isIndexable(t: tsm.Type): boolean {
     if (t.isLiteral()) return false
@@ -48,11 +63,11 @@ export class Manager {
   }
 
   getFQTN(t: tsm.Type): string {
-    return getFQTNFromType(this.settings.sourceRoot, t)
+    return getFQTNFromType(this.settings.srcDir, t)
   }
 
   indexTypeAliasNode(n: tsm.TypeAliasDeclaration, doc: Thunk<Node>): Node {
-    const fqtn = getFQTNFromTypeAliasNode(this.settings.sourceRoot, n)
+    const fqtn = getFQTNFromTypeAliasNode(this.settings.srcDir, n)
     this.data.typeIndex[fqtn] = {} as any
     const result = doc() as IndexableNode
     this.data.typeIndex[fqtn] = result
@@ -61,7 +76,7 @@ export class Manager {
 
   indexTypeIfApplicable(t: tsm.Type, doc: Thunk<Node>) {
     if (this.isIndexable(t)) {
-      const fqtn = getFQTNFromType(this.settings.sourceRoot, t)
+      const fqtn = getFQTNFromType(this.settings.srcDir, t)
       if (!this.isIndexed(fqtn)) {
         // register then hydrate, this prevents infinite loops
         debug('provisioning entry in type index: %s', fqtn)
@@ -74,7 +89,103 @@ export class Manager {
     }
     return doc()
   }
+
+  isMainModule(sf: tsm.SourceFile): boolean {
+    return this.settings.mainModuleFilePathAbs === getModulePath(sf)
+  }
+
+  getImportFromPath(sf: tsm.SourceFile): string {
+    // handle root case
+    if (this.isMainModule(sf)) {
+      return '/'
+    }
+
+    const modulePath = getModulePath(sf)
+
+    // handle mapped non-root module case
+    const srcRelModulePath = path.relative(this.settings.srcDir, modulePath)
+    const packageMapping = this.settings.sourceModuleToPackagePathMappings?.[
+      srcRelModulePath
+    ]
+    if (packageMapping) {
+      debug('getting module path (%s) from settings mappings', packageMapping)
+      return packageMapping
+    }
+
+    // handle non-root module case
+    return path.join('/', path.relative(this.settings.prjDir, modulePath))
+  }
 }
+
+/**
+ * Get the path to the main TypeScript module in the package.
+ *
+ * @remarks If relative paths are given then the result will be relative.
+ * otherwise if absolute paths are given the result will be absolute. Do not mix
+ * relative and absolute paths!
+ */
+export function getMainModule({
+  outDir,
+  srcDir,
+  packageMainEntrypoint,
+}: {
+  outDir: string
+  srcDir: string
+  packageMainEntrypoint: string
+}): string {
+  // todo assertion that all paths are relative or absolute––no mixing
+  const jsFilePathRel = path.relative(outDir, packageMainEntrypoint)
+  const mainModuleName = path.basename(jsFilePathRel, '.js')
+  const MainModulePathRel = path.join(
+    path.dirname(jsFilePathRel),
+    mainModuleName
+  )
+  const MainModulePathAbs = path.join(srcDir, MainModulePathRel)
+  return MainModulePathAbs
+}
+
+/**
+ * Get the module path of the given source file. The difference froma  file path
+ * is that a module path does not have a file extension.
+ */
+function getModulePath(sf: tsm.SourceFile): string {
+  return path.join(
+    path.dirname(sf.getFilePath()),
+    sf.getBaseNameWithoutExtension()
+  )
+}
+
+// // todo move to test suite
+// getMainModule({
+//   outDir: './dist',
+//   srcDir: './src',
+//   packageMainEntrypoint: './main.js',
+// }) //?
+// getMainModule({
+//   outDir: 'dist',
+//   srcDir: 'src',
+//   packageMainEntrypoint: 'main.js',
+// }) //?
+// getMainModule({
+//   outDir: 'dist',
+//   srcDir: 'src',
+//   packageMainEntrypoint: 'main',
+// }) //?
+// getMainModule({
+//   outDir: '/projects/foo/dist',
+//   srcDir: '/projects/foo/src',
+//   packageMainEntrypoint: '/projects/foo/main.js',
+// }) //?
+// getMainModule({
+//   outDir: '/projects/foo/dist',
+//   srcDir: '/projects/foo/src',
+//   packageMainEntrypoint: '/projects/foo/dist/index.js',
+// }) //?
+// getMainModule({
+//   outDir: '/projects/foo/dist',
+//   srcDir: '/projects/foo/src',
+//   packageMainEntrypoint: '/projects/foo/dist/index.js',
+// }) //?
 
 export function getFQTNFromTypeAliasNode(
   sourceRoot: string,
@@ -166,8 +277,15 @@ export type TypeNode =
 // Node Features
 //
 
+// prettier-ignore
 export type JSDoc = {
-  jsdoc: null | { raw: string; tags: { name: string; text: string }[] }
+  jsdoc: 
+    | null
+    | {
+        raw: string
+        summary: string
+        tags: { name: string; text: string }[]
+      }
 }
 
 export type Raw = {
@@ -212,15 +330,36 @@ export function expor(input: ExporInput): Expor {
 export type DocModule = JSDoc & {
   kind: 'module'
   name: string
+  /**
+   * The path to this module from package root. If this module is the root
+   * module then the path will be `/`.
+   *
+   * @remarks
+   *
+   * This is what a user would place in their import `from `string _following_ the
+   * package name. For example:
+   *
+   * ```ts
+   * import foo from "@foo/bar/quux/toto"
+   * //                       ^^^^^^^^^^
+   * ```
+   */
+  path: string
+  isMain: boolean
   mainExport: null | Node
   namedExports: Expor[]
+  location: {
+    absoluteFilePath: string
+  }
 }
 
 type ModInput = {
   name: string
   mainExport?: null | Node
+  isMain: boolean
   namedExports?: Expor[]
   jsdoc: JSDoc['jsdoc']
+  path: string
   location: {
     absoluteFilePath: string
     // projectRelativeFilePath: string // todo
@@ -236,10 +375,15 @@ export function mod(input: ModInput): DocModule {
   }
 }
 
-export function modFromSourceFile(sourceFile: tsm.SourceFile): DocModule {
+export function modFromSourceFile(
+  manager: Manager,
+  sourceFile: tsm.SourceFile
+): DocModule {
   return mod({
     name: sourceFile.getBaseNameWithoutExtension(),
-    jsdoc: extractModuleLevelJSDoc(sourceFile),
+    jsdoc: extractModuleLevelJSDoc(manager, sourceFile),
+    path: manager.getImportFromPath(sourceFile),
+    isMain: manager.isMainModule(sourceFile),
     location: {
       absoluteFilePath: sourceFile.getFilePath(),
     },
@@ -254,7 +398,10 @@ export function modFromSourceFile(sourceFile: tsm.SourceFile): DocModule {
  * comment, actually). A non-import node that does not have its own JSDoc would
  * cause the one leading the module to be its doc.
  */
-function extractModuleLevelJSDoc(sf: tsm.SourceFile): JSDoc['jsdoc'] {
+function extractModuleLevelJSDoc(
+  manager: Manager,
+  sf: tsm.SourceFile
+): JSDoc['jsdoc'] {
   const syntaxList = sf.getChildren()[0]
 
   if (!tsm.Node.isSyntaxList(syntaxList)) {
@@ -280,6 +427,10 @@ function extractModuleLevelJSDoc(sf: tsm.SourceFile): JSDoc['jsdoc'] {
     if (comment) {
       return {
         raw: comment.getText(),
+        summary: renderDocNode(
+          manager.tsdocParser.parseString(comment.getText()).docComment
+            .summarySection
+        ),
         tags: [], // todo
       }
     }
@@ -449,4 +600,17 @@ function findDiscriminant(nodes: Node[]): null | string[] {
     if (possible.length === 0) return null
   }
   return possible
+}
+
+function renderDocNode(docNode: tsdoc.DocNode): string {
+  let result: string = ''
+  if (docNode) {
+    if (docNode instanceof tsdoc.DocExcerpt) {
+      result += docNode.content.toString()
+    }
+    for (const childNode of docNode.getChildNodes()) {
+      result += renderDocNode(childNode)
+    }
+  }
+  return result
 }

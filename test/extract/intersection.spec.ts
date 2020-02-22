@@ -97,10 +97,11 @@ it.only('gets each member of the intersection when inside a union', () => {
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "jsdoc": null,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -116,6 +117,7 @@ Object {
           },
         },
       ],
+      "path": "/",
     },
   ],
   "typeIndex": Object {

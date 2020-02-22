@@ -5,7 +5,8 @@ import * as jsde from '../src'
 function createContextt() {
   const project = new tsm.Project({
     compilerOptions: {
-      rootDir: '/',
+      rootDir: './src',
+      outDir: './dist',
     },
     addFilesFromTsConfig: false,
     useInMemoryFileSystem: true,
@@ -28,7 +29,7 @@ function createContextt() {
       sourcesFormatted
         .map(source => [letters.shift()!, source])
         .forEach(([moduleName, source]) =>
-          project.createSourceFile(`${moduleName}.ts`, source, {
+          project.createSourceFile(`./src/${moduleName}.ts`, source, {
             overwrite: true,
           })
         )
@@ -36,6 +37,9 @@ function createContextt() {
       return jsde.fromProject({
         entrypoints: ['a'],
         project: project,
+        prjDir: '/',
+        readSettingsFromJSON: false,
+        packageMainEntrypoint: project.compilerOptions.get().outDir + '/a.js',
       })
     },
   }

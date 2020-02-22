@@ -9,10 +9,11 @@ it('inlines the type extracted from the term', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "jsdoc": null,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -38,6 +39,7 @@ it('inlines the type extracted from the term', () => {
               },
             },
           ],
+          "path": "/",
         },
       ],
       "typeIndex": Object {

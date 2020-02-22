@@ -6,10 +6,11 @@ it('passes smoke test', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "jsdoc": null,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -25,6 +26,7 @@ it('passes smoke test', () => {
               },
             },
           ],
+          "path": "/",
         },
       ],
       "typeIndex": Object {

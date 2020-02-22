@@ -196,10 +196,11 @@ it.only('passes smoke test', () => {
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "jsdoc": null,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -399,6 +400,7 @@ Object {
           },
         },
       ],
+      "path": "/",
     },
   ],
   "typeIndex": Object {

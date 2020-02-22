@@ -28,24 +28,10 @@ export interface Options {
 export function render(docs: Doc.DocPackage, opts: Options): string {
   debug('start')
 
-  const md = lines()
-
-  if (docs.modules.length === 0) {
-    // do nothing
-  } else if (docs.modules.length === 1) {
-    md.add(renderModule(opts, docs.modules[0], docs.typeIndex))
-  } else {
-    md.add(
-      docs.modules.map(mod => {
-        return section(codeSpan(mod.name)).add(
-          renderModule(opts, mod, docs.typeIndex)
-        )
-      })
-    )
-  }
+  const markdownDocs = renderPackage()
 
   // .replace() hack until we have jsdoc extraction
-  const docsString = renderMarkdown({ level: 3 }, md).replace(
+  const docsString = renderMarkdown({ level: 3 }, markdownDocs).replace(
     /\/\/ prettier-ignore\n/g,
     ''
   )
@@ -64,6 +50,28 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
   // helpers
   //
 
+  function renderPackage() {
+    const md = lines()
+
+    if (docs.modules.length === 0) {
+      // do nothing
+      return md
+    }
+
+    if (docs.modules.length === 1) {
+      // If there is only one module then no need to qualify it
+      return md.add(renderModule(opts, docs.modules[0], docs.typeIndex))
+    }
+
+    return md.add(
+      docs.modules.map(mod => {
+        return section(codeSpan(mod.path)).add(
+          renderModule(opts, mod, docs.typeIndex)
+        )
+      })
+    )
+  }
+
   /**
    * Render one module of the package.
    */
@@ -76,6 +84,11 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
     debugModule('start exported terms')
 
     const md = lines()
+
+    if (mod.jsdoc) {
+      md.add(mod.jsdoc?.summary)
+    }
+
     const exportedTermsContent = exportedTerms.map(ex => {
       const termSection = section(codeSpan(ex.name))
       // Use type text for terms. Using node text would render uninteresting and
