@@ -2,6 +2,11 @@ import * as Prettier from 'prettier'
 import * as tsm from 'ts-morph'
 import * as jsde from '../src'
 
+interface SourceSpec {
+  anEntrypoint: boolean
+  content: string
+}
+
 function createContextt() {
   const project = new tsm.Project({
     compilerOptions: {
@@ -13,7 +18,10 @@ function createContextt() {
   })
 
   const api = {
-    markdown(opts: jsde.RenderMarkdownOptions, ...sources: string[]) {
+    markdown(
+      opts: jsde.RenderMarkdownOptions,
+      ...sources: (string | SourceSpec)[]
+    ) {
       return jsde.renderMarkdown(api.extract(...sources), opts)
     },
     /**
@@ -21,21 +29,22 @@ function createContextt() {
      * entrypoint. Files are named by alphabet letters, starting from "a",
      * incrementing toward "z".
      */
-    extract(...sources: string[]) {
+    extract(...sources: (string | SourceSpec)[]) {
       const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-      const sourcesFormatted = sources.map(source =>
-        Prettier.format(source, { parser: 'typescript' })
-      )
-      sourcesFormatted
-        .map(source => [letters.shift()!, source])
-        .forEach(([moduleName, source]) =>
-          project.createSourceFile(`./src/${moduleName}.ts`, source, {
-            overwrite: true,
-          })
-        )
-
+      const entrypoints = ['a']
+      for (const source of sources) {
+        const content = typeof source === 'string' ? source : source.content
+        const contentPretty = Prettier.format(content, { parser: 'typescript' })
+        const moduleName = letters.shift()!
+        if (typeof source === 'object' && source.anEntrypoint) {
+          entrypoints.push(moduleName)
+        }
+        project.createSourceFile(`./src/${moduleName}.ts`, contentPretty, {
+          overwrite: true,
+        })
+      }
       return jsde.fromProject({
-        entrypoints: ['a'],
+        entrypoints: entrypoints,
         project: project,
         prjDir: '/',
         readSettingsFromJSON: false,

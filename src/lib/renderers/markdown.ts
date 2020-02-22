@@ -60,16 +60,38 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     if (docs.modules.length === 1) {
       // If there is only one module then no need to qualify it
+      debugModule('start module %s', docs.modules[0].path)
       return md.add(renderModule(opts, docs.modules[0], docs.typeIndex))
     }
 
-    return md.add(
+    md.add(
       docs.modules.map(mod => {
+        debugModule('start module %s', mod.path)
         return section(codeSpan(mod.path)).add(
           renderModule(opts, mod, docs.typeIndex)
         )
       })
     )
+
+    debugModule('start type index')
+
+    md.add(
+      section('Type Index').add(
+        Object.values(docs.typeIndex).map(t => {
+          const md = section(typeTitle(t))
+          // Use type node text because type text for types is just names it
+          // seems, not informative.
+          if (t.kind === 'alias' && t.type.kind === 'callable') {
+            md.add(sigCodeBlock(t.raw.nodeFullText))
+          } else {
+            md.add(tsCodeBlock(t.raw.nodeFullText))
+          }
+          return md
+        })
+      )
+    )
+
+    return md
   }
 
   /**
@@ -127,24 +149,6 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
           const c = section(typeTitle(ext))
           c.add(tsCodeBlock(type.kind))
           return c
-        })
-      )
-    )
-
-    debugModule('start type index')
-
-    md.add(
-      section('Type Index').add(
-        Object.values(ti).map(t => {
-          const md = section(typeTitle(t))
-          // Use type node text because type text for types is just names it
-          // seems, not informative.
-          if (t.kind === 'alias' && t.type.kind === 'callable') {
-            md.add(sigCodeBlock(t.raw.nodeFullText))
-          } else {
-            md.add(tsCodeBlock(t.raw.nodeFullText))
-          }
-          return md
         })
       )
     )
