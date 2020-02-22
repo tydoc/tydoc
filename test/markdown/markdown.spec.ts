@@ -106,3 +106,70 @@ it('module doc if present above terms', () => {
 "
 `)
 })
+
+it.only('when multiple entrypoints, typeindex is only rendered once', () => {
+  expect(
+    ctx.markdown(
+      { flatTermsSection: true },
+      `
+        /**
+         * About this module a...
+         */
+
+        import { C } from './c'
+
+        /**
+         *  About var a...
+         */
+        export let c:C = {}
+      `,
+      {
+        anEntrypoint: true,
+        content: `
+          /**
+           * About this module b...
+           */
+
+          import { C } from './c'
+
+          /**
+           *  About var b...
+           */
+          export let c:C = {}
+        `,
+      },
+      `
+        export interface C {}
+      `
+    )
+  ).toMatchInlineSnapshot(`
+"### \`/\`
+
+About this module a...
+
+#### \`c\`
+
+Of type [\`C\`](#i-c)
+
+#### Exported Types
+
+### \`/src/b\`
+
+About this module b...
+
+#### \`c\`
+
+Of type [\`C\`](#i-c)
+
+#### Exported Types
+
+### Type Index
+
+#### \`I\` \`C\`
+
+\`\`\`ts
+export interface C {}
+\`\`\`
+"
+`)
+})
