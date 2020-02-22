@@ -129,10 +129,11 @@ it('tydoc can extract data', () => {
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "jsdoc": null,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -320,6 +321,7 @@ export function foo(a: string, b: number) {}",
           },
         },
       ],
+      "path": "/",
     },
   ],
   "typeIndex": Object {

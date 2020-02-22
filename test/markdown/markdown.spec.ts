@@ -76,3 +76,33 @@ interface A {}
 "
 `)
 })
+
+it('module doc if present above terms', () => {
+  expect(
+    ctx.markdown(
+      { flatTermsSection: true },
+      `
+        /**
+         * About this module...
+         */
+
+        /**
+         *  About a...
+         */
+        export let a = 1
+      `
+    )
+  ).toMatchInlineSnapshot(`
+"About this module...
+
+### \`a\`
+
+\`\`\`ts
+\`\`\`
+
+### Exported Types
+
+### Type Index
+"
+`)
+})

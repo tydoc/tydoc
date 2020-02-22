@@ -16,10 +16,11 @@ it('interfaces can have jsdoc', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "jsdoc": null,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -35,6 +36,7 @@ it('interfaces can have jsdoc', () => {
               },
             },
           ],
+          "path": "/",
         },
       ],
       "typeIndex": Object {
@@ -47,6 +49,7 @@ it('interfaces can have jsdoc', () => {
 
     bar
     ",
+            "summary": "",
             "tags": Array [
               Object {
                 "name": "a",

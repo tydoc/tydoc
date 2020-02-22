@@ -1,4 +1,6 @@
 import Debug from 'debug'
+import * as fs from 'fs-jetpack'
+import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import * as Doc from './doc'
@@ -21,6 +23,63 @@ interface Options {
    */
   entrypoints: string[]
   project?: tsm.Project
+  /**
+   * Specify the path to the package's entrypoint file.
+   *
+   * @defualt Read from package.json main field
+   * @remarks This is useful for tests to avoid mocks or environment setup
+   */
+  packageMainEntrypoint?: string
+  /**
+   * Specify the root of the project.
+   *
+   * @default The current working directory
+   * @remarks This is useful for tests to avoid having to mock process.cwd
+   */
+  prjDir?: string
+  readSettingsFromJSON: boolean
+  /**
+   * Sometimes a source entrypoint is fronted by a facade module that allows
+   * package consumers to do e.g. `import foo from "bar/toto"` _instead of_
+   * `import foo from "bar/dist/toto". Use this mapping to force tydoc to view
+   * the given source modules (keys) at the given package path (values).
+   *
+   * @example
+   *
+   * Given project layout:
+   *
+   * ```
+   * /src/foo/bar/toto.ts
+   * ```
+   *
+   * The setting:
+   *
+   * ```ts
+   * sourceModuleToPackagePathMappings: {
+   *    "foo/bar/toto": "toto"
+   * }
+   * ```
+   *
+   * Will cause the `toto` module to be documented as being available at path:
+   *
+   * ```ts
+   * import some from "thing/toto"
+   * ```
+   */
+  sourceModuleToPackagePathMappings?: Record<string, string>
+}
+
+function readSettingsFromPackage(): Partial<Doc.Settings> {
+  const userSettings = fs.read('package.json', 'json').tydoc
+
+  // todo validation ... :(
+  if (userSettings) {
+    debug('read user settings from package.json %O', userSettings)
+    return userSettings
+  }
+
+  debug('no user settings to read from package.json')
+  return {}
 }
 
 /**
@@ -35,23 +94,83 @@ export function fromProject(opts: Options): Doc.DocPackage {
       tsConfigFilePath: path.join(process.cwd(), 'tsconfig.json'),
     })
 
+  // Wherever the user's package.json is. We assume for now that this tool is
+  // running from project root.
+  // todo there seems to be no way to get project dir from project instance??
+  // todo guard that cwd has tsconfig in it
+  let prjDir: string
+  if (opts.prjDir) {
+    prjDir = opts.prjDir
+    debug('prjDir set to %s -- taken from passed config ', prjDir)
+  } else {
+    prjDir = process.cwd()
+    debug('prjDir set to %s -- taken from current working directory', prjDir)
+  }
+
   // Find the source dir
   //
-  let sourceRoot: string
+  let srcDir: string
   const compilerOptRootDir = project.getCompilerOptions().rootDir
   if (compilerOptRootDir) {
     if (path.isAbsolute(compilerOptRootDir)) {
-      sourceRoot = compilerOptRootDir
+      srcDir = compilerOptRootDir
     } else {
-      // todo there seems to be no way to get project dir from project instance??
-      // todo guard that cwd has tsconfig in it
-      sourceRoot = path.resolve(process.cwd(), compilerOptRootDir)
+      srcDir = path.resolve(prjDir, compilerOptRootDir)
     }
-    debug('found source root from tsconfig.json %s', sourceRoot)
   } else {
-    sourceRoot = process.cwd()
-    debug('using source root fallback of CWD %s', sourceRoot)
+    srcDir = prjDir
   }
+  if (!path.isAbsolute(srcDir)) {
+    srcDir = path.join(prjDir, srcDir)
+  }
+  debug('srcDir set to %s', srcDir)
+
+  // Find the out dir
+  //
+  let outDir: string
+  const compilerOptOutDir = project.getCompilerOptions().outDir
+  if (compilerOptOutDir !== undefined) {
+    outDir = compilerOptOutDir
+  } else {
+    // todo we could fallback to the source root dir which IIUC is what TS does?
+    throw new Error(
+      'Your tsconfig.json compilerOptions did not specify an outDir. It must.'
+    )
+  }
+  if (!path.isAbsolute(outDir)) {
+    outDir = path.join(prjDir, outDir)
+  }
+  debug('outDir set to %s', outDir)
+
+  // Find the package entrypoint
+  //
+  let packageMainEntrypoint: string
+  if (opts.packageMainEntrypoint) {
+    // useful for tests
+    packageMainEntrypoint = opts.packageMainEntrypoint
+  } else {
+    const pjson = fs.read('package.json', 'json')
+    if (pjson.main) {
+      packageMainEntrypoint = pjson.main
+    } else {
+      throw new Error(
+        'Your package.json main field is missing or empty. It must be present.'
+      )
+    }
+  }
+  if (!path.isAbsolute(packageMainEntrypoint)) {
+    packageMainEntrypoint = path.join(prjDir, packageMainEntrypoint)
+  }
+  debug('packageMainEntrypoint is %s', packageMainEntrypoint)
+
+  // Find the package _source_ entrypoint
+  //
+  const mainModuleFilePathAbs = Doc.getMainModule({
+    outDir,
+    packageMainEntrypoint,
+    srcDir,
+  })
+  debug('mainModuleFilePathAbs is %s', mainModuleFilePathAbs)
 
   // If the project is in a bad state don't bother trying to extract docs
   //
@@ -72,29 +191,32 @@ export function fromProject(opts: Options): Doc.DocPackage {
     sourceFiles.map(sf => sf.getFilePath())
   )
 
+  // Get the entrypoints to crawl
+  //
   const sourceFileEntrypoints = []
   for (const findEntryPoint of opts.entrypoints) {
-    let absoluteEntrypointModulePath: string
+    let entrypointModulePathAbs: string
     if (path.isAbsolute(findEntryPoint[0])) {
       debug(
-        'considering given entrypoint as absolute, disregarding source root: %s',
+        'considering given entrypoint as absolute, disregarding srcDir: %s',
         findEntryPoint
       )
-      absoluteEntrypointModulePath = path.join(
+      entrypointModulePathAbs = path.join(
         path.dirname(findEntryPoint),
         path.basename(findEntryPoint, path.extname(findEntryPoint))
       )
     } else {
       debug(
-        'considering given entrypoint relative to source root: %s',
+        'considering given entrypoint relative to srcDir: %s',
         findEntryPoint
       )
-      absoluteEntrypointModulePath = path.join(
-        sourceRoot,
+      entrypointModulePathAbs = path.join(
+        srcDir,
         path.dirname(findEntryPoint),
         path.basename(findEntryPoint, path.extname(findEntryPoint))
       )
     }
+    debug('entrypointModulePathAbs is %s', entrypointModulePathAbs)
 
     // todo if given entrypoint is a folder then infer that to mean looking for
     // an index within it (just like how node module resolution works)
@@ -106,12 +228,12 @@ export function fromProject(opts: Options): Doc.DocPackage {
         sf.getBaseNameWithoutExtension()
       )
       tried.push(absoluteModulePath)
-      return absoluteModulePath === absoluteEntrypointModulePath
+      return absoluteModulePath === entrypointModulePathAbs
     })
 
     if (!sf) {
       throw new Error(
-        `Given entrypoint not found in project: ${absoluteEntrypointModulePath}. Source files were:\n\n${tried.join(
+        `Given entrypoint not found in project: ${entrypointModulePathAbs}. Source files were:\n\n${tried.join(
           ', '
         )}`
       )
@@ -120,13 +242,30 @@ export function fromProject(opts: Options): Doc.DocPackage {
     sourceFileEntrypoints.push(sf)
   }
 
-  const docman = new Doc.Manager({ sourceRoot })
+  // Setup manager settings
+  //
+  const managerSettings = {
+    srcDir: srcDir,
+    prjDir: prjDir,
+    mainModuleFilePathAbs: mainModuleFilePathAbs,
+    sourceModuleToPackagePathMappings: opts.sourceModuleToPackagePathMappings,
+  }
+
+  if (opts.readSettingsFromJSON) {
+    lo.merge(managerSettings, readSettingsFromPackage())
+  } else {
+    debug('reading user settings from package.json is disabled')
+  }
+
+  // Create manager extract doc and return final docs AST
+  //
+  const manager = new Doc.Manager(managerSettings)
 
   sourceFileEntrypoints.forEach(sf => {
-    fromModule(docman, sf)
+    fromModule(manager, sf)
   })
 
-  return docman.data
+  return manager.data
 }
 
 /**
@@ -137,7 +276,7 @@ export function fromModule(
   manager: Doc.Manager,
   sourceFile: tsm.SourceFile
 ): Doc.DocPackage {
-  const mod = Doc.modFromSourceFile(sourceFile)
+  const mod = Doc.modFromSourceFile(manager, sourceFile)
 
   for (const ex of sourceFile.getExportedDeclarations()) {
     const exportName = ex[0]
@@ -447,6 +586,7 @@ function getJSDoc(t: tsm.Type): Doc.JSDoc {
     } else {
       docFragJSDoc = {
         raw: tsJSDoc.getInnerText(),
+        summary: '', // todo
         tags: tsJSDoc.getTags().map(t => {
           return {
             name: t.getTagName(),

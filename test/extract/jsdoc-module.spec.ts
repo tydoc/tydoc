@@ -11,19 +11,23 @@ it('extracts first comment in an empty file', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "jsdoc": Object {
             "raw": "/**
      * ...
      */",
+            "summary": "...
+    ",
             "tags": Array [],
           },
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
           "namedExports": Array [],
+          "path": "/",
         },
       ],
       "typeIndex": Object {},
@@ -48,19 +52,23 @@ it('extracts first comment above an import node', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "jsdoc": Object {
             "raw": "/**
      * ...
      */",
+            "summary": "...
+    ",
             "tags": Array [],
           },
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
           "namedExports": Array [],
+          "path": "/",
         },
       ],
       "typeIndex": Object {},
@@ -85,15 +93,18 @@ it('extracts first comment above an export node', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "jsdoc": Object {
             "raw": "/**
      * ...
      */",
+            "summary": "...
+    ",
             "tags": Array [],
           },
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -109,6 +120,7 @@ it('extracts first comment above an export node', () => {
               },
             },
           ],
+          "path": "/",
         },
       ],
       "typeIndex": Object {},
@@ -134,19 +146,23 @@ it('extracts leadig comment above any node if node has own comment', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "jsdoc": Object {
             "raw": "/**
      * ...
      */",
+            "summary": "...
+    ",
             "tags": Array [],
           },
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
           "namedExports": Array [],
+          "path": "/",
         },
       ],
       "typeIndex": Object {},
@@ -165,22 +181,24 @@ it('does not extract leadig comment if appears to be for a piece of code', () =>
       `
     )
   ).toMatchInlineSnapshot(`
-Object {
-  "modules": Array [
     Object {
-      "jsdoc": null,
-      "kind": "module",
-      "location": Object {
-        "absoluteFilePath": "/a.ts",
-      },
-      "mainExport": null,
-      "name": "a",
-      "namedExports": Array [],
-    },
-  ],
-  "typeIndex": Object {},
-}
-`)
+      "modules": Array [
+        Object {
+          "isMain": true,
+          "jsdoc": null,
+          "kind": "module",
+          "location": Object {
+            "absoluteFilePath": "/src/a.ts",
+          },
+          "mainExport": null,
+          "name": "a",
+          "namedExports": Array [],
+          "path": "/",
+        },
+      ],
+      "typeIndex": Object {},
+    }
+  `)
 })
 
 it('does not extract leadig comment if there is none', () => {
@@ -191,22 +209,24 @@ it('does not extract leadig comment if there is none', () => {
       `
     )
   ).toMatchInlineSnapshot(`
-Object {
-  "modules": Array [
     Object {
-      "jsdoc": null,
-      "kind": "module",
-      "location": Object {
-        "absoluteFilePath": "/a.ts",
-      },
-      "mainExport": null,
-      "name": "a",
-      "namedExports": Array [],
-    },
-  ],
-  "typeIndex": Object {},
-}
-`)
+      "modules": Array [
+        Object {
+          "isMain": true,
+          "jsdoc": null,
+          "kind": "module",
+          "location": Object {
+            "absoluteFilePath": "/src/a.ts",
+          },
+          "mainExport": null,
+          "name": "a",
+          "namedExports": Array [],
+          "path": "/",
+        },
+      ],
+      "typeIndex": Object {},
+    }
+  `)
 })
 
 it('does not extract leadig comment from totally empty file', () => {
@@ -214,14 +234,16 @@ it('does not extract leadig comment from totally empty file', () => {
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "jsdoc": null,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
       "namedExports": Array [],
+      "path": "/",
     },
   ],
   "typeIndex": Object {},

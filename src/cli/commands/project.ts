@@ -32,6 +32,7 @@ export class Project extends Command {
 
     const docs = TyDoc.fromProject({
       entrypoints: argv,
+      readSettingsFromJSON: true,
     })
 
     if (flags.json) {
