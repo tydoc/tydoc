@@ -7,6 +7,7 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [API](#api)
   - [`renderMarkdown`](#rendermarkdown)
   - [`fromProject`](#fromproject)
@@ -16,7 +17,9 @@ Work in progress 👷‍
   - [Type Index](#type-index)
     - [`I` `Options`](#i-options)
     - [`T` `DocPackage`](#t-docpackage)
-    - [`T` `DocModule`](#t-docmodule)
+    - [`&` `DocModule`](#-docmodule)
+    - [`T` `TSDocFrag`](#t-tsdocfrag)
+    - [`I` `TSDoc`](#i-tsdoc)
     - [`&` `DocTypeUnion`](#-doctypeunion)
     - [`|` `Node`](#-node)
     - [`T` `DocTypePrimitive`](#t-doctypeprimitive)
@@ -35,7 +38,7 @@ Work in progress 👷‍
     - [`&` `DocTypeIntersection`](#-doctypeintersection)
     - [`T` `Expor`](#t-expor)
     - [`I` `Options`](#i-options-1)
-    - [`I` `Manager`](#i-manager)
+    - [`I` `Settings`](#i-settings)
     - [`F` `Thunk`](#f-thunk)
 - [Internal Development](#internal-development)
 
@@ -63,7 +66,7 @@ Work in progress 👷‍
 
 <!-- prettier-ignore -->
 ```ts
-(docs: Manager, sourceFile: SourceFile) => DocPackage
+(manager: Manager, sourceFile: SourceFile) => DocPackage
 ```
 
 ### Exported Types
@@ -101,18 +104,60 @@ export type DocPackage = {
 }
 ```
 
-#### `T` `DocModule`
+#### `&` `DocModule`
 
-```ts
+````ts
 //
 // Module Node
 //
 
-export type DocModule = {
+export type DocModule = TSDocFrag & {
   kind: 'module'
   name: string
+  /**
+   * The path to this module from package root. If this module is the root
+   * module then the path will be `/`.
+   *
+   * @remarks
+   *
+   * This is what a user would place in their import `from `string _following_ the
+   * package name. For example:
+   *
+   * ```ts
+   * import foo from "@foo/bar/quux/toto"
+   * //                       ^^^^^^^^^^
+   * ```
+   */
+  path: string
+  isMain: boolean
   mainExport: null | Node
   namedExports: Expor[]
+  location: {
+    absoluteFilePath: string
+  }
+}
+````
+
+#### `T` `TSDocFrag`
+
+```ts
+//
+// Node Features
+//
+
+export type TSDocFrag = {
+  tsdoc: null | TSDoc
+}
+```
+
+#### `I` `TSDoc`
+
+```ts
+export interface TSDoc {
+  raw: string
+  summary: string
+  examples: { text: string }[]
+  customTags: { name: string; text: string }[]
 }
 ```
 
@@ -197,7 +242,8 @@ export type DocTypeInterface = {
   kind: 'interface'
   name: string
   props: DocProp[]
-} & Raw
+} & Raw &
+  TSDocFrag
 ```
 
 #### `T` `DocProp`
@@ -300,22 +346,72 @@ export type Expor = {
 
 #### `I` `Options`
 
-```ts
+````ts
 interface Options {
+  /**
+   * Paths to modules in project, relative to project root or absolute.
+   */
   entrypoints: string[]
   project?: tsm.Project
+  /**
+   * Specify the path to the package's entrypoint file.
+   *
+   * @defualt Read from package.json main field
+   * @remarks This is useful for tests to avoid mocks or environment setup
+   */
+  packageMainEntrypoint?: string
+  /**
+   * Specify the root of the project.
+   *
+   * @default The current working directory
+   * @remarks This is useful for tests to avoid having to mock process.cwd
+   */
+  prjDir?: string
+  readSettingsFromJSON: boolean
+  /**
+   * Sometimes a source entrypoint is fronted by a facade module that allows
+   * package consumers to do e.g. `import foo from "bar/toto"` _instead of_
+   * `import foo from "bar/dist/toto". Use this mapping to force tydoc to view
+   * the given source modules (keys) at the given package path (values).
+   *
+   * @example
+   *
+   * Given project layout:
+   *
+   * ```
+   * /src/foo/bar/toto.ts
+   * ```
+   *
+   * The setting:
+   *
+   * ```ts
+   * sourceModuleToPackagePathMappings: {
+   *    "foo/bar/toto": "toto"
+   * }
+   * ```
+   *
+   * Will cause the `toto` module to be documented as being available at path:
+   *
+   * ```ts
+   * import some from "thing/toto"
+   * ```
+   */
+  sourceModuleToPackagePathMappings?: Record<string, string>
 }
-```
+````
 
-#### `I` `Manager`
+#### `I` `Settings`
 
 ```ts
-export interface Manager {
-  d: DocPackage
-  isIndexable(t: tsm.Type): boolean
-  isIndexed(name: string): boolean
-  getFromIndex(name: string): Node
-  indexIfApplicable(t: tsm.Type, doc: Thunk<Node>): Node
+export interface Settings {
+  /**
+   * Absolute path to the source root. This should match the path that rootDir
+   * resolves to from the project's tsconfig.json.
+   */
+  srcDir: string
+  prjDir: string
+  mainModuleFilePathAbs: string
+  sourceModuleToPackagePathMappings?: Record<string, string>
 }
 ```
 
@@ -325,7 +421,6 @@ export interface Manager {
 ```ts
 export type Thunk<T> = () => T
 ```
-
 <!-- END API DOCS --->
 
 <br>

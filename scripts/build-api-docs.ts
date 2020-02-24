@@ -3,7 +3,10 @@ import * as path from 'path'
 import { inspect } from 'util'
 import { fromProject, renderMarkdown } from '../src'
 
-const docsData = fromProject({ entrypoints: ['index'] })
+const docsData = fromProject({
+  entrypoints: ['index'],
+  readSettingsFromJSON: true,
+})
 
 if (process.argv[2] === '--json') {
   console.log(inspect(docsData, { depth: null }))
