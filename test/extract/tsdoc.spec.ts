@@ -1,11 +1,10 @@
-it('interfaces can have jsdoc', () => {
+it('interfaces can have tsdoc', () => {
   expect(
     ctx.extract(`
     /**
      * ...
      * 
-     * @a foo
-     * @b
+     * @example
      * 
      * bar
      * 
@@ -17,7 +16,6 @@ it('interfaces can have jsdoc', () => {
       "modules": Array [
         Object {
           "isMain": true,
-          "jsdoc": null,
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/src/a.ts",
@@ -37,30 +35,11 @@ it('interfaces can have jsdoc', () => {
             },
           ],
           "path": "/",
+          "tsdoc": null,
         },
       ],
       "typeIndex": Object {
         "(a).A": Object {
-          "jsdoc": Object {
-            "raw": "...
-
-    @a foo
-    @b
-
-    bar
-    ",
-            "summary": "",
-            "tags": Array [
-              Object {
-                "name": "a",
-                "text": "foo",
-              },
-              Object {
-                "name": "b",
-                "text": "bar",
-              },
-            ],
-          },
           "kind": "interface",
           "name": "A",
           "props": Array [],
@@ -68,8 +47,7 @@ it('interfaces can have jsdoc', () => {
             "nodeFullText": "/**
      * ...
      *
-     * @a foo
-     * @b
+     * @example
      *
      * bar
      *
@@ -77,6 +55,23 @@ it('interfaces can have jsdoc', () => {
     export interface A {}",
             "nodeText": "export interface A {}",
             "typeText": "A",
+          },
+          "tsdoc": Object {
+            "customTags": Array [],
+            "examples": Array [
+              Object {
+                "text": "bar",
+              },
+            ],
+            "raw": "/**
+     * ...
+     *
+     * @example
+     *
+     * bar
+     *
+     */",
+            "summary": "...",
           },
         },
       },

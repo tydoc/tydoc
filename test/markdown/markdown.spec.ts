@@ -107,7 +107,7 @@ it('module doc if present above terms', () => {
 `)
 })
 
-it.only('when multiple entrypoints, typeindex is only rendered once', () => {
+it('when multiple entrypoints, typeindex is only rendered once', () => {
   expect(
     ctx.markdown(
       { flatTermsSection: true },
@@ -169,6 +169,58 @@ Of type [\`C\`](#i-c)
 
 \`\`\`ts
 export interface C {}
+\`\`\`
+"
+`)
+})
+
+it('examples for interfaces are rendered', () => {
+  expect(
+    ctx.markdown(
+      { flatTermsSection: true },
+      `
+      /**
+       * foo
+       * 
+       * @example
+       * 
+       * \`\`\`ts
+       * import { A } from 'bar'
+       * \`\`\`
+       */
+      export interface A {}
+      `
+    )
+  ).toMatchInlineSnapshot(`
+"### Exported Types
+
+#### \`I\` \`A\`
+
+\`\`\`ts
+typeIndexRef
+\`\`\`
+
+### Type Index
+
+#### \`I\` \`A\`
+
+\`\`\`\`ts
+/**
+ * foo
+ *
+ * @example
+ *
+ * \`\`\`ts
+ * import { A } from 'bar'
+ * \`\`\`
+ */
+export interface A {}
+\`\`\`\`
+
+##### Example
+
+\`\`\`ts
+import { A } from 'bar'
 \`\`\`
 "
 `)

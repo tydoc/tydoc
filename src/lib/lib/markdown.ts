@@ -149,7 +149,7 @@ interface Appendable {
   add(...nodes: ArrayOrVarg<Node>): Node
 }
 
-interface SmartNode extends Renderable, Appendable {}
+export interface SmartNode extends Renderable, Appendable {}
 
 export type Node = Renderable | string
 

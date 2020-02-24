@@ -10,7 +10,6 @@ it('inlines the type extracted from the term', () => {
       "modules": Array [
         Object {
           "isMain": true,
-          "jsdoc": null,
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/src/a.ts",
@@ -40,11 +39,11 @@ it('inlines the type extracted from the term', () => {
             },
           ],
           "path": "/",
+          "tsdoc": null,
         },
       ],
       "typeIndex": Object {
         "(a).A": Object {
-          "jsdoc": null,
           "kind": "interface",
           "name": "A",
           "props": Array [
@@ -87,9 +86,9 @@ it('inlines the type extracted from the term', () => {
     }",
             "typeText": "A",
           },
+          "tsdoc": null,
         },
         "(a).B": Object {
-          "jsdoc": null,
           "kind": "interface",
           "name": "B",
           "props": Array [],
@@ -98,6 +97,7 @@ it('inlines the type extracted from the term', () => {
             "nodeText": "export interface B {}",
             "typeText": "B",
           },
+          "tsdoc": null,
         },
       },
     }

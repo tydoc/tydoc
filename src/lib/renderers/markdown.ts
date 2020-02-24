@@ -1,6 +1,7 @@
 import * as Debug from 'Debug'
 import * as Prettier from 'prettier'
 import * as Doc from '../extractor/doc'
+import * as MD from '../lib/markdown'
 import {
   codeSpan,
   lines,
@@ -11,6 +12,7 @@ import {
   span,
   tsCodeBlock,
 } from '../lib/markdown'
+
 const debug = Debug('tydoc:markdown')
 const debugModule = Debug('tydoc:markdown:module')
 
@@ -30,7 +32,11 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
   const markdownDocs = renderPackage()
 
-  // .replace() hack until we have jsdoc extraction
+  // .replace() hack until we are using tsdoc extraction rather than the raw
+  // source/checker extraction from TS. Without this, any prettier-ignore
+  // pragmas in source code will end up in docs preventing them from being
+  // formatted by prettier (which isn't obviously desirable, as the reasons to
+  // disable prettier in source may not follow through to doc blocks).
   const docsString = renderMarkdown({ level: 3 }, markdownDocs).replace(
     /\/\/ prettier-ignore\n/g,
     ''
@@ -61,17 +67,17 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
     if (docs.modules.length === 1) {
       // If there is only one module then no need to qualify it
       debugModule('start module %s', docs.modules[0].path)
-      return md.add(renderModule(opts, docs.modules[0], docs.typeIndex))
+      md.add(renderModule(opts, docs.modules[0], docs.typeIndex))
+    } else {
+      md.add(
+        docs.modules.map(mod => {
+          debugModule('start module %s', mod.path)
+          return section(codeSpan(mod.path)).add(
+            renderModule(opts, mod, docs.typeIndex)
+          )
+        })
+      )
     }
-
-    md.add(
-      docs.modules.map(mod => {
-        debugModule('start module %s', mod.path)
-        return section(codeSpan(mod.path)).add(
-          renderModule(opts, mod, docs.typeIndex)
-        )
-      })
-    )
 
     debugModule('start type index')
 
@@ -85,6 +91,10 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
             md.add(sigCodeBlock(t.raw.nodeFullText))
           } else {
             md.add(tsCodeBlock(t.raw.nodeFullText))
+          }
+          // todo render examples for all
+          if (t.kind === 'interface' && t.tsdoc) {
+            renderExamples(md, t.tsdoc)
           }
           return md
         })
@@ -107,8 +117,9 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     const md = lines()
 
-    if (mod.jsdoc) {
-      md.add(mod.jsdoc?.summary)
+    if (mod.tsdoc) {
+      md.add(mod.tsdoc.summary)
+      renderExamples(md, mod.tsdoc)
     }
 
     const exportedTermsContent = exportedTerms.map(ex => {
@@ -227,4 +238,18 @@ function slugify(x: string) {
     .replace(/--+/g, '-')
     .replace(/^-|-$/, '')
     .toLowerCase()
+}
+
+function renderExamples(md: MD.SmartNode, tsdoc: Doc.TSDoc): void {
+  if (tsdoc.examples.length === 0) return
+
+  if (tsdoc.examples.length === 1) {
+    md.add(section('Example').add(tsdoc.examples[0].text))
+  } else {
+    md.add(
+      section('Examples').add(
+        tsdoc.examples.map((ex, i) => section(`Example ${i}`).add(ex.text))
+      )
+    )
+  }
 }

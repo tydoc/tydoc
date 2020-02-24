@@ -197,7 +197,6 @@ Object {
   "modules": Array [
     Object {
       "isMain": true,
-      "jsdoc": null,
       "kind": "module",
       "location": Object {
         "absoluteFilePath": "/src/a.ts",
@@ -401,11 +400,11 @@ Object {
         },
       ],
       "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
     "(a).D": Object {
-      "jsdoc": null,
       "kind": "interface",
       "name": "D",
       "props": Array [],
@@ -414,9 +413,9 @@ Object {
         "nodeText": "interface D {}",
         "typeText": "D",
       },
+      "tsdoc": null,
     },
     "(a).E": Object {
-      "jsdoc": null,
       "kind": "interface",
       "name": "E",
       "props": Array [
@@ -481,6 +480,7 @@ Object {
 }",
         "typeText": "E",
       },
+      "tsdoc": null,
     },
     "(a).F": Object {
       "kind": "alias",
@@ -620,7 +620,6 @@ Object {
       },
     },
     "(a).H2": Object {
-      "jsdoc": null,
       "kind": "interface",
       "name": "H2",
       "props": Array [],
@@ -629,6 +628,7 @@ Object {
         "nodeText": "interface H2 {}",
         "typeText": "H2",
       },
+      "tsdoc": null,
     },
     "(a).I": Object {
       "kind": "alias",
