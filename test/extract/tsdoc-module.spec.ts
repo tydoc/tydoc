@@ -3,6 +3,14 @@ it('extracts first comment in an empty file', () => {
     ctx.extract(`
       /**
        * ...
+       * 
+       * @example
+       * 
+       * 1
+       * 
+       * @example
+       * 
+       * 2
        */
 
        // I am ignored
@@ -12,14 +20,6 @@ it('extracts first comment in an empty file', () => {
       "modules": Array [
         Object {
           "isMain": true,
-          "jsdoc": Object {
-            "raw": "/**
-     * ...
-     */",
-            "summary": "...
-    ",
-            "tags": Array [],
-          },
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/src/a.ts",
@@ -28,6 +28,29 @@ it('extracts first comment in an empty file', () => {
           "name": "a",
           "namedExports": Array [],
           "path": "/",
+          "tsdoc": Object {
+            "customTags": Array [],
+            "examples": Array [
+              Object {
+                "text": "1",
+              },
+              Object {
+                "text": "2",
+              },
+            ],
+            "raw": "/**
+     * ...
+     *
+     * @example
+     *
+     * 1
+     *
+     * @example
+     *
+     * 2
+     */",
+            "summary": "...",
+          },
         },
       ],
       "typeIndex": Object {},
@@ -53,14 +76,6 @@ it('extracts first comment above an import node', () => {
       "modules": Array [
         Object {
           "isMain": true,
-          "jsdoc": Object {
-            "raw": "/**
-     * ...
-     */",
-            "summary": "...
-    ",
-            "tags": Array [],
-          },
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/src/a.ts",
@@ -69,6 +84,14 @@ it('extracts first comment above an import node', () => {
           "name": "a",
           "namedExports": Array [],
           "path": "/",
+          "tsdoc": Object {
+            "customTags": Array [],
+            "examples": Array [],
+            "raw": "/**
+     * ...
+     */",
+            "summary": "...",
+          },
         },
       ],
       "typeIndex": Object {},
@@ -94,14 +117,6 @@ it('extracts first comment above an export node', () => {
       "modules": Array [
         Object {
           "isMain": true,
-          "jsdoc": Object {
-            "raw": "/**
-     * ...
-     */",
-            "summary": "...
-    ",
-            "tags": Array [],
-          },
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/src/a.ts",
@@ -121,6 +136,14 @@ it('extracts first comment above an export node', () => {
             },
           ],
           "path": "/",
+          "tsdoc": Object {
+            "customTags": Array [],
+            "examples": Array [],
+            "raw": "/**
+     * ...
+     */",
+            "summary": "...",
+          },
         },
       ],
       "typeIndex": Object {},
@@ -147,14 +170,6 @@ it('extracts leadig comment above any node if node has own comment', () => {
       "modules": Array [
         Object {
           "isMain": true,
-          "jsdoc": Object {
-            "raw": "/**
-     * ...
-     */",
-            "summary": "...
-    ",
-            "tags": Array [],
-          },
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/src/a.ts",
@@ -163,6 +178,14 @@ it('extracts leadig comment above any node if node has own comment', () => {
           "name": "a",
           "namedExports": Array [],
           "path": "/",
+          "tsdoc": Object {
+            "customTags": Array [],
+            "examples": Array [],
+            "raw": "/**
+     * ...
+     */",
+            "summary": "...",
+          },
         },
       ],
       "typeIndex": Object {},
@@ -185,7 +208,6 @@ it('does not extract leadig comment if appears to be for a piece of code', () =>
       "modules": Array [
         Object {
           "isMain": true,
-          "jsdoc": null,
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/src/a.ts",
@@ -194,6 +216,7 @@ it('does not extract leadig comment if appears to be for a piece of code', () =>
           "name": "a",
           "namedExports": Array [],
           "path": "/",
+          "tsdoc": null,
         },
       ],
       "typeIndex": Object {},
@@ -213,7 +236,6 @@ it('does not extract leadig comment if there is none', () => {
       "modules": Array [
         Object {
           "isMain": true,
-          "jsdoc": null,
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/src/a.ts",
@@ -222,6 +244,7 @@ it('does not extract leadig comment if there is none', () => {
           "name": "a",
           "namedExports": Array [],
           "path": "/",
+          "tsdoc": null,
         },
       ],
       "typeIndex": Object {},
@@ -231,22 +254,22 @@ it('does not extract leadig comment if there is none', () => {
 
 it('does not extract leadig comment from totally empty file', () => {
   expect(ctx.extract(``)).toMatchInlineSnapshot(`
-Object {
-  "modules": Array [
     Object {
-      "isMain": true,
-      "jsdoc": null,
-      "kind": "module",
-      "location": Object {
-        "absoluteFilePath": "/src/a.ts",
-      },
-      "mainExport": null,
-      "name": "a",
-      "namedExports": Array [],
-      "path": "/",
-    },
-  ],
-  "typeIndex": Object {},
-}
-`)
+      "modules": Array [
+        Object {
+          "isMain": true,
+          "kind": "module",
+          "location": Object {
+            "absoluteFilePath": "/src/a.ts",
+          },
+          "mainExport": null,
+          "name": "a",
+          "namedExports": Array [],
+          "path": "/",
+          "tsdoc": null,
+        },
+      ],
+      "typeIndex": Object {},
+    }
+  `)
 })

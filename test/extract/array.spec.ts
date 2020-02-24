@@ -7,7 +7,6 @@ it('passes smoke test', () => {
       "modules": Array [
         Object {
           "isMain": true,
-          "jsdoc": null,
           "kind": "module",
           "location": Object {
             "absoluteFilePath": "/src/a.ts",
@@ -27,6 +26,7 @@ it('passes smoke test', () => {
             },
           ],
           "path": "/",
+          "tsdoc": null,
         },
       ],
       "typeIndex": Object {

@@ -98,7 +98,6 @@ Object {
   "modules": Array [
     Object {
       "isMain": true,
-      "jsdoc": null,
       "kind": "module",
       "location": Object {
         "absoluteFilePath": "/src/a.ts",
@@ -118,6 +117,7 @@ Object {
         },
       ],
       "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {

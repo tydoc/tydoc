@@ -52,6 +52,12 @@ source = `
    * 
    * @privateRemarks ...internal eyes only...
    * 
+   * @example
+   * 
+   * \`\`\`ts
+   * const a = 1
+   * \`\`\`
+   * 
    * @beta
    * @alpha
    */
@@ -79,6 +85,9 @@ content.params.blocks.forEach(p => {
 })
 Formatter.renderDocNode(content.privateRemarks.content) //?
 content.customBlocks.forEach(cb => {
+  cb.kind //?
+  cb.blockTag.kind //?
+  cb.blockTag.tagName //?
   Formatter.renderDocNode(cb.content) //?
 })
 
@@ -113,3 +122,41 @@ ref.memberReferences[1].memberIdentifier.kind //?
 ref.memberReferences[1].memberIdentifier.hasQuotes //?
 ref.memberReferences[1].memberIdentifier.identifier //?
 ref.memberReferences[1].selector //?
+
+// ------------------------------
+
+source = `
+/**
+ * ...
+ * 
+ * @a foo
+ * @example
+ * 
+ * bar
+ * 
+ */
+`
+tsdocParser = new TSDoc.TSDocParser()
+parserContext = tsdocParser.parseString(source)
+content = parserContext.docComment
+
+parserContext.log.messages.map(m => [m.messageId, m.text]) //?
+// content.emitAsTsdoc() //?
+// content.summarySection //?
+
+content.kind //?
+content.modifierTagSet.isBeta() //?
+content.modifierTagSet.isAlpha() //?
+Formatter.renderDocNode(content.summarySection) //?
+Formatter.renderDocNode(content.typeParams) //?
+Formatter.renderDocNode(content.inheritDocTag) //?
+content.params.blocks.forEach(p => {
+  p.parameterName //?
+  Formatter.renderDocNode(p.content) //?
+})
+content.customBlocks.forEach(cb => {
+  cb.kind //?
+  cb.blockTag.kind //?
+  cb.blockTag.tagName //?
+  Formatter.renderDocNode(cb.content) //?
+})

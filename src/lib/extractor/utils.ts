@@ -1,3 +1,4 @@
+import * as tsdoc from '@microsoft/tsdoc'
 import * as tsm from 'ts-morph'
 
 export function isCallable(t: tsm.Type): boolean {
@@ -109,4 +110,17 @@ export function dumpNode(n: tsm.Node): void {
     n.getType().getAliasSymbol()?.getName() = ${n.getType().getAliasSymbol()?.getName()}
     n.getType().getApparentType().getText() = ${n.getType().getApparentType().getText()}
   `)
+}
+
+export function renderTSDocNode(docNode: tsdoc.DocNode): string {
+  let result: string = ''
+  if (docNode) {
+    if (docNode instanceof tsdoc.DocExcerpt) {
+      result += docNode.content.toString()
+    }
+    for (const childNode of docNode.getChildNodes()) {
+      result += renderTSDocNode(childNode)
+    }
+  }
+  return result
 }

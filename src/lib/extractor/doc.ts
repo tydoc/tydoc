@@ -1,11 +1,15 @@
-import * as tsdoc from '@microsoft/tsdoc'
 import { TSDocParser } from '@microsoft/tsdoc'
 import Debug from 'debug'
 import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { Index, Thunk } from '../../utils'
-import { hasAlias, isPrimitive, isTypeLevelNode } from './utils'
+import {
+  hasAlias,
+  isPrimitive,
+  isTypeLevelNode,
+  renderTSDocNode,
+} from './utils'
 
 const debug = Debug('tydoc:doc')
 
@@ -235,7 +239,6 @@ function getPathFromSourceRoot(
     fileDirPath,
     sourceFile.getBaseNameWithoutExtension()
   )
-  // todo relative to project root...
   return path.relative(sourceRoot, modulePath)
 }
 
@@ -277,15 +280,15 @@ export type TypeNode =
 // Node Features
 //
 
-// prettier-ignore
-export type JSDoc = {
-  jsdoc: 
-    | null
-    | {
-        raw: string
-        summary: string
-        tags: { name: string; text: string }[]
-      }
+export type TSDocFrag = {
+  tsdoc: null | TSDoc
+}
+
+export interface TSDoc {
+  raw: string
+  summary: string
+  examples: { text: string }[]
+  customTags: { name: string; text: string }[]
 }
 
 export type Raw = {
@@ -327,7 +330,7 @@ export function expor(input: ExporInput): Expor {
 // Module Node
 //
 
-export type DocModule = JSDoc & {
+export type DocModule = TSDocFrag & {
   kind: 'module'
   name: string
   /**
@@ -358,7 +361,7 @@ type ModInput = {
   mainExport?: null | Node
   isMain: boolean
   namedExports?: Expor[]
-  jsdoc: JSDoc['jsdoc']
+  tsdoc: TSDocFrag['tsdoc']
   path: string
   location: {
     absoluteFilePath: string
@@ -381,7 +384,7 @@ export function modFromSourceFile(
 ): DocModule {
   return mod({
     name: sourceFile.getBaseNameWithoutExtension(),
-    jsdoc: extractModuleLevelJSDoc(manager, sourceFile),
+    tsdoc: extractModuleLevelTSDoc(manager, sourceFile),
     path: manager.getImportFromPath(sourceFile),
     isMain: manager.isMainModule(sourceFile),
     location: {
@@ -391,17 +394,17 @@ export function modFromSourceFile(
 }
 
 /**
- * Extract leading JSDoc that pertains to the module as a whole.
+ * Extract leading TSDoc that pertains to the module as a whole.
  *
- * Leading JSDoc is considered for the module if it is following by nothing,
- * imports, or a node that has its own JSDoc annotation (or any other kind of
- * comment, actually). A non-import node that does not have its own JSDoc would
+ * Leading TSDoc is considered for the module if it is following by nothing,
+ * imports, or a node that has its own TSDoc annotation (or any other kind of
+ * comment, actually). A non-import node that does not have its own TSDoc would
  * cause the one leading the module to be its doc.
  */
-function extractModuleLevelJSDoc(
+function extractModuleLevelTSDoc(
   manager: Manager,
   sf: tsm.SourceFile
-): JSDoc['jsdoc'] {
+): TSDocFrag['tsdoc'] {
   const syntaxList = sf.getChildren()[0]
 
   if (!tsm.Node.isSyntaxList(syntaxList)) {
@@ -425,18 +428,36 @@ function extractModuleLevelJSDoc(
   ) {
     const comment = syntaxList.getLeadingCommentRanges()[0]
     if (comment) {
-      return {
-        raw: comment.getText(),
-        summary: renderDocNode(
-          manager.tsdocParser.parseString(comment.getText()).docComment
-            .summarySection
-        ),
-        tags: [], // todo
-      }
+      return tsDocFromText(manager, comment.getText())
     }
   }
 
   return null
+}
+
+export function tsDocFromText(manager: Manager, raw: string) {
+  const tsDocComment = manager.tsdocParser.parseString(raw).docComment
+  const examples = []
+  const customTags = []
+  for (const block of tsDocComment.customBlocks) {
+    const tagName = block.blockTag.tagName.replace(/^@/, '')
+    if (tagName === 'example') {
+      examples.push({
+        text: renderTSDocNode(block.content).trim(),
+      })
+    } else {
+      customTags.push({
+        name: tagName,
+        text: renderTSDocNode(block.content).trim(),
+      })
+    }
+  }
+  return {
+    raw: raw,
+    summary: renderTSDocNode(tsDocComment.summarySection).trim(),
+    examples: examples,
+    customTags: customTags,
+  }
 }
 
 //
@@ -500,7 +521,7 @@ export function alias(input: AliasInput): DocTypeAlias {
   return { kind: 'alias', ...input }
 }
 // prettier-ignore
-export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] } & Raw & JSDoc
+export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] } & Raw & TSDocFrag
 // prettier-ignore
 type InterInput = Omit<DocTypeInterface, 'kind'>
 // prettier-ignore
@@ -600,17 +621,4 @@ function findDiscriminant(nodes: Node[]): null | string[] {
     if (possible.length === 0) return null
   }
   return possible
-}
-
-function renderDocNode(docNode: tsdoc.DocNode): string {
-  let result: string = ''
-  if (docNode) {
-    if (docNode instanceof tsdoc.DocExcerpt) {
-      result += docNode.content.toString()
-    }
-    for (const childNode of docNode.getChildNodes()) {
-      result += renderDocNode(childNode)
-    }
-  }
-  return result
 }

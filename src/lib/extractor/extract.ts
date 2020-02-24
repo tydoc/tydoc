@@ -390,7 +390,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
       Doc.inter({
         name: s.getName(),
         props: propertyDocsFromType(manager, t),
-        ...getJSDoc(t),
+        ...getTSDoc(manager, t),
         ...getRaw(t),
       })
     )
@@ -571,33 +571,24 @@ function getRaw(t: tsm.Type): Doc.Raw {
   }
 }
 
-function getJSDoc(t: tsm.Type): Doc.JSDoc {
+function getTSDoc(manager: Doc.Manager, t: tsm.Type): Doc.TSDocFrag {
   const n = getNodeFromTypePreferingAlias(t)
-  let docFragJSDoc: Doc.JSDoc['jsdoc']
+  let docFragTSDoc: Doc.TSDocFrag['tsdoc']
 
   if (!n) {
-    docFragJSDoc = null
+    docFragTSDoc = null
   } else if (!tsm.Node.isJSDocableNode(n)) {
-    docFragJSDoc = null
+    docFragTSDoc = null
   } else {
-    const tsJSDoc = n.getJsDocs()[0]
-    if (!tsJSDoc) {
-      docFragJSDoc = null
+    const jsDocNode = n.getJsDocs()[0]
+    if (!jsDocNode) {
+      docFragTSDoc = null
     } else {
-      docFragJSDoc = {
-        raw: tsJSDoc.getInnerText(),
-        summary: '', // todo
-        tags: tsJSDoc.getTags().map(t => {
-          return {
-            name: t.getTagName(),
-            text: t.getComment() ?? '',
-          }
-        }),
-      }
+      docFragTSDoc = Doc.tsDocFromText(manager, jsDocNode.getText())
     }
   }
 
   return {
-    jsdoc: docFragJSDoc,
+    tsdoc: docFragTSDoc,
   }
 }
