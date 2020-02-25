@@ -11,9 +11,10 @@ it('raw is based on type alias declaration node', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -25,14 +26,16 @@ it('raw is based on type alias declaration node', () => {
               "name": "A",
               "type": Object {
                 "kind": "typeIndexRef",
-                "link": "(\\"/a\\").A",
+                "link": "(a).A",
               },
             },
           ],
+          "path": "/",
+          "tsdoc": null,
         },
       ],
       "typeIndex": Object {
-        "(\\"/a\\").A": Object {
+        "(a).A": Object {
           "kind": "alias",
           "name": "A",
           "raw": Object {
@@ -42,6 +45,14 @@ it('raw is based on type alias declaration node', () => {
     type A = {};",
             "nodeText": "type A = {};",
             "typeText": "A",
+          },
+          "tsdoc": Object {
+            "customTags": Array [],
+            "examples": Array [],
+            "raw": "/**
+     * foobar
+     */",
+            "summary": "foobar",
           },
           "type": Object {
             "kind": "object",
@@ -70,9 +81,10 @@ it('exported type alias of number is added to type index', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -84,14 +96,16 @@ it('exported type alias of number is added to type index', () => {
               "name": "A",
               "type": Object {
                 "kind": "typeIndexRef",
-                "link": "(\\"/a\\").A",
+                "link": "(a).A",
               },
             },
           ],
+          "path": "/",
+          "tsdoc": null,
         },
       ],
       "typeIndex": Object {
-        "(\\"/a\\").A": Object {
+        "(a).A": Object {
           "kind": "alias",
           "name": "A",
           "raw": Object {
@@ -99,6 +113,7 @@ it('exported type alias of number is added to type index', () => {
             "nodeText": "export type A = 1;",
             "typeText": "1",
           },
+          "tsdoc": null,
           "type": Object {
             "base": "number",
             "kind": "literal",
@@ -117,48 +132,52 @@ it('exported type alias of number via typeof is added to type index', () => {
       export type A = typeof a
     `)
   ).toMatchInlineSnapshot(`
-Object {
-  "modules": Array [
     Object {
-      "kind": "module",
-      "location": Object {
-        "absoluteFilePath": "/a.ts",
-      },
-      "mainExport": null,
-      "name": "a",
-      "namedExports": Array [
+      "modules": Array [
         Object {
-          "isTerm": false,
-          "isType": true,
-          "kind": "export",
-          "name": "A",
-          "type": Object {
-            "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+          "isMain": true,
+          "kind": "module",
+          "location": Object {
+            "absoluteFilePath": "/src/a.ts",
           },
+          "mainExport": null,
+          "name": "a",
+          "namedExports": Array [
+            Object {
+              "isTerm": false,
+              "isType": true,
+              "kind": "export",
+              "name": "A",
+              "type": Object {
+                "kind": "typeIndexRef",
+                "link": "(a).A",
+              },
+            },
+          ],
+          "path": "/",
+          "tsdoc": null,
         },
       ],
-    },
-  ],
-  "typeIndex": Object {
-    "(\\"/a\\").A": Object {
-      "kind": "alias",
-      "name": "A",
-      "raw": Object {
-        "nodeFullText": "
-export type A = typeof a;",
-        "nodeText": "export type A = typeof a;",
-        "typeText": "1",
+      "typeIndex": Object {
+        "(a).A": Object {
+          "kind": "alias",
+          "name": "A",
+          "raw": Object {
+            "nodeFullText": "
+    export type A = typeof a;",
+            "nodeText": "export type A = typeof a;",
+            "typeText": "1",
+          },
+          "tsdoc": null,
+          "type": Object {
+            "base": "number",
+            "kind": "literal",
+            "name": "1",
+          },
+        },
       },
-      "type": Object {
-        "base": "number",
-        "kind": "literal",
-        "name": "1",
-      },
-    },
-  },
-}
-`)
+    }
+  `)
 })
 
 // todo nice test but differs in raw, PITA to manually tweak, revisit
@@ -211,6 +230,6 @@ it('exported type alias of array is added to type index', () => {
   expect(ctx.extract(`export type A = 1[]`)).toMatchSnapshot()
 })
 
-it.only('exported type alias of array via typeof is added to type index', () => {
+it('exported type alias of array via typeof is added to type index', () => {
   expect(ctx.extract(`let a = [1]; export type A = typeof a`)).toMatchSnapshot()
 })

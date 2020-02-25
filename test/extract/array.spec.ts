@@ -38,6 +38,7 @@ it('passes smoke test', () => {
             "nodeText": "export type StringList = string[];",
             "typeText": "StringList",
           },
+          "tsdoc": null,
           "type": Object {
             "innerType": Object {
               "kind": "primitive",

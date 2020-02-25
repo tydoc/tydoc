@@ -4,9 +4,10 @@ exports[`exported type alias of array is added to type index 1`] = `
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -18,14 +19,16 @@ Object {
           "name": "A",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+            "link": "(a).A",
           },
         },
       ],
+      "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {
@@ -33,6 +36,7 @@ Object {
         "nodeText": "export type A = 1[];",
         "typeText": "A",
       },
+      "tsdoc": null,
       "type": Object {
         "innerType": Object {
           "base": "number",
@@ -83,6 +87,7 @@ export type A = typeof a;",
         "nodeText": "export type A = typeof a;",
         "typeText": "number[]",
       },
+      "tsdoc": null,
       "type": Object {
         "innerType": Object {
           "kind": "primitive",
@@ -99,9 +104,10 @@ exports[`exported type alias of boolean is added to type index 1`] = `
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -113,14 +119,16 @@ Object {
           "name": "A",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+            "link": "(a).A",
           },
         },
       ],
+      "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {
@@ -128,6 +136,7 @@ Object {
         "nodeText": "export type A = boolean;",
         "typeText": "boolean",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "primitive",
         "type": "boolean",
@@ -141,9 +150,10 @@ exports[`exported type alias of boolean via typeof is added to type index 1`] = 
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -155,14 +165,16 @@ Object {
           "name": "A",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+            "link": "(a).A",
           },
         },
       ],
+      "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {
@@ -171,6 +183,7 @@ export type A = typeof a;",
         "nodeText": "export type A = typeof a;",
         "typeText": "boolean",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "primitive",
         "type": "boolean",
@@ -184,9 +197,10 @@ exports[`exported type alias of function is added to type index 1`] = `
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -198,14 +212,16 @@ Object {
           "name": "A",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+            "link": "(a).A",
           },
         },
       ],
+      "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {
@@ -213,6 +229,7 @@ Object {
         "nodeText": "export type A = () => {};",
         "typeText": "A",
       },
+      "tsdoc": null,
       "type": Object {
         "hasProps": false,
         "isOverloaded": false,
@@ -248,9 +265,10 @@ exports[`exported type alias of function via typeof is added to type index 1`] =
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -262,14 +280,16 @@ Object {
           "name": "A",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+            "link": "(a).A",
           },
         },
       ],
+      "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {
@@ -278,6 +298,7 @@ export type A = typeof a;",
         "nodeText": "export type A = typeof a;",
         "typeText": "() => void",
       },
+      "tsdoc": null,
       "type": Object {
         "hasProps": false,
         "isOverloaded": false,
@@ -308,9 +329,10 @@ exports[`exported type alias of object is added to type index 1`] = `
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -322,14 +344,16 @@ Object {
           "name": "A",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+            "link": "(a).A",
           },
         },
       ],
+      "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {
@@ -337,6 +361,7 @@ Object {
         "nodeText": "export type A = { b: 1 };",
         "typeText": "A",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
@@ -365,9 +390,10 @@ exports[`exported type alias of object via typeof is added to type index 1`] = `
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "absoluteFilePath": "/src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -379,14 +405,16 @@ Object {
           "name": "A",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+            "link": "(a).A",
           },
         },
       ],
+      "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {
@@ -395,6 +423,7 @@ export type A = typeof a;",
         "nodeText": "export type A = typeof a;",
         "typeText": "{ b: number; }",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
