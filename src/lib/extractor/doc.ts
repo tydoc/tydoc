@@ -257,8 +257,8 @@ export type Node =
   | DocTypeIntersection
   // todo unused?
   | { kind: 'function'; signatures: DocSig[] }
-  | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & Raw
-  | { kind: 'callable_interface'; properties: DocProp[]; signatures: DocSig[] } & Raw
+  | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & RawFrag
+  | { kind: 'callable_interface'; properties: DocProp[]; signatures: DocSig[] } & RawFrag
 
 // prettier-ignore
 export type IndexableNode =
@@ -291,7 +291,7 @@ export interface TSDoc {
   customTags: { name: string; text: string }[]
 }
 
-export type Raw = {
+export type RawFrag = {
   raw: {
     typeText: string
     nodeText: string
@@ -514,14 +514,14 @@ export function typeIndexRef(link: string): DocTypeIndexRef {
   return { kind: 'typeIndexRef', link }
 }
 // prettier-ignore
-export type DocTypeAlias = { kind: 'alias'; name: string, type: Node  } & Raw
+export type DocTypeAlias = { kind: 'alias'; name: string, type: Node  } & RawFrag & TSDocFrag
 type AliasInput = Omit<DocTypeAlias, 'kind'>
 // prettier-ignore
 export function alias(input: AliasInput): DocTypeAlias {
   return { kind: 'alias', ...input }
 }
 // prettier-ignore
-export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] } & Raw & TSDocFrag
+export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] } & RawFrag & TSDocFrag
 // prettier-ignore
 type InterInput = Omit<DocTypeInterface, 'kind'>
 // prettier-ignore
@@ -533,7 +533,7 @@ export function prop(input: { name: string, type: Node }): DocProp {
   return { kind: 'prop', ...input }
 }
 // prettier-ignore
-export type DocTypeObject = { kind: 'object'; props: DocProp[] } & Raw
+export type DocTypeObject = { kind: 'object'; props: DocProp[] } & RawFrag
 // prettier-ignore
 type objInput = Omit<DocTypeObject, 'kind'>
 // prettier-ignore
@@ -541,7 +541,7 @@ export function obj(input: objInput ): DocTypeObject {
   return { kind: 'object', ...input }
 }
 // prettier-ignore
-export type DocTypeCallable = { kind: 'callable', isOverloaded: boolean, hasProps:boolean, sigs: DocSig[], props: DocProp[] } & Raw
+export type DocTypeCallable = { kind: 'callable', isOverloaded: boolean, hasProps:boolean, sigs: DocSig[], props: DocProp[] } & RawFrag
 // prettier-ignore
 type callableInput = Omit<DocTypeCallable, 'kind' | 'isOverloaded' | 'hasProps'>
 // prettier-ignore
@@ -561,9 +561,9 @@ export function sigParam(input: { name: string; type: Node }): DocSigParam {
   return { kind: 'sigParam', ...input }
 }
 // prettier-ignore
-export type DocUnsupported = { kind:'unsupported' } & Raw
+export type DocUnsupported = { kind:'unsupported' } & RawFrag
 // prettier-ignorp
-export function unsupported(raw: Raw): DocUnsupported {
+export function unsupported(raw: RawFrag): DocUnsupported {
   return { kind: 'unsupported', ...raw }
 }
 
@@ -571,7 +571,10 @@ export function unsupported(raw: Raw): DocUnsupported {
 // Intersection Node
 //
 
-export type DocTypeIntersection = { kind: 'intersection'; types: Node[] } & Raw
+export type DocTypeIntersection = {
+  kind: 'intersection'
+  types: Node[]
+} & RawFrag
 
 type IntersectionInput = Omit<DocTypeIntersection, 'kind'>
 
@@ -584,9 +587,9 @@ export function intersection(input: IntersectionInput): DocTypeIntersection {
 //
 
 // prettier-ignore
-export type DocTypeUnion = { kind:'union', isDiscriminated: boolean, discriminantProperties: null | string[], types: Node[] } & Raw
+export type DocTypeUnion = { kind:'union', isDiscriminated: boolean, discriminantProperties: null | string[], types: Node[] } & RawFrag
 
-type UnionInput = { types: Node[] } & Raw
+type UnionInput = { types: Node[] } & RawFrag
 
 export function union(input: UnionInput): DocTypeUnion {
   const discriminantProperties = findDiscriminant(input.types)

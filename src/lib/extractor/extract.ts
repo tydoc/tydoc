@@ -303,6 +303,8 @@ export function fromModule(
             nodeText: n.getText(),
             typeText: t.getText(),
           },
+          // todo getTSDocFromNode()
+          ...getTSDoc(manager, n.getType()),
           type: fromType(manager, t),
         })
       )
@@ -380,7 +382,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     const innerType = t.getArrayElementTypeOrThrow()
     debugVisible('-> handle array inner type %s', innerType.getText())
     return manager.indexTypeIfApplicable(t, () =>
-      extractAliasIfOne(t, Doc.array(fromType(manager, innerType)))
+      extractAliasIfOne(manager, t, Doc.array(fromType(manager, innerType)))
     )
   }
   if (t.isInterface()) {
@@ -400,6 +402,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     debugVisible('-> type is callable')
     return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(
+        manager,
         t,
         Doc.callable({
           props: propertyDocsFromType(manager, t),
@@ -414,6 +417,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     debugVisible('-> type is object')
     return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(
+        manager,
         t,
         Doc.obj({
           props: propertyDocsFromType(manager, t),
@@ -426,13 +430,14 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     debugVisible('-> type is union')
     return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(
+        manager,
         t,
         Doc.union({
           ...getRaw(t),
           types: t.getUnionTypes().map(tm => {
             debugVisible('-> handle union member %s', tm.getText())
             // todo no extract alias here ...
-            return extractAliasIfOne(tm, fromType(manager, tm))
+            return extractAliasIfOne(manager, tm, fromType(manager, tm))
           }),
         })
       )
@@ -442,6 +447,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     debugVisible('-> type is intersection')
     return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(
+        manager,
         t,
         Doc.intersection({
           ...getRaw(t),
@@ -516,7 +522,11 @@ function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
  * Thus the given doc node may be returned as-is if no alias found or returned
  * wrapped in doc for the found alias.
  */
-function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
+function extractAliasIfOne(
+  manager: Doc.Manager,
+  t: tsm.Type,
+  doc: Doc.Node
+): Doc.Node {
   // is it possible to get alias of aliases? It seems the checker "compacts"
   // these and if we __really__ wanted to "see" the chain we'd have to go the
   // node AST way.
@@ -530,13 +540,14 @@ function extractAliasIfOne(t: tsm.Type, doc: Doc.Node): Doc.Node {
     name: as.getName(),
     type: doc,
     ...getRaw(t),
+    ...getTSDoc(manager, t),
   })
 }
 
 /**
  * Get raw doc information for the given type.
  */
-function getRaw(t: tsm.Type): Doc.Raw {
+function getRaw(t: tsm.Type): Doc.RawFrag {
   /**
    * The use-alias-outside-current-scope flag makes it so that the type for
    * something imported is seen not as `import(...).<name>` but the actual type
@@ -571,6 +582,17 @@ function getRaw(t: tsm.Type): Doc.Raw {
   }
 }
 
+/**
+ * Extract tsdoc docs for the given type.
+ *
+ * @return
+ *
+ * If the node associated with the type does not support JSDoc (not all node
+ * types do) then `null` is returned.
+ *
+ * If the node associated with the type does not have JSDoc present in the
+ * source code then `null` is returned.
+ */
 function getTSDoc(manager: Doc.Manager, t: tsm.Type): Doc.TSDocFrag {
   const n = getNodeFromTypePreferingAlias(t)
   let docFragTSDoc: Doc.TSDocFrag['tsdoc']

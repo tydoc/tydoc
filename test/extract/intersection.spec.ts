@@ -129,6 +129,7 @@ Object {
         "nodeText": "export type A = 1 | ({ s: string } & { b: boolean });",
         "typeText": "A",
       },
+      "tsdoc": null,
       "type": Object {
         "discriminantProperties": null,
         "isDiscriminated": false,

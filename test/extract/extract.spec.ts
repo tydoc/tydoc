@@ -490,6 +490,7 @@ Object {
         "nodeText": "type F = {};",
         "typeText": "F",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [],
@@ -508,6 +509,7 @@ Object {
         "nodeText": "type F5 = { a: string };",
         "typeText": "F5",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
@@ -535,6 +537,7 @@ Object {
         "nodeText": "type G = { a: string; b: any; c: null[]; d: unknown; e: never };",
         "typeText": "G",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
@@ -597,6 +600,7 @@ Object {
         "nodeText": "type H = { h2: H2[] };",
         "typeText": "H",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
@@ -638,6 +642,7 @@ Object {
         "nodeText": "type I = () => {};",
         "typeText": "I",
       },
+      "tsdoc": null,
       "type": Object {
         "hasProps": false,
         "isOverloaded": false,
@@ -673,6 +678,7 @@ Object {
         "nodeText": "type K = string | boolean[] | { a: string };",
         "typeText": "K",
       },
+      "tsdoc": null,
       "type": Object {
         "discriminantProperties": null,
         "isDiscriminated": false,
@@ -723,6 +729,7 @@ Object {
         "nodeText": "type L = { d1: \\"a\\"; d2: \\"a\\"; foo: boolean } | { d1: \\"b\\"; d2: \\"b\\"; bar: number };",
         "typeText": "L",
       },
+      "tsdoc": null,
       "type": Object {
         "discriminantProperties": Array [
           "d1",
@@ -819,6 +826,7 @@ Object {
         "nodeText": "type M = {};",
         "typeText": "M",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [],
@@ -837,6 +845,7 @@ Object {
         "nodeText": "type N1 = { n1: N1 };",
         "typeText": "N1",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
@@ -864,6 +873,7 @@ Object {
         "nodeText": "type N2 = N2[];",
         "typeText": "N2",
       },
+      "tsdoc": null,
       "type": Object {
         "innerType": Object {
           "kind": "typeIndexRef",
@@ -880,6 +890,7 @@ Object {
         "nodeText": "type N3 = { n3: N3 } | 1;",
         "typeText": "N3",
       },
+      "tsdoc": null,
       "type": Object {
         "discriminantProperties": null,
         "isDiscriminated": false,

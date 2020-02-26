@@ -271,6 +271,7 @@ Object {
         "nodeText": "export type A = { a: A };",
         "typeText": "A",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
