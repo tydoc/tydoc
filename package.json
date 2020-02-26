@@ -35,7 +35,7 @@
     "fs-jetpack": "^2.2.3",
     "globby": "^11.0.0",
     "lodash": "^4.17.15",
-    "ts-morph": "^6.0.2",
+    "ts-morph": "^7.0.0",
     "typescript": "^3.7.4"
   },
   "devDependencies": {
