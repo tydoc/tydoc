@@ -25,7 +25,7 @@ Work in progress 👷‍
     - [`T` `DocTypePrimitive`](#t-doctypeprimitive)
     - [`T` `DocTypeLiteral`](#t-doctypeliteral)
     - [`&` `DocTypeAlias`](#-doctypealias)
-    - [`T` `Raw`](#t-raw)
+    - [`T` `RawFrag`](#t-rawfrag)
     - [`&` `DocTypeInterface`](#-doctypeinterface)
     - [`T` `DocProp`](#t-docprop)
     - [`&` `DocTypeCallable`](#-doctypecallable)
@@ -173,7 +173,7 @@ export type DocTypeUnion = {
   isDiscriminated: boolean
   discriminantProperties: null | string[]
   types: Node[]
-} & Raw
+} & RawFrag
 ```
 
 #### `|` `Node`
@@ -197,12 +197,12 @@ export type Node =
       kind: 'callable_object'
       signatures: DocSig[]
       properties: DocProp[]
-    } & Raw)
+    } & RawFrag)
   | ({
       kind: 'callable_interface'
       properties: DocProp[]
       signatures: DocSig[]
-    } & Raw)
+    } & RawFrag)
 ```
 
 #### `T` `DocTypePrimitive`
@@ -220,13 +220,18 @@ export type DocTypeLiteral = { kind: 'literal'; base: string }
 #### `&` `DocTypeAlias`
 
 ```ts
-export type DocTypeAlias = { kind: 'alias'; name: string; type: Node } & Raw
+export type DocTypeAlias = {
+  kind: 'alias'
+  name: string
+  type: Node
+} & RawFrag &
+  TSDocFrag
 ```
 
-#### `T` `Raw`
+#### `T` `RawFrag`
 
 ```ts
-export type Raw = {
+export type RawFrag = {
   raw: {
     typeText: string
     nodeText: string
@@ -242,7 +247,7 @@ export type DocTypeInterface = {
   kind: 'interface'
   name: string
   props: DocProp[]
-} & Raw &
+} & RawFrag &
   TSDocFrag
 ```
 
@@ -261,7 +266,7 @@ export type DocTypeCallable = {
   hasProps: boolean
   sigs: DocSig[]
   props: DocProp[]
-} & Raw
+} & RawFrag
 ```
 
 #### `T` `DocSig`
@@ -285,7 +290,7 @@ export type DocTypeArray = { kind: 'array'; innerType: Node }
 #### `&` `DocTypeObject`
 
 ```ts
-export type DocTypeObject = { kind: 'object'; props: DocProp[] } & Raw
+export type DocTypeObject = { kind: 'object'; props: DocProp[] } & RawFrag
 ```
 
 #### `T` `DocTypeIndexRef`
@@ -315,7 +320,7 @@ export type DocTypeIndexRef = {
 #### `&` `DocUnsupported`
 
 ```ts
-export type DocUnsupported = { kind: 'unsupported' } & Raw
+export type DocUnsupported = { kind: 'unsupported' } & RawFrag
 ```
 
 #### `&` `DocTypeIntersection`
@@ -325,7 +330,10 @@ export type DocUnsupported = { kind: 'unsupported' } & Raw
 // Intersection Node
 //
 
-export type DocTypeIntersection = { kind: 'intersection'; types: Node[] } & Raw
+export type DocTypeIntersection = {
+  kind: 'intersection'
+  types: Node[]
+} & RawFrag
 ```
 
 #### `T` `Expor`
