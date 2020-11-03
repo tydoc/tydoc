@@ -23,7 +23,9 @@
     "dev:test": "jest --watch",
     "test": "jest",
     "test:dev": "yarn -s dev:test",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "release:stable": "dripip stable",
+    "release:preview": "dripip preview"
   },
   "dependencies": {
     "@oclif/command": "^1.8.0",
@@ -45,6 +47,7 @@
     "@types/jest": "^25.1.2",
     "@types/node": "^13.7.6",
     "@types/prettier": "^1.19.0",
+    "dripip": "^0.10.0",
     "jest": "^25.1.0",
     "jest-validate": "^25.1.0",
     "jest-watch-suspend": "^1.1.2",
