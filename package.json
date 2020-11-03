@@ -28,6 +28,7 @@
     "release:preview": "dripip preview"
   },
   "dependencies": {
+    "@microsoft/tsdoc": "^0.12.21",
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.0",
@@ -42,7 +43,6 @@
     "typescript": "^3.7.4"
   },
   "devDependencies": {
-    "@microsoft/tsdoc": "^0.12.16",
     "@oclif/dev-cli": "^1.22.2",
     "@types/jest": "^25.1.2",
     "@types/node": "^13.7.6",
