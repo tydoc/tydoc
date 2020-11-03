@@ -22,7 +22,8 @@
     "clean": "rm -rf dist",
     "dev:test": "jest --watch",
     "test": "jest",
-    "test:dev": "yarn -s dev:test"
+    "test:dev": "yarn -s dev:test",
+    "prepublishOnly": "build"
   },
   "dependencies": {
     "@oclif/command": "^1.5.19",
