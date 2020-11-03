@@ -25,6 +25,6 @@ export function dump(...args: any[]) {
   if (args[0] instanceof tsm.Node) return dumpNode(args[0])
   if (args[0] instanceof tsm.Type) return dumpType(args[0])
 
-  const argsInspected = args.map(a => inspect(a, { depth: 20 }))
+  const argsInspected = args.map((a) => inspect(a, { depth: 20 }))
   console.error(...argsInspected)
 }

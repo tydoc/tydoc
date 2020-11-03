@@ -98,6 +98,7 @@ it('module doc if present above terms', () => {
 ### \`a\`
 
 \`\`\`ts
+
 \`\`\`
 
 ### Exported Types

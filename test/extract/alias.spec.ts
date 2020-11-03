@@ -192,9 +192,7 @@ it('exported type alias of function is added to type index', () => {
 })
 
 it('exported type alias of function via typeof is added to type index', () => {
-  expect(
-    ctx.extract(`const a = () => {}; export type A = typeof a`)
-  ).toMatchSnapshot()
+  expect(ctx.extract(`const a = () => {}; export type A = typeof a`)).toMatchSnapshot()
 })
 
 // todo nice test but differs in raw, PITA to manually tweak, revisit
@@ -209,9 +207,7 @@ it('exported type alias of object is added to type index', () => {
 })
 
 it('exported type alias of object via typeof is added to type index', () => {
-  expect(
-    ctx.extract(`const a = { b: 1 }; export type A = typeof a`)
-  ).toMatchSnapshot()
+  expect(ctx.extract(`const a = { b: 1 }; export type A = typeof a`)).toMatchSnapshot()
 })
 
 it('exported type alias of boolean is added to type index', () => {
@@ -219,11 +215,7 @@ it('exported type alias of boolean is added to type index', () => {
 })
 
 it('exported type alias of boolean via typeof is added to type index', () => {
-  expect(
-    ctx.extract(
-      `let a = Math.random() ? false : true; export type A = typeof a`
-    )
-  ).toMatchSnapshot()
+  expect(ctx.extract(`let a = Math.random() ? false : true; export type A = typeof a`)).toMatchSnapshot()
 })
 
 it('exported type alias of array is added to type index', () => {

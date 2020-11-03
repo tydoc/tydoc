@@ -16,7 +16,7 @@ nodes.length //?
 const node = nodes[0]
 node.getKindName() //?
 node.getText() //?
-node.getLeadingCommentRanges().map(cr => cr.getText())[0] //?
+node.getLeadingCommentRanges().map((cr) => cr.getText())[0] //?
 node.getChildren().length //?
 node.getChildren()[0].getKindName() //?
 node.getChildren()[1].getKindName() //?

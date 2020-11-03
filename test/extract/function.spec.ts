@@ -1,9 +1,7 @@
 describe('can be a named export', () => {
   const docs = ctx.extract(`export function fa () {}`)
   it('shows up as a named export', () => {
-    expect(docs.modules[0].namedExports).toMatchObject([
-      { name: 'fa', type: { kind: 'callable' } },
-    ])
+    expect(docs.modules[0].namedExports).toMatchObject([{ name: 'fa', type: { kind: 'callable' } }])
   })
   it('is not added to the type index', () => {
     expect(docs.typeIndex).toEqual({})
@@ -78,9 +76,7 @@ describe('parameters', () => {
       })
     })
     it('inline interfaces are documented inline', () => {
-      const docs = ctx.extract(
-        `export function fa (pa: { a: boolean, b: {} }) {}`
-      )
+      const docs = ctx.extract(`export function fa (pa: { a: boolean, b: {} }) {}`)
       expect(docs).toMatchObject({
         modules: [
           {
@@ -155,9 +151,7 @@ describe('parameters', () => {
                               {
                                 name: 'b',
                                 type: {
-                                  props: [
-                                    { name: 'b2', type: { type: 'string' } },
-                                  ],
+                                  props: [{ name: 'b2', type: { type: 'string' } }],
                                 },
                               },
                             ],

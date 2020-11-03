@@ -19,9 +19,7 @@ export function section(title: Node): SmartNode {
         state,
         lines(
           render(state, heading(state.level, data.title)),
-          ...lo.flatMap(data.nodes, content =>
-            renderN({ ...state, level: state.level + 1 }, content)
-          )
+          ...lo.flatMap(data.nodes, (content) => renderN({ ...state, level: state.level + 1 }, content))
         )
       )
     },
@@ -92,7 +90,7 @@ export function lines(...nodes: ArrayOrVarg<Node>): SmartNode {
       return me
     },
     render(state) {
-      return lo.flatMap(data.nodes, n => renderN(state, n)).join('\n')
+      return lo.flatMap(data.nodes, (n) => renderN(state, n)).join('\n')
     },
   }
 
@@ -113,7 +111,7 @@ export function span(...nodes: ArrayOrVarg<Node>): SmartNode {
       return me
     },
     render(state) {
-      return lo.flatMap(data.nodes, n => renderN(state, n)).join(' ')
+      return lo.flatMap(data.nodes, (n) => renderN(state, n)).join(' ')
     },
   }
 

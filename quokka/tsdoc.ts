@@ -67,7 +67,7 @@ tsdocParser = new TSDoc.TSDocParser()
 parserContext = tsdocParser.parseString(source)
 content = parserContext.docComment
 
-parserContext.log.messages.map(m => [m.messageId, m.text]) //?
+parserContext.log.messages.map((m) => [m.messageId, m.text]) //?
 // content.emitAsTsdoc() //?
 // content.summarySection //?
 
@@ -79,12 +79,12 @@ Formatter.renderDocNode(content.remarksBlock.content) //?
 Formatter.renderDocNode(content.typeParams) //?
 Formatter.renderDocNode(content.deprecatedBlock.content) //?
 Formatter.renderDocNode(content.inheritDocTag) //?
-content.params.blocks.forEach(p => {
+content.params.blocks.forEach((p) => {
   p.parameterName //?
   Formatter.renderDocNode(p.content) //?
 })
 Formatter.renderDocNode(content.privateRemarks.content) //?
-content.customBlocks.forEach(cb => {
+content.customBlocks.forEach((cb) => {
   cb.kind //?
   cb.blockTag.kind //?
   cb.blockTag.tagName //?
@@ -103,7 +103,7 @@ tsdocParser = new TSDoc.TSDocParser()
 parserContext = tsdocParser.parseString(source)
 content = parserContext.docComment
 
-parserContext.log.messages.map(m => [m.messageId, m.text]) //?
+parserContext.log.messages.map((m) => [m.messageId, m.text]) //?
 
 const ref = content.inheritDocTag.declarationReference
 ref.packageName //?
@@ -140,7 +140,7 @@ tsdocParser = new TSDoc.TSDocParser()
 parserContext = tsdocParser.parseString(source)
 content = parserContext.docComment
 
-parserContext.log.messages.map(m => [m.messageId, m.text]) //?
+parserContext.log.messages.map((m) => [m.messageId, m.text]) //?
 // content.emitAsTsdoc() //?
 // content.summarySection //?
 
@@ -150,11 +150,11 @@ content.modifierTagSet.isAlpha() //?
 Formatter.renderDocNode(content.summarySection) //?
 Formatter.renderDocNode(content.typeParams) //?
 Formatter.renderDocNode(content.inheritDocTag) //?
-content.params.blocks.forEach(p => {
+content.params.blocks.forEach((p) => {
   p.parameterName //?
   Formatter.renderDocNode(p.content) //?
 })
-content.customBlocks.forEach(cb => {
+content.customBlocks.forEach((cb) => {
   cb.kind //?
   cb.blockTag.kind //?
   cb.blockTag.tagName //?

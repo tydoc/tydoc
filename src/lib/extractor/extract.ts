@@ -4,13 +4,7 @@ import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import * as Doc from './doc'
-import {
-  getLocationKind,
-  getNodeFromTypePreferingAlias,
-  hasAlias,
-  isCallable,
-  isPrimitive,
-} from './utils'
+import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 
 const debug = Debug('tydoc:extract')
 const debugExport = Debug('tydoc:extract:export')
@@ -133,9 +127,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
     outDir = compilerOptOutDir
   } else {
     // todo we could fallback to the source root dir which IIUC is what TS does?
-    throw new Error(
-      'Your tsconfig.json compilerOptions did not specify an outDir. It must.'
-    )
+    throw new Error('Your tsconfig.json compilerOptions did not specify an outDir. It must.')
   }
   if (!path.isAbsolute(outDir)) {
     outDir = path.join(prjDir, outDir)
@@ -153,9 +145,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
     if (pjson.main) {
       packageMainEntrypoint = pjson.main
     } else {
-      throw new Error(
-        'Your package.json main field is missing or empty. It must be present.'
-      )
+      throw new Error('Your package.json main field is missing or empty. It must be present.')
     }
   }
   if (!path.isAbsolute(packageMainEntrypoint)) {
@@ -188,7 +178,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
   }
   debug(
     'found project source files ',
-    sourceFiles.map(sf => sf.getFilePath())
+    sourceFiles.map((sf) => sf.getFilePath())
   )
 
   // Get the entrypoints to crawl
@@ -197,19 +187,13 @@ export function fromProject(opts: Options): Doc.DocPackage {
   for (const findEntryPoint of opts.entrypoints) {
     let entrypointModulePathAbs: string
     if (path.isAbsolute(findEntryPoint[0])) {
-      debug(
-        'considering given entrypoint as absolute, disregarding srcDir: %s',
-        findEntryPoint
-      )
+      debug('considering given entrypoint as absolute, disregarding srcDir: %s', findEntryPoint)
       entrypointModulePathAbs = path.join(
         path.dirname(findEntryPoint),
         path.basename(findEntryPoint, path.extname(findEntryPoint))
       )
     } else {
-      debug(
-        'considering given entrypoint relative to srcDir: %s',
-        findEntryPoint
-      )
+      debug('considering given entrypoint relative to srcDir: %s', findEntryPoint)
       entrypointModulePathAbs = path.join(
         srcDir,
         path.dirname(findEntryPoint),
@@ -222,11 +206,8 @@ export function fromProject(opts: Options): Doc.DocPackage {
     // an index within it (just like how node module resolution works)
 
     const tried: string[] = []
-    const sf = sourceFiles.find(sf => {
-      const absoluteModulePath = path.join(
-        path.dirname(sf.getFilePath()),
-        sf.getBaseNameWithoutExtension()
-      )
+    const sf = sourceFiles.find((sf) => {
+      const absoluteModulePath = path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
       tried.push(absoluteModulePath)
       return absoluteModulePath === entrypointModulePathAbs
     })
@@ -261,7 +242,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
   //
   const manager = new Doc.Manager(managerSettings)
 
-  sourceFileEntrypoints.forEach(sf => {
+  sourceFileEntrypoints.forEach((sf) => {
     fromModule(manager, sf)
   })
 
@@ -272,10 +253,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
  * Recursively extract docs starting from exports of the given module.
  * Everything that is reachable will be considered.
  */
-export function fromModule(
-  manager: Doc.Manager,
-  sourceFile: tsm.SourceFile
-): Doc.DocPackage {
+export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.DocPackage {
   const mod = Doc.modFromSourceFile(manager, sourceFile)
 
   for (const ex of sourceFile.getExportedDeclarations()) {
@@ -291,10 +269,7 @@ export function fromModule(
     // So far we know this happens in typeof cases.
     let doc
     if (tsm.Node.isTypeAliasDeclaration(n) && !hasAlias(t)) {
-      debugExport(
-        'type alias pointing to type that cannot back reference to the type alias %s',
-        n.getText()
-      )
+      debugExport('type alias pointing to type that cannot back reference to the type alias %s', n.getText())
       doc = manager.indexTypeAliasNode(n, () =>
         Doc.alias({
           name: n.getName(),
@@ -357,9 +332,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     debugVisible('-> type is indexable')
     const fqtn = manager.getFQTN(t)
     if (manager.isIndexed(fqtn)) {
-      debugVisible(
-        '-> type is being documented as link to the type index (aka. cache hit)'
-      )
+      debugVisible('-> type is being documented as link to the type index (aka. cache hit)')
       return Doc.typeIndexRef(fqtn)
     }
   } else {
@@ -434,7 +407,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
         t,
         Doc.union({
           ...getRaw(t),
-          types: t.getUnionTypes().map(tm => {
+          types: t.getUnionTypes().map((tm) => {
             debugVisible('-> handle union member %s', tm.getText())
             // todo no extract alias here ...
             return extractAliasIfOne(manager, tm, fromType(manager, tm))
@@ -451,7 +424,7 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
         t,
         Doc.intersection({
           ...getRaw(t),
-          types: t.getIntersectionTypes().map(tm => {
+          types: t.getIntersectionTypes().map((tm) => {
             debugVisible('-> handle intersection member %s', tm.getText())
             return fromType(manager, tm)
           }),
@@ -472,13 +445,13 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
  * and in TS this as modelled as object types being able to be made callable).
  */
 function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
-  return t.getCallSignatures().map(sig => {
+  return t.getCallSignatures().map((sig) => {
     const tRet = sig.getReturnType()
     const params = sig.getParameters()
     debugVisible('handle callable return: %s', tRet.getText())
     return Doc.sig({
       return: fromType(docs, tRet),
-      params: params.map(p => {
+      params: params.map((p) => {
         const node = p.getDeclarations()[0]
         const paramName = p.getName()
         const paramType = node.getType()
@@ -499,7 +472,7 @@ function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
  * Extract docs from the type's properties.
  */
 function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
-  return t.getProperties().map(p => {
+  return t.getProperties().map((p) => {
     // prettier-ignore
     const node = p.getDeclarations()[0] as tsm.PropertySignature | tsm.MethodSignature
     const propName = p.getName()
@@ -522,11 +495,7 @@ function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
  * Thus the given doc node may be returned as-is if no alias found or returned
  * wrapped in doc for the found alias.
  */
-function extractAliasIfOne(
-  manager: Doc.Manager,
-  t: tsm.Type,
-  doc: Doc.Node
-): Doc.Node {
+function extractAliasIfOne(manager: Doc.Manager, t: tsm.Type, doc: Doc.Node): Doc.Node {
   // is it possible to get alias of aliases? It seems the checker "compacts"
   // these and if we __really__ wanted to "see" the chain we'd have to go the
   // node AST way.
@@ -553,12 +522,7 @@ function getRaw(t: tsm.Type): Doc.RawFrag {
    * something imported is seen not as `import(...).<name>` but the actual type
    * from the thing's origin.
    */
-  const typeText = t
-    .getText(
-      undefined,
-      tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope
-    )
-    .trim()
+  const typeText = t.getText(undefined, tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope).trim()
 
   const node = getNodeFromTypePreferingAlias(t)
 

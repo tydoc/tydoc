@@ -37,10 +37,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
   // pragmas in source code will end up in docs preventing them from being
   // formatted by prettier (which isn't obviously desirable, as the reasons to
   // disable prettier in source may not follow through to doc blocks).
-  const docsString = renderMarkdown({ level: 3 }, markdownDocs).replace(
-    /\/\/ prettier-ignore\n/g,
-    ''
-  )
+  const docsString = renderMarkdown({ level: 3 }, markdownDocs).replace(/\/\/ prettier-ignore\n/g, '')
 
   debug('prettier start')
   const formattedDocsString = Prettier.format(docsString, {
@@ -70,11 +67,9 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       md.add(renderModule(opts, docs.modules[0], docs.typeIndex))
     } else {
       md.add(
-        docs.modules.map(mod => {
+        docs.modules.map((mod) => {
           debugModule('start module %s', mod.path)
-          return section(codeSpan(mod.path)).add(
-            renderModule(opts, mod, docs.typeIndex)
-          )
+          return section(codeSpan(mod.path)).add(renderModule(opts, mod, docs.typeIndex))
         })
       )
     }
@@ -83,7 +78,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     md.add(
       section('Type Index').add(
-        Object.values(docs.typeIndex).map(t => {
+        Object.values(docs.typeIndex).map((t) => {
           const md = section(typeTitle(t))
           // Use type node text because type text for types is just names it
           // seems, not informative.
@@ -110,8 +105,8 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
   function renderModule(opts: Options, mod: Doc.DocModule, ti: Doc.TypeIndex) {
     debugModule('start')
 
-    const exportedTypes = mod.namedExports.filter(ex => ex.isType)
-    const exportedTerms = mod.namedExports.filter(ex => ex.isTerm)
+    const exportedTypes = mod.namedExports.filter((ex) => ex.isType)
+    const exportedTerms = mod.namedExports.filter((ex) => ex.isTerm)
 
     debugModule('start exported terms')
 
@@ -122,7 +117,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       renderExamples(md, mod.tsdoc)
     }
 
-    const exportedTermsContent = exportedTerms.map(ex => {
+    const exportedTermsContent = exportedTerms.map((ex) => {
       const termSection = section(codeSpan(ex.name))
       // Use type text for terms. Using node text would render uninteresting and
       // potentially massive implementation source code.
@@ -131,13 +126,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
         termSection.add(sigCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
       } else if (ex.type.kind === 'typeIndexRef') {
         termSection.add(
-          span(
-            'Of type',
-            link(
-              codeSpan(ti[ex.type.link].name),
-              typeTitleAnchorLink(ti[ex.type.link])
-            )
-          )
+          span('Of type', link(codeSpan(ti[ex.type.link].name), typeTitleAnchorLink(ti[ex.type.link])))
         )
       } else {
         termSection.add(tsCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
@@ -155,7 +144,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     md.add(
       section('Exported Types').add(
-        exportedTypes.map(ext => {
+        exportedTypes.map((ext) => {
           const type = ext.type
           const c = section(typeTitle(ext))
           c.add(tsCodeBlock(type.kind))
@@ -246,10 +235,6 @@ function renderExamples(md: MD.SmartNode, tsdoc: Doc.TSDoc): void {
   if (tsdoc.examples.length === 1) {
     md.add(section('Example').add(tsdoc.examples[0].text))
   } else {
-    md.add(
-      section('Examples').add(
-        tsdoc.examples.map((ex, i) => section(`Example ${i}`).add(ex.text))
-      )
-    )
+    md.add(section('Examples').add(tsdoc.examples.map((ex, i) => section(`Example ${i}`).add(ex.text))))
   }
 }

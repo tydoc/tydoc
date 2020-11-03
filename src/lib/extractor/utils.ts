@@ -46,13 +46,7 @@ export function isTypeFromDependencies(t: tsm.Type): boolean {
   return getLocationKind(t) === 'dep'
 }
 
-type LocationKind =
-  | 'typeScriptCore'
-  | 'typeScriptStandardLibrary'
-  | 'dep'
-  | 'app'
-  | 'inline'
-  | 'unknown'
+type LocationKind = 'typeScriptCore' | 'typeScriptStandardLibrary' | 'dep' | 'app' | 'inline' | 'unknown'
 
 export function getLocationKind(t: tsm.Type): LocationKind {
   if (isPrimitive(t)) {
@@ -64,14 +58,10 @@ export function getLocationKind(t: tsm.Type): LocationKind {
   }
 
   // todo does the order of symbol we choose matter in case of both being present?
-  const filePath = (t.getSymbol() ?? t.getAliasSymbol())
-    ?.getDeclarations()[0]
-    ?.getSourceFile()
-    .getFilePath()
+  const filePath = (t.getSymbol() ?? t.getAliasSymbol())?.getDeclarations()[0]?.getSourceFile().getFilePath()
 
   if (filePath) {
-    if (filePath.includes('/node_modules/typescript/lib/'))
-      return 'typeScriptStandardLibrary'
+    if (filePath.includes('/node_modules/typescript/lib/')) return 'typeScriptStandardLibrary'
     if (filePath.includes('/node_modules/')) return 'dep'
     return 'app'
   }

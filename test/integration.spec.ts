@@ -49,8 +49,7 @@ const sources = [
 ]
 
 it('tydoc can render markdown', () => {
-  expect(ctx.markdown({ flatTermsSection: true }, ...sources))
-    .toMatchInlineSnapshot(`
+  expect(ctx.markdown({ flatTermsSection: true }, ...sources)).toMatchInlineSnapshot(`
     "### Example
 
     \`\`\`ts

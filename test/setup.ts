@@ -18,10 +18,7 @@ function createContextt() {
   })
 
   const api = {
-    markdown(
-      opts: jsde.RenderMarkdownOptions,
-      ...sources: (string | SourceSpec)[]
-    ) {
+    markdown(opts: jsde.RenderMarkdownOptions, ...sources: (string | SourceSpec)[]) {
       return jsde.renderMarkdown(api.extract(...sources), opts)
     },
     /**

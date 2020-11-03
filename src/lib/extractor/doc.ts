@@ -4,12 +4,7 @@ import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { Index, Thunk } from '../../utils'
-import {
-  hasAlias,
-  isPrimitive,
-  isTypeLevelNode,
-  renderTSDocNode,
-} from './utils'
+import { hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
 
 const debug = Debug('tydoc:doc')
 
@@ -30,11 +25,9 @@ export interface Settings {
 export class Manager {
   constructor(public settings: Settings) {
     this.settings.sourceModuleToPackagePathMappings = Object.fromEntries(
-      Object.entries(this.settings.sourceModuleToPackagePathMappings ?? {}).map(
-        ([k, v]) => {
-          return [path.normalize(k), path.normalize(path.join('/', v))]
-        }
-      )
+      Object.entries(this.settings.sourceModuleToPackagePathMappings ?? {}).map(([k, v]) => {
+        return [path.normalize(k), path.normalize(path.join('/', v))]
+      })
     )
   }
 
@@ -108,9 +101,7 @@ export class Manager {
 
     // handle mapped non-root module case
     const srcRelModulePath = path.relative(this.settings.srcDir, modulePath)
-    const packageMapping = this.settings.sourceModuleToPackagePathMappings?.[
-      srcRelModulePath
-    ]
+    const packageMapping = this.settings.sourceModuleToPackagePathMappings?.[srcRelModulePath]
     if (packageMapping) {
       debug('getting module path (%s) from settings mappings', packageMapping)
       return packageMapping
@@ -140,10 +131,7 @@ export function getMainModule({
   // todo assertion that all paths are relative or absolute––no mixing
   const jsFilePathRel = path.relative(outDir, packageMainEntrypoint)
   const mainModuleName = path.basename(jsFilePathRel, '.js')
-  const MainModulePathRel = path.join(
-    path.dirname(jsFilePathRel),
-    mainModuleName
-  )
+  const MainModulePathRel = path.join(path.dirname(jsFilePathRel), mainModuleName)
   const MainModulePathAbs = path.join(srcDir, MainModulePathRel)
   return MainModulePathAbs
 }
@@ -153,10 +141,7 @@ export function getMainModule({
  * is that a module path does not have a file extension.
  */
 function getModulePath(sf: tsm.SourceFile): string {
-  return path.join(
-    path.dirname(sf.getFilePath()),
-    sf.getBaseNameWithoutExtension()
-  )
+  return path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
 }
 
 // // todo move to test suite
@@ -191,10 +176,7 @@ function getModulePath(sf: tsm.SourceFile): string {
 //   packageMainEntrypoint: '/projects/foo/dist/index.js',
 // }) //?
 
-export function getFQTNFromTypeAliasNode(
-  sourceRoot: string,
-  n: tsm.TypeAliasDeclaration
-): string {
+export function getFQTNFromTypeAliasNode(sourceRoot: string, n: tsm.TypeAliasDeclaration): string {
   const typePath = getPathFromSourceRoot(sourceRoot, n.getSourceFile())
   const fqtn = formatFQTN(typePath, n.getName())
   return fqtn
@@ -216,9 +198,7 @@ export function getFQTNFromType(sourceRoot: string, t: tsm.Type): string {
     sourceFile = s.getDeclarations()[0].getSourceFile()
     typeName = t.getText(undefined, tsm.ts.TypeFormatFlags.None)
   } else {
-    throw new Error(
-      `Given type ${t.getText()} has neither symbol nor alias symbol`
-    )
+    throw new Error(`Given type ${t.getText()} has neither symbol nor alias symbol`)
   }
   const typePath = getPathFromSourceRoot(sourceRoot, sourceFile)
   const fqtn = formatFQTN(typePath, typeName)
@@ -229,16 +209,10 @@ function formatFQTN(typePath: string, typeName: string): string {
   return `(${typePath}).${typeName}`
 }
 
-function getPathFromSourceRoot(
-  sourceRoot: string,
-  sourceFile: tsm.SourceFile
-): string {
+function getPathFromSourceRoot(sourceRoot: string, sourceFile: tsm.SourceFile): string {
   const filePath = sourceFile.getFilePath()
   const fileDirPath = path.dirname(filePath)
-  const modulePath = path.join(
-    fileDirPath,
-    sourceFile.getBaseNameWithoutExtension()
-  )
+  const modulePath = path.join(fileDirPath, sourceFile.getBaseNameWithoutExtension())
   return path.relative(sourceRoot, modulePath)
 }
 
@@ -378,10 +352,7 @@ export function mod(input: ModInput): DocModule {
   }
 }
 
-export function modFromSourceFile(
-  manager: Manager,
-  sourceFile: tsm.SourceFile
-): DocModule {
+export function modFromSourceFile(manager: Manager, sourceFile: tsm.SourceFile): DocModule {
   return mod({
     name: sourceFile.getBaseNameWithoutExtension(),
     tsdoc: extractModuleLevelTSDoc(manager, sourceFile),
@@ -401,10 +372,7 @@ export function modFromSourceFile(
  * comment, actually). A non-import node that does not have its own TSDoc would
  * cause the one leading the module to be its doc.
  */
-function extractModuleLevelTSDoc(
-  manager: Manager,
-  sf: tsm.SourceFile
-): TSDocFrag['tsdoc'] {
+function extractModuleLevelTSDoc(manager: Manager, sf: tsm.SourceFile): TSDocFrag['tsdoc'] {
   const syntaxList = sf.getChildren()[0]
 
   if (!tsm.Node.isSyntaxList(syntaxList)) {
@@ -607,14 +575,10 @@ function findDiscriminant(nodes: Node[]): null | string[] {
   let possible: string[] = []
   let isLoop1 = true
   for (const n of nodes) {
-    if (
-      n.kind !== 'callable' &&
-      n.kind !== 'interface' &&
-      n.kind !== 'object'
-    ) {
+    if (n.kind !== 'callable' && n.kind !== 'interface' && n.kind !== 'object') {
       return null
     }
-    const props = n.props.map(p => p.name)
+    const props = n.props.map((p) => p.name)
     if (isLoop1) {
       possible = props
       isLoop1 = false
