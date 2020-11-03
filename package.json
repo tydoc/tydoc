@@ -1,7 +1,7 @@
 {
   "name": "tydoc",
   "description": "The TypeScript documenter that meets you where you are",
-  "version": "0.0.0",
+  "version": "0.0.0-dripip",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
@@ -23,7 +23,7 @@
     "dev:test": "jest --watch",
     "test": "jest",
     "test:dev": "yarn -s dev:test",
-    "prepublishOnly": "build"
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "@oclif/command": "^1.5.19",
