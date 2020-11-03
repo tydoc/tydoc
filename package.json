@@ -17,7 +17,7 @@
     "build:docs": "yarn -s build:docs:api && yarn -s build:docs:toc",
     "build:oclif": "oclif-dev manifest",
     "build:ts": "tsc",
-    "build": "yarn -s build:oclif && yarn -s build:ts",
+    "build": "yarn clean && yarn -s build:oclif && yarn -s build:ts",
     "dev": "tsc -w",
     "clean": "rm -rf dist",
     "dev:test": "jest --watch",
