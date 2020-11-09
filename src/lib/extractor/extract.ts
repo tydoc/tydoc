@@ -3,8 +3,17 @@ import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
+import { dump } from '../../utils'
 import * as Doc from './doc'
-import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
+import {
+  dumpNode,
+  dumpType,
+  getLocationKind,
+  getNodeFromTypePreferingAlias,
+  hasAlias,
+  isCallable,
+  isPrimitive
+} from './utils'
 
 const debug = Debug('tydoc:extract')
 const debugExport = Debug('tydoc:extract:export')
@@ -256,11 +265,11 @@ export function fromProject(opts: Options): Doc.DocPackage {
 export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.DocPackage {
   const mod = Doc.modFromSourceFile(manager, sourceFile)
 
-  for (const ex of sourceFile.getExportedDeclarations()) {
-    const exportName = ex[0]
-    const n = ex[1][0]
+  for (const [exportedName, exportedDeclarations] of sourceFile.getExportedDeclarations()) {
+    const n = exportedDeclarations[0]
     const t = n.getType()
     debugExport('start')
+    debugExport('-> export name is "%s"', exportedName)
     debugExport('-> node kind is %s', n.getKindName())
     debugExport('-> type text is %j', n.getType().getText())
 
@@ -283,18 +292,29 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
           type: fromType(manager, t),
         })
       )
+    } else if (tsm.Node.isVariableDeclaration(n)) {
+      dumpType(t)
+      dumpNode(n)
+      dumpNode(n.getChildren()[2])
+      dumpNode(n.getChildrenOfKind(tsm.SyntaxKind.TypeReference)[0])
+      const tr = n.getChildrenOfKind(tsm.SyntaxKind.TypeReference)[0]
+      dump(tr)
+      dump(tr.getTypeName())
+      doc = fromType(manager, t)
     } else {
+      dumpType(t)
+      dumpNode(n)
       doc = fromType(manager, t)
     }
 
-    if (exportName === 'default') {
+    if (exportedName === 'default') {
       mod.mainExport = doc
       continue
     }
 
     mod.namedExports.push(
       Doc.expor({
-        name: exportName,
+        name: exportedName,
         type: doc,
         node: n,
       })
