@@ -7,7 +7,6 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Features](#features)
   - [CLI](#cli)
   - [JSON Representation](#json-representation)
@@ -62,6 +61,10 @@ Work in progress 👷‍
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Features
+
+> **Note**: The following feature examples show JSON in [JSON5](https://json5.org/) format so that comments may be rendered with the examples. Just understand that Tydoc actually emits JSON, not JSON5.
+
+> **Note**: The JSON output of Tydoc is verbose. Examples here show only a minimal subset of the data as required to make the point in any given example. Just understand that there are many more aspects to the data than any one example shows at a time.
 
 ### CLI
 
@@ -139,14 +142,13 @@ $ tydoc project path/to/main
 
 Leads to extracted JSON:
 
-```json
+```json5
 {
-  "modules": [
+  modules: [
     {
-      "isMain": true
-      // ...
-    }
-  ]
+      isMain: true,
+    },
+  ],
 }
 ```
 
@@ -172,13 +174,10 @@ export type Bar = {
         {
           name: 'Bar',
           type: {
-            kind: 'typeIndexRef',
             link: '(example).Bar',
           },
-          // ...
         },
       ],
-      // ...
     },
   ],
   typeIndex: {
@@ -200,9 +199,7 @@ export type Bar = {
             },
           },
         ],
-        // ...
       },
-      // ...
     },
   },
 }
@@ -249,28 +246,23 @@ export const b = 1
 export const c = 2
 ```
 
-```json
+```json5
 {
-  "modules": [
+  modules: [
     {
-      "namedExports": [
+      namedExports: [
         {
-          "name": "a"
-          //...
+          name: 'a',
         },
         {
-          "name": "b"
-          //...
+          name: 'b',
         },
         {
-          "name": "c"
-          //...
-        }
-      ]
-      //...
-    }
-  ]
-  // ...
+          name: 'c',
+        },
+      ],
+    },
+  ],
 }
 ```
 
@@ -285,16 +277,13 @@ const a = 0
 export default a
 ```
 
-```json
+```json5
 {
   "modules": [
     {
       "mainExport": {
-        // ...
       }
-      //...
   ]
-  //...
 }
 ```
 
@@ -314,46 +303,39 @@ type Foo = { a: string }
 export const foo: Foo = { a: 'bar' }
 ```
 
-```json
+```json5
 {
-  "modules": [
+  modules: [
     {
-      "namedExports": [
+      namedExports: [
         {
-          "kind": "export",
-          "name": "foo",
-          "type": {
-            "kind": "typeIndexRef",
-            "link": "(test).Foo"
+          name: 'foo',
+          type: {
+            link: '(test).Foo',
           },
-          "isType": false,
-          "isTerm": true
-        }
-      ]
-      // ...
-    }
+        },
+      ],
+    },
   ],
-  "typeIndex": {
-    "(test).Foo": {
-      "kind": "alias",
-      "name": "Foo",
-      "type": {
-        "kind": "object",
-        "props": [
+  typeIndex: {
+    '(test).Foo': {
+      kind: 'alias',
+      name: 'Foo',
+      type: {
+        kind: 'object',
+        props: [
           {
-            "kind": "prop",
-            "name": "a",
-            "type": {
-              "kind": "primitive",
-              "type": "string"
-            }
-          }
-        ]
-        // ...
-      }
-      // ...
-    }
-  }
+            kind: 'prop',
+            name: 'a',
+            type: {
+              kind: 'primitive',
+              type: 'string',
+            },
+          },
+        ],
+      },
+    },
+  },
 }
 ```
 
@@ -367,56 +349,45 @@ export type Foo = { a: string }
 export const foo: Foo = { a: 'bar' }
 ```
 
-```json
+```json5
 {
-  "modules": [
+  modules: [
     {
-      "namedExports": [
+      namedExports: [
         {
-          "kind": "export",
-          "name": "Foo",
-          "type": {
-            "kind": "typeIndexRef",
-            "link": "(test).Foo"
+          name: 'Foo',
+          type: {
+            link: '(test).Foo',
           },
-          "isType": true,
-          "isTerm": false
         },
         {
-          "kind": "export",
-          "name": "foo",
-          "type": {
-            "kind": "typeIndexRef",
-            "link": "(test).Foo"
+          name: 'foo',
+          type: {
+            link: '(test).Foo',
           },
-          "isType": false,
-          "isTerm": true
-        }
-      ]
-      // ...
-    }
+        },
+      ],
+    },
   ],
-  "typeIndex": {
-    "(test).Foo": {
-      "kind": "alias",
-      "name": "Foo",
-      "type": {
-        "kind": "object",
-        "props": [
+  typeIndex: {
+    '(test).Foo': {
+      kind: 'alias',
+      name: 'Foo',
+      type: {
+        kind: 'object',
+        props: [
           {
-            "kind": "prop",
-            "name": "a",
-            "type": {
-              "kind": "primitive",
-              "type": "string"
-            }
-          }
-        ]
-        // ...
-      }
-      // ...
-    }
-  }
+            kind: 'prop',
+            name: 'a',
+            type: {
+              kind: 'primitive',
+              type: 'string',
+            },
+          },
+        ],
+      },
+    },
+  },
 }
 ```
 
@@ -436,19 +407,18 @@ For example:
  */
 ```
 
-```json
+```json5
 {
-  "modules": [
+  modules: [
     {
-      "tsdoc": {
-        "raw": "/**\n * Welcome to MyAwesomePackage...\n */",
-        "summary": "Welcome to MyAwesomePackage...",
-        "examples": [],
-        "customTags": []
-      }
-      // ...
-    }
-  ]
+      tsdoc: {
+        raw: '/**\n * Welcome to MyAwesomePackage...\n */',
+        summary: 'Welcome to MyAwesomePackage...',
+        examples: [],
+        customTags: [],
+      },
+    },
+  ],
 }
 ```
 
@@ -464,14 +434,13 @@ For example:
 function foo() {}
 ```
 
-```json
+```json5
 {
-  "modules": [
+  modules: [
     {
-      "tsdoc": null
-      // ...
-    }
-  ]
+      tsdoc: null,
+    },
+  ],
 }
 ```
 
@@ -490,19 +459,18 @@ For example:
 function foo() {}
 ```
 
-```json
+```json5
 {
-  "modules": [
+  modules: [
     {
-      "tsdoc": {
-        "raw": "/**\n * Welcome to MyAwesomePackage...\n */",
-        "summary": "Welcome to MyAwesomePackage...",
-        "examples": [],
-        "customTags": []
-      }
-      // ...
-    }
-  ]
+      tsdoc: {
+        raw: '/**\n * Welcome to MyAwesomePackage...\n */',
+        summary: 'Welcome to MyAwesomePackage...',
+        examples: [],
+        customTags: [],
+      },
+    },
+  ],
 }
 ```
 
