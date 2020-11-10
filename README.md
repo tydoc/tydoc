@@ -11,13 +11,19 @@ Work in progress 👷‍
 - [Features](#features)
   - [CLI](#cli)
   - [JSON Representation](#json-representation)
+  - [Markdown Representation](#markdown-representation)
   - [Automatic Main-Entrypoint Detection](#automatic-main-entrypoint-detection)
+    - [What is a "main" entrypoint](#what-is-a-main-entrypoint)
+    - [Tydoc support](#tydoc-support)
+  - [Support for `typeof` operator](#support-for-typeof-operator)
   - [Multiple Entrypoint Support](#multiple-entrypoint-support)
+    - [What does "multiple entrypoints" mean](#what-does-multiple-entrypoints-mean)
+    - [Tydoc support](#tydoc-support-1)
   - [Named Exports](#named-exports)
   - [Main Export](#main-export)
   - [Type Index](#type-index)
-    - [Non-exported types of named exports](#non-exported-types-of-named-exports)
-    - [Types of named exports reference the type index](#types-of-named-exports-reference-the-type-index)
+    - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
+    - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
   - [TsDoc](#tsdoc)
     - [Module Level TsDoc](#module-level-tsdoc)
 - [API](#api)
@@ -70,10 +76,18 @@ Pass as many entrypoints as there are in your node package. All paths given are 
 
 ### JSON Representation
 
-Tydoc can extract documentation as JSON so that you can render it however you want. The structure is fully typed. You can leverage the typings like so:
+Tydoc can extract documentation as JSON so that you can render it however you want.
+
+You can generate JSON from the CLI like so:
+
+```
+tydoc project --json main > docs.json
+```
+
+The structure is fully typed. You can leverage the typings like so:
 
 ```ts
-import docPackageJson from './extracted/tydoc/json/file.json'
+import docPackageJson from './docs.json'
 import DocPackage from 'tydoc/types'
 
 const docs = docPackageJson as DocPackage
@@ -81,7 +95,19 @@ const docs = docPackageJson as DocPackage
 
 The types are extensively documented inline so read them to learn more about the shape/schema of the JSON data and semantics of fields therein (e.g. is a path relative or not).
 
+### Markdown Representation
+
+There is a bundled markdown renderer. You can use it from the command line like so:
+
+```
+tydoc project --markdown main > docs.md
+```
+
+For an example of what the output looks like see the Tydoc repo `README.md` "API" section.
+
 ### Automatic Main-Entrypoint Detection
+
+#### What is a "main" entrypoint
 
 All valid Node packages must specify their main entrtypoint in `package.json` like so:
 
@@ -100,6 +126,8 @@ import { foo } from 'somePackage' // <somePackagePath>/path/to/main.js
 import { bar } from 'somePackage/not/main/one'
 import { qux } from 'somePackage/not/main/two'
 ```
+
+#### Tydoc support
 
 Tydoc takes advantage of this to automatically detect when the entrypoint it is extracting is the main one or not.
 
@@ -122,9 +150,67 @@ Leads to extracted JSON:
 }
 ```
 
+### Support for `typeof` operator
+
+Tydoc will respect instances of `typeof` usage.
+
+For example:
+
+```ts
+const foo = 1
+
+export type Bar = {
+  foo: typeof foo
+}
+```
+
+```json5
+{
+  modules: [
+    {
+      namedExports: [
+        {
+          name: 'Bar',
+          type: {
+            kind: 'typeIndexRef',
+            link: '(example).Bar',
+          },
+          // ...
+        },
+      ],
+      // ...
+    },
+  ],
+  typeIndex: {
+    '(example).Bar': {
+      kind: 'alias',
+      name: 'Bar',
+      type: {
+        kind: 'object',
+        props: [
+          {
+            kind: 'prop',
+            name: 'foo',
+            // Notice how the type result of calling
+            // `typeof` has been inlined here.
+            type: {
+              kind: 'literal',
+              name: '1',
+              base: 'number',
+            },
+          },
+        ],
+        // ...
+      },
+      // ...
+    },
+  },
+}
+```
+
 ### Multiple Entrypoint Support
 
-Tydoc supports packages with multiple entrypoints.
+#### What does "multiple entrypoints" mean
 
 A package with multiple entrypoints means that your package has more than one module where your users are allowed to import things from. For example in the following `b.ts` and `c.ts` are official entrypoints into the package in addition to `a`.
 
@@ -142,6 +228,8 @@ import { foo } from 'some-package' // a
 import { bar } from 'some-package/b'
 import { qux } from 'some-package/c'
 ```
+
+#### Tydoc support
 
 Tydoc accepts multiple entrypoints on the CLI:
 
@@ -212,11 +300,13 @@ export default a
 
 ### Type Index
 
-The types in a package are potentially a graph of references, so Tydoc always creates a type index. When Tydoc is extracting type information from your package, it keeps extracted types in the type index rather than documenting types inline.
+The types in a package are a graph of references, so Tydoc always creates a type index. What this means is that when Tydoc is extracting type information from your package, it keeps extracted types in the type index rather than documenting types inline.
 
-#### Non-exported types of named exports
+#### Non-exported types of exported terms show up in the Type Index
 
 For example in the following module `Foo` is not exported. But since the exported term `foo` references it, it will still be part of the type index.
+
+In this way the Type Index is a representation of all the possible types that your users could encounter as they use your package.
 
 ```ts
 type Foo = { a: string }
@@ -267,7 +357,7 @@ export const foo: Foo = { a: 'bar' }
 }
 ```
 
-#### Types of named exports reference the type index
+#### Exported Types of exported terms reference the type index
 
 For example in the following module the `Foo` type will be indexed and referenced by the two named exports here. Note that `Foo` type is treated as both a named export and a type in the type index. Tydoc decouples the concepts.
 
