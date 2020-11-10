@@ -72,6 +72,17 @@ it('raw is based on type alias declaration node', () => {
   `)
 })
 
+describe('regressions', () => {
+  it('exported type alias used to type an exported term is added to the type index', () => {
+    expect(
+      ctx.extract(`
+        export type Foo = string
+        export const foo: Foo = 'bar'
+      `)
+    ).toMatchSnapshot()
+  })
+})
+
 it('exported type alias of number is added to type index', () => {
   expect(
     ctx.extract(`

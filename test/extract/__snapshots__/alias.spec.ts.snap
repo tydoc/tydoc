@@ -446,3 +446,59 @@ export type A = typeof a;",
   },
 }
 `;
+
+exports[`regressions exported type alias used to type an exported term is added to the type index 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "isMain": true,
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/src/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "Foo",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).Foo",
+          },
+        },
+        Object {
+          "isTerm": true,
+          "isType": false,
+          "kind": "export",
+          "name": "foo",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).Foo",
+          },
+        },
+      ],
+      "path": "/",
+      "tsdoc": null,
+    },
+  ],
+  "typeIndex": Object {
+    "(a).Foo": Object {
+      "kind": "alias",
+      "name": "Foo",
+      "raw": Object {
+        "nodeFullText": "export type Foo = string;",
+        "nodeText": "export type Foo = string;",
+        "typeText": "string",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "kind": "primitive",
+        "type": "string",
+      },
+    },
+  },
+}
+`;

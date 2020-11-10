@@ -1,5 +1,8 @@
 import * as tsm from 'ts-morph'
 
+tsm.VariableDeclarationList
+tsm.TypeReferenceNode
+
 const project = new tsm.Project({
   addFilesFromTsConfig: false,
   useInMemoryFileSystem: true,
@@ -8,6 +11,8 @@ const project = new tsm.Project({
 const sourceFile = project.createSourceFile(
   'playground.ts',
   `
+    export type Foo = string
+    export const foo: Foo = 'bar'
   `
 )
 
@@ -20,6 +25,16 @@ node.getLeadingCommentRanges().map((cr) => cr.getText())[0] //?
 node.getChildren().length //?
 node.getChildren()[0].getKindName() //?
 node.getChildren()[1].getKindName() //?
+
+const n = node.getChildren()[1]
+n.getText() //?
+n.getType().getText() //?
+n.getChildren()[1].getKindName() //?
+const n2 = n.getChildren()[1] as tsm.VariableDeclarationList //?
+n2.getDeclarations()[0] //?
+n.getChildren()[1].getChildren()[1].getText() //?
+n.getChildren()[1].getChildren()[1].getKindName() //?
+n.getChildren()[1].getChildren()[1].getType() //?
 
 // sourceFile.getChildren().forEach(n => {
 //   n.getKindName() //?
