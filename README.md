@@ -540,7 +540,7 @@ Tydoc supports union types.
 
 For example:
 
-```
+```ts
 export type Foo = 'a' | 'b'
 ```
 
