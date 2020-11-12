@@ -7,7 +7,10 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Features](#features)
+  - [Future](#future)
+- [Feature Guide](#feature-guide)
   - [CLI](#cli)
   - [JSON Representation](#json-representation)
   - [Markdown Representation](#markdown-representation)
@@ -23,8 +26,9 @@ Work in progress 👷‍
   - [Type Index](#type-index)
     - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
     - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
-  - [TsDoc](#tsdoc)
     - [Module Level TsDoc](#module-level-tsdoc)
+    - [Qualified Module Paths](#qualified-module-paths)
+  - [Union Types](#union-types)
 - [API](#api)
   - [`renderMarkdown`](#rendermarkdown)
   - [`fromProject`](#fromproject)
@@ -61,6 +65,30 @@ Work in progress 👷‍
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Features
+
+- Support for named exports
+- Support for default exports
+- Support for multiple modules
+- Automatic main module detection
+- Type Index to dedupe type referenes
+- CLI
+- API
+- JSON output
+- Markdown output
+- Interfaces
+- Type aliases
+- Typeof operator
+- Union types
+- Function signatures
+- Discriminant union detection
+- Support for unions with multiple discriminants
+
+### Future
+
+- Parse jsdoc on extracted items
+- Parse jsdoc on modules
+
+## Feature Guide
 
 > **Note**: The following feature examples show JSON in [JSON5](https://json5.org/) format so that comments may be rendered with the examples. Just understand that Tydoc actually emits JSON, not JSON5.
 
@@ -106,7 +134,7 @@ There is a bundled markdown renderer. You can use it from the command line like 
 tydoc project --markdown main > docs.md
 ```
 
-For an example of what the output looks like see the Tydoc repo `README.md` "API" section.
+For an example of what the output looks like see the [Tydoc repo `README.md` "API" section](https://github.com/jasonkuhrt/tydoc/tree/docs/features#api).
 
 ### Automatic Main-Entrypoint Detection
 
@@ -391,10 +419,6 @@ export const foo: Foo = { a: 'bar' }
 }
 ```
 
-### TsDoc
-
-TyDoc supports TsDoc which is a stricter version of JsDoc.
-
 #### Module Level TsDoc
 
 If you write TsDoc at the top of your module then it will be treated as module-level documentation.
@@ -471,6 +495,82 @@ function foo() {}
       },
     },
   ],
+}
+```
+
+#### Qualified Module Paths
+
+Tydoc fully qualifies each type name in the type index. This version of a type name is referred to as its "fully qualified type name", abbreviated as FQTN. The FQTN makes it possible to keep different types with the same name in the index.
+
+For example:
+
+```ts
+// a.ts
+import * as B from './foo/bar/b'
+import * as A from './tim/buk/c'
+
+export const a: B.Foo = { b: 1 }
+export const b: C.Foo = { c: 2 }
+```
+
+```ts
+// b.ts
+export type Foo = { b: 2 }
+```
+
+```ts
+// c.ts
+export type Foo = { c: 3 }
+```
+
+Would result in two `Foo` types in the type index, qualified with paths `b` and `c`:
+
+```json5
+{
+  typeIndex: {
+    '(foo/bar/b).Foo': {},
+    '(tim/buk/c).Foo': {},
+  },
+}
+```
+
+### Union Types
+
+Tydoc supports union types.
+
+For example:
+
+```
+export type Foo = 'a' | 'b'
+```
+
+Leads to type index entry:
+
+```json5
+{
+  typeIndex: {
+    '(example).Foo': {
+      kind: 'alias',
+      name: 'Foo',
+      type: {
+        kind: 'union',
+        isDiscriminated: false,
+        discriminantProperties: null,
+        types: [
+          {
+            kind: 'literal',
+            name: '"a"',
+            base: 'string',
+          },
+          {
+            kind: 'literal',
+            name: '"b"',
+            base: 'string',
+          },
+        ],
+      },
+    },
+  },
 }
 ```
 

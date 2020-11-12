@@ -125,7 +125,7 @@ it('when multiple entrypoints, typeindex is only rendered once', () => {
         export let c:C = {}
       `,
       {
-        anEntrypoint: true,
+        isEntrypoint: true,
         content: `
           /**
            * About this module b...
