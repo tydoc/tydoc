@@ -7,7 +7,6 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Features](#features)
   - [Future](#future)
 - [Feature Guide](#feature-guide)
@@ -68,9 +67,10 @@ Work in progress 👷‍
 
 - Support for named exports
 - Support for default exports
-- Support for multiple modules
+- Support for packages with multiple entrypoints
 - Automatic main module detection
 - Type Index to dedupe type referenes
+- Support for different same-name types by using module paths to disambiguate (fully qualified type name aka. "FQTN")
 - CLI
 - API
 - JSON output
