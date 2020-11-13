@@ -7,6 +7,7 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Features](#features)
   - [Future](#future)
 - [Feature Guide](#feature-guide)
@@ -23,11 +24,14 @@ Work in progress 👷‍
   - [Named Exports](#named-exports)
   - [Main Export](#main-export)
   - [Type Index](#type-index)
-    - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
     - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
+    - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
     - [Module Level TsDoc](#module-level-tsdoc)
     - [Qualified Module Paths](#qualified-module-paths)
   - [Union Types](#union-types)
+  - [Discriminant Union Types Detection](#discriminant-union-types-detection)
+    - [About Discriminant Union Types in TypeScript](#about-discriminant-union-types-in-typescript)
+    - [About Discriminant Union Types in Tydoc](#about-discriminant-union-types-in-tydoc)
 - [API](#api)
   - [`renderMarkdown`](#rendermarkdown)
   - [`fromProject`](#fromproject)
@@ -544,8 +548,6 @@ For example:
 export type Foo = 'a' | 'b'
 ```
 
-Leads to type index entry:
-
 ```json5
 {
   typeIndex: {
@@ -576,7 +578,41 @@ Leads to type index entry:
 
 ### Discriminant Union Types Detection
 
-Tydoc will detect if all members of a union type have a property in common and if so mark the union type as being descriminated and capture which property is the discriminant. If multiple properties could act as discriminants then Tydoc captures them all.
+#### About Discriminant Union Types in TypeScript
+
+TypeScript supports the concept of discriminant union types. It simply means that among the members of the union there is a common property that can be used at runtime to narrow which member is being worked with.
+
+```ts
+type Fruit = Apple | Banana
+type Apple = { kind: 'Apple'; crispy: boolean }
+type Banana = { kind: 'Banana'; slippery: boolean }
+
+const members = [
+  { kind: 'Apple', crispy: true },
+  { kind: 'Banana', slippery: false }
+] as const
+
+const fruit: Fruit = members[Math.floor(Math.random() * 2]
+
+if (fruit.kind === 'Apple') {
+  fruit.crispy // narrows to type Apple
+}
+
+if (fruit.kind === 'Banana') {
+  fruit.slippery // narrows to type Banana
+}
+```
+
+Although the type of a discriminant property is typically a string literal it does not have to be. The requirements are that:
+
+1. Must: The types do not overlap. For example if all `kind` properties above were of type `string` then the checks would not be sufficient to know which member is being worked with. TS statically enforces this.
+2. Should: The types can be checked predictably at runtime via equality operator `===`/`==`. For example if the `kind` properties above were of type `string` and `number` then the checks needed at runtime would be infinite... (and now if you're wondering if TS permits testing the discriminant with JS's `typeof` operator, the answer is no).
+
+#### About Discriminant Union Types in Tydoc
+
+Tydoc supports this pattern.
+
+Tydoc will detect if all members of a union type have a property in common whose type does not overlap and if so mark the union type as being descriminated and capture which property is the discriminant. If multiple properties could act as discriminants then Tydoc captures them all.
 
 For example:
 
