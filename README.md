@@ -32,6 +32,9 @@ Work in progress 👷‍
   - [Discriminant Union Types Detection](#discriminant-union-types-detection)
     - [About Discriminant Union Types in TypeScript](#about-discriminant-union-types-in-typescript)
     - [About Discriminant Union Types in Tydoc](#about-discriminant-union-types-in-tydoc)
+  - [Functions](#functions)
+  - [Overloaded Functions](#overloaded-functions)
+  - [Callable Namespaces](#callable-namespaces)
 - [API](#api)
   - [`renderMarkdown`](#rendermarkdown)
   - [`fromProject`](#fromproject)
@@ -69,28 +72,31 @@ Work in progress 👷‍
 
 ## Features
 
+- CLI
+- API
+- JSON output
+- Markdown output
 - Support for named exports
 - Support for default exports
 - Support for packages with multiple entrypoints
 - Automatic main module detection
 - Type Index to dedupe type referenes
 - Support for different same-name types by using module paths to disambiguate (fully qualified type name aka. "FQTN")
-- CLI
-- API
-- JSON output
-- Markdown output
 - Interfaces
 - Type aliases
-- Typeof operator
 - Union types
-- Function signatures
 - Discriminant union detection
 - Support for unions with multiple discriminants
+- Functions
+- Overloaded functions
+- Callable namespaces (functions with properties)
+- Typeof operator
 
 ### Future
 
 - Parse jsdoc on extracted items
 - Parse jsdoc on modules
+- classes
 
 ## Feature Guide
 
@@ -103,8 +109,8 @@ Work in progress 👷‍
 Tydoc comes with a CLI. Use the `project` sub-command at the root of your node package (where `package.json` resides) to generate your API documentation.
 
 ```
-cd my/node/package
-tydoc project <entrypoint1> <entrypoint2> ...
+$ cd my/node/package
+$ tydoc project a b ...
 ```
 
 Pass as many entrypoints as there are in your node package. All paths given are relative to your source root. Source root is the `rootDir` as configured in your `tsconfig.json`. If not set then source root is the current working directory.
@@ -135,7 +141,7 @@ The types are extensively documented inline so read them to learn more about the
 There is a bundled markdown renderer. You can use it from the command line like so:
 
 ```
-tydoc project --markdown main > docs.md
+$ tydoc project --markdown main > docs.md
 ```
 
 For an example of what the output looks like see the [Tydoc repo `README.md` "API" section](https://github.com/jasonkuhrt/tydoc/tree/docs/features#api).
@@ -147,7 +153,6 @@ For an example of what the output looks like see the [Tydoc repo `README.md` "AP
 All valid Node packages must specify their main entrtypoint in `package.json` like so:
 
 ```json
-// package.json
 {
   "name": "somePackage",
   "main": "./path/to/main.js"
@@ -637,6 +642,152 @@ type C = { c: 3; kind1: 'C1'; kind2: 'C2' }
   },
 }
 ```
+
+### Functions
+
+Tydoc supports extracting documentation from functions. The Signature is extracted into an array because there can be multiple signatures in cases of overloaded functions. If `isOverloaded` is `false` then `sigs` is guaranteed to be an array of length one.
+
+For example:
+
+```ts
+export function foo(x: string, y: boolean): number {
+  // ...
+}
+```
+
+```json5
+{
+  modules: [
+    {
+      kind: 'module',
+      namedExports: [
+        {
+          kind: 'export',
+          name: 'foo',
+          type: {
+            kind: 'callable',
+            isOverloaded: false,
+            hasProps: false,
+            props: [],
+            sigs: [ <-- guaranteed one signature here becuase `isOverloaded` is `false`
+              {
+                kind: 'sig',
+                return: {
+                  kind: 'primitive',
+                  type: 'number',
+                },
+                params: [
+                  {
+                    kind: 'sigParam',
+                    name: 'x',
+                    type: {
+                      kind: 'primitive',
+                      type: 'string',
+                    },
+                  },
+                  {
+                    kind: 'sigParam',
+                    name: 'y',
+                    type: {
+                      kind: 'primitive',
+                      type: 'boolean',
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+```
+
+### Overloaded Functions
+
+Tydoc supports extracting documentation from overloaded functions. It sets `isOverloaded` to `true` in such cases.
+
+For example:
+
+```ts
+function foo(x: RegExp): boolean
+function foo(a: string, b: number): number
+function foo(...args: [RegExp] | [string, number]) {
+  // ...
+}
+
+export { foo }
+```
+
+```json5
+{
+  modules: [
+    {
+      kind: 'module',
+      namedExports: [
+        {
+          kind: 'export',
+          name: 'foo',
+          type: {
+            kind: 'callable',
+            isOverloaded: true, // <-- true
+            hasProps: false,
+            props: [],
+            sigs: [ <-- All signatures are contained in this array
+              {
+                kind: 'sig',
+                return: {
+                  kind: 'primitive',
+                  type: 'boolean',
+                },
+                params: [
+                  {
+                    kind: 'sigParam',
+                    name: 'x',
+                    type: {
+                      kind: 'unsupported',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'sig',
+                return: {
+                  kind: 'primitive',
+                  type: 'number',
+                },
+                params: [
+                  {
+                    kind: 'sigParam',
+                    name: 'a',
+                    type: {
+                      kind: 'primitive',
+                      type: 'string',
+                    },
+                  },
+                  {
+                    kind: 'sigParam',
+                    name: 'b',
+                    type: {
+                      kind: 'primitive',
+                      type: 'number',
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+}
+```
+
+### Callable Namespaces
+
+todo
 
 ## API
 
