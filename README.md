@@ -319,14 +319,12 @@ export default a
 
 The types in a package are a graph of references, so Tydoc always creates a type index. What this means is that when Tydoc is extracting type information from your package, it keeps extracted types in the type index rather than documenting types inline.
 
-#### Non-exported types of exported terms show up in the Type Index
+#### Exported Types of exported terms reference the type index
 
-For example in the following module `Foo` is not exported. But since the exported term `foo` references it, it will still be part of the type index.
-
-In this way the Type Index is a representation of all the possible types that your users could encounter as they use your package.
+For example in the following module the `Foo` type will be indexed and referenced by the two named exports here. Note that `Foo` type is treated as both a named export and a type in the type index. Tydoc decouples the concepts.
 
 ```ts
-type Foo = { a: string }
+export type Foo = { a: string }
 
 export const foo: Foo = { a: 'bar' }
 ```
@@ -336,6 +334,12 @@ export const foo: Foo = { a: 'bar' }
   modules: [
     {
       namedExports: [
+        {
+          name: 'Foo',
+          type: {
+            link: '(test).Foo',
+          },
+        },
         {
           name: 'foo',
           type: {
@@ -367,12 +371,14 @@ export const foo: Foo = { a: 'bar' }
 }
 ```
 
-#### Exported Types of exported terms reference the type index
+#### Non-exported types of exported terms show up in the Type Index
 
-For example in the following module the `Foo` type will be indexed and referenced by the two named exports here. Note that `Foo` type is treated as both a named export and a type in the type index. Tydoc decouples the concepts.
+For example in the following module `Foo` is not exported. But since the exported term `foo` references it, it will still be part of the type index.
+
+In this way the Type Index is a representation of all the possible types that your users could encounter as they use your package.
 
 ```ts
-export type Foo = { a: string }
+type Foo = { a: string }
 
 export const foo: Foo = { a: 'bar' }
 ```
@@ -382,12 +388,6 @@ export const foo: Foo = { a: 'bar' }
   modules: [
     {
       namedExports: [
-        {
-          name: 'Foo',
-          type: {
-            link: '(test).Foo',
-          },
-        },
         {
           name: 'foo',
           type: {
@@ -568,6 +568,34 @@ Leads to type index entry:
             base: 'string',
           },
         ],
+      },
+    },
+  },
+}
+```
+
+### Discriminant Union Types Detection
+
+Tydoc will detect if all members of a union type have a property in common and if so mark the union type as being descriminated and capture which property is the discriminant. If multiple properties could act as discriminants then Tydoc captures them all.
+
+For example:
+
+```ts
+export type A = B | C
+type B = { b: 2; kind1: 'B1'; kind2: 'B2' }
+type C = { c: 3; kind1: 'C1'; kind2: 'C2' }
+```
+
+```json5
+{
+  typeIndex: {
+    '(a).A': {
+      kind: 'alias',
+      name: 'A',
+      type: {
+        kind: 'union',
+        discriminantProperties: ['kind1', 'kind2'],
+        isDiscriminated: true,
       },
     },
   },
