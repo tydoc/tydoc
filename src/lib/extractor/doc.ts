@@ -633,15 +633,14 @@ export function intersection(input: IntersectionInput): DocTypeIntersection {
 // prettier-ignore
 export type DocTypeUnion = { kind:'union', isDiscriminated: boolean, discriminantProperties: null | string[], types: Node[] } & RawFrag
 
-type UnionInput = { types: Node[] } & RawFrag
+type UnionInput = { types: Node[]; discriminantProperties: string[] } & RawFrag
 
 export function union(input: UnionInput): DocTypeUnion {
-  const discriminantProperties = findDiscriminant(input.types)
   return {
     kind: 'union',
-    isDiscriminated: discriminantProperties !== null,
-    discriminantProperties,
     ...input,
+    isDiscriminated: input.discriminantProperties.length > 0,
+    discriminantProperties: input.discriminantProperties.length > 0 ? input.discriminantProperties : null,
   }
 }
 
@@ -654,14 +653,18 @@ function findDiscriminant(nodes: Node[]): null | string[] {
     if (n.kind !== 'callable' && n.kind !== 'interface' && n.kind !== 'object') {
       return null
     }
+
     const props = n.props.map((p) => p.name)
+
     if (isLoop1) {
       possible = props
       isLoop1 = false
     } else {
       possible = lo.intersection(possible, props)
     }
+
     if (possible.length === 0) return null
   }
+
   return possible
 }

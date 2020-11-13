@@ -3,8 +3,18 @@ import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
+import {
+  getDiscriminantPropertiesOfUnionMembers,
+  getProperties
+} from '../../utils'
 import * as Doc from './doc'
-import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
+import {
+  getLocationKind,
+  getNodeFromTypePreferingAlias,
+  hasAlias,
+  isCallable,
+  isPrimitive
+} from './utils'
 
 const debug = Debug('tydoc:extract')
 const debugExport = Debug('tydoc:extract:export')
@@ -401,20 +411,23 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   }
   if (t.isUnion()) {
     debugVisible('-> type is union')
-    return manager.indexTypeIfApplicable(t, () =>
-      extractAliasIfOne(
+    return manager.indexTypeIfApplicable(t, () => {
+      const members = t.getUnionTypes()
+      const discriminantProperties = getDiscriminantPropertiesOfUnionMembers(members)
+      return extractAliasIfOne(
         manager,
         t,
         Doc.union({
           ...getRaw(t),
-          types: t.getUnionTypes().map((tm) => {
+          discriminantProperties: discriminantProperties.map((p) => p.getName()),
+          types: members.map((tm) => {
             debugVisible('-> handle union member %s', tm.getText())
             // todo no extract alias here ...
             return extractAliasIfOne(manager, tm, fromType(manager, tm))
           }),
         })
       )
-    )
+    })
   }
   if (t.isIntersection()) {
     debugVisible('-> type is intersection')
@@ -472,15 +485,13 @@ function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
  * Extract docs from the type's properties.
  */
 function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
-  return t.getProperties().map((p) => {
-    // prettier-ignore
-    const node = p.getDeclarations()[0] as tsm.PropertySignature | tsm.MethodSignature
+  return getProperties(t).map((p) => {
     const propName = p.getName()
-    const propType = node.getType()
+    const propType = p.getType()
     // what is this method for then? It was just returning an `any` type
     // const propType = p.getDeclaredType()
     // prettier-ignore
-    debugVisible('handle property: %s %s %s', node.getKindName(), propName, propType.getText())
+    debugVisible('handle property: %s %s %s', p.getKindName(), propName, propType.getText())
     // Do not try to index type here. Must come after index lookup.
     return Doc.prop({
       name: propName,
