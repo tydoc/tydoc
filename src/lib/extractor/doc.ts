@@ -262,18 +262,18 @@ export type TypeNode =
 // Node Features
 //
 
-/**
- * The extracted tsdoc for this entity (module, type, term). If none, is null.
- */
 export type TSDocFrag = {
+  /**
+   * The extracted tsdoc for this entity (module, type, term). If none, is null.
+   */
   tsdoc: null | TSDoc
 }
 
 export interface TSDoc {
-  raw: string
   summary: string
   examples: { text: string }[]
   customTags: { name: string; text: string }[]
+  raw: string
 }
 
 export type RawFrag = {
@@ -584,8 +584,22 @@ type objInput = Omit<DocTypeObject, 'kind'>
 export function obj(input: objInput ): DocTypeObject {
   return { kind: 'object', ...input }
 }
-// prettier-ignore
-export type DocTypeCallable = { kind: 'callable', isOverloaded: boolean, hasProps:boolean, sigs: DocSig[], props: DocProp[] } & RawFrag
+
+export type DocTypeCallable = {
+  kind: 'callable'
+  isOverloaded: boolean
+  // todo rename to isNamespace
+  hasProps: boolean
+  /**
+   * Signatures extracted for this function.
+   *
+   * @remarks
+   *
+   * This is an array because overloaded functions have multiple signatures. Look at property "isOverloaded" to know if this function is overloaded or not. If it is overloaded that means this array is guaranteed to have two or more signatures. Otherwise this array is guaranteed to have exactly one signature.
+   */
+  sigs: DocSig[]
+  props: DocProp[]
+} & RawFrag
 // prettier-ignore
 type callableInput = Omit<DocTypeCallable, 'kind' | 'isOverloaded' | 'hasProps'>
 // prettier-ignore
