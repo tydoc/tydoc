@@ -1,0 +1,706 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`if union members share a common property name then union is considered a discriminant union alias object 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "isMain": true,
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/src/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).A",
+          },
+        },
+      ],
+      "path": "/",
+      "tsdoc": null,
+    },
+  ],
+  "typeIndex": Object {
+    "(a).A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "export type A = B | C;",
+        "nodeText": "export type A = B | C;",
+        "typeText": "A",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "discriminantProperties": Array [
+          "kind",
+        ],
+        "isDiscriminated": true,
+        "kind": "union",
+        "raw": Object {
+          "nodeFullText": "export type A = B | C;",
+          "nodeText": "export type A = B | C;",
+          "typeText": "A",
+        },
+        "types": Array [
+          Object {
+            "kind": "alias",
+            "name": "B",
+            "raw": Object {
+              "nodeFullText": "type B = { b: 2; kind: \\"B\\" };",
+              "nodeText": "type B = { b: 2; kind: \\"B\\" };",
+              "typeText": "B",
+            },
+            "tsdoc": null,
+            "type": Object {
+              "kind": "typeIndexRef",
+              "link": "(a).B",
+            },
+          },
+          Object {
+            "kind": "alias",
+            "name": "C",
+            "raw": Object {
+              "nodeFullText": "type C = { c: 3; kind: \\"C\\" };",
+              "nodeText": "type C = { c: 3; kind: \\"C\\" };",
+              "typeText": "C",
+            },
+            "tsdoc": null,
+            "type": Object {
+              "kind": "typeIndexRef",
+              "link": "(a).C",
+            },
+          },
+        ],
+      },
+    },
+    "(a).B": Object {
+      "kind": "alias",
+      "name": "B",
+      "raw": Object {
+        "nodeFullText": "type B = { b: 2; kind: \\"B\\" };",
+        "nodeText": "type B = { b: 2; kind: \\"B\\" };",
+        "typeText": "B",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "b",
+            "type": Object {
+              "base": "number",
+              "kind": "literal",
+              "name": "2",
+            },
+          },
+          Object {
+            "kind": "prop",
+            "name": "kind",
+            "type": Object {
+              "base": "string",
+              "kind": "literal",
+              "name": "\\"B\\"",
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "type B = { b: 2; kind: \\"B\\" };",
+          "nodeText": "type B = { b: 2; kind: \\"B\\" };",
+          "typeText": "B",
+        },
+      },
+    },
+    "(a).C": Object {
+      "kind": "alias",
+      "name": "C",
+      "raw": Object {
+        "nodeFullText": "type C = { c: 3; kind: \\"C\\" };",
+        "nodeText": "type C = { c: 3; kind: \\"C\\" };",
+        "typeText": "C",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "c",
+            "type": Object {
+              "base": "number",
+              "kind": "literal",
+              "name": "3",
+            },
+          },
+          Object {
+            "kind": "prop",
+            "name": "kind",
+            "type": Object {
+              "base": "string",
+              "kind": "literal",
+              "name": "\\"C\\"",
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "type C = { c: 3; kind: \\"C\\" };",
+          "nodeText": "type C = { c: 3; kind: \\"C\\" };",
+          "typeText": "C",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`if union members share a common property name then union is considered a discriminant union interface 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "isMain": true,
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/src/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).A",
+          },
+        },
+      ],
+      "path": "/",
+      "tsdoc": null,
+    },
+  ],
+  "typeIndex": Object {
+    "(a).A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "export type A = B | C;",
+        "nodeText": "export type A = B | C;",
+        "typeText": "A",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "discriminantProperties": Array [
+          "kind",
+        ],
+        "isDiscriminated": true,
+        "kind": "union",
+        "raw": Object {
+          "nodeFullText": "export type A = B | C;",
+          "nodeText": "export type A = B | C;",
+          "typeText": "A",
+        },
+        "types": Array [
+          Object {
+            "kind": "typeIndexRef",
+            "link": "(a).B",
+          },
+          Object {
+            "kind": "typeIndexRef",
+            "link": "(a).C",
+          },
+        ],
+      },
+    },
+    "(a).B": Object {
+      "kind": "interface",
+      "name": "B",
+      "props": Array [
+        Object {
+          "kind": "prop",
+          "name": "b",
+          "type": Object {
+            "base": "number",
+            "kind": "literal",
+            "name": "2",
+          },
+        },
+        Object {
+          "kind": "prop",
+          "name": "kind",
+          "type": Object {
+            "base": "string",
+            "kind": "literal",
+            "name": "\\"B\\"",
+          },
+        },
+      ],
+      "raw": Object {
+        "nodeFullText": "interface B {
+  b: 2;
+  kind: \\"B\\";
+}",
+        "nodeText": "interface B {
+  b: 2;
+  kind: \\"B\\";
+}",
+        "typeText": "B",
+      },
+      "tsdoc": null,
+    },
+    "(a).C": Object {
+      "kind": "interface",
+      "name": "C",
+      "props": Array [
+        Object {
+          "kind": "prop",
+          "name": "c",
+          "type": Object {
+            "base": "number",
+            "kind": "literal",
+            "name": "3",
+          },
+        },
+        Object {
+          "kind": "prop",
+          "name": "kind",
+          "type": Object {
+            "base": "string",
+            "kind": "literal",
+            "name": "\\"C\\"",
+          },
+        },
+      ],
+      "raw": Object {
+        "nodeFullText": "interface C {
+  c: 3;
+  kind: \\"C\\";
+}",
+        "nodeText": "interface C {
+  c: 3;
+  kind: \\"C\\";
+}",
+        "typeText": "C",
+      },
+      "tsdoc": null,
+    },
+  },
+}
+`;
+
+exports[`if union members share multiple common properties then all are captured as discriminants alias object 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "isMain": true,
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/src/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).A",
+          },
+        },
+      ],
+      "path": "/",
+      "tsdoc": null,
+    },
+  ],
+  "typeIndex": Object {
+    "(a).A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "export type A = B | C;",
+        "nodeText": "export type A = B | C;",
+        "typeText": "A",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "discriminantProperties": Array [
+          "kind1",
+          "kind2",
+        ],
+        "isDiscriminated": true,
+        "kind": "union",
+        "raw": Object {
+          "nodeFullText": "export type A = B | C;",
+          "nodeText": "export type A = B | C;",
+          "typeText": "A",
+        },
+        "types": Array [
+          Object {
+            "kind": "alias",
+            "name": "B",
+            "raw": Object {
+              "nodeFullText": "type B = { b: 2; kind1: \\"B1\\"; kind2: \\"B2\\" };",
+              "nodeText": "type B = { b: 2; kind1: \\"B1\\"; kind2: \\"B2\\" };",
+              "typeText": "B",
+            },
+            "tsdoc": null,
+            "type": Object {
+              "kind": "typeIndexRef",
+              "link": "(a).B",
+            },
+          },
+          Object {
+            "kind": "alias",
+            "name": "C",
+            "raw": Object {
+              "nodeFullText": "type C = { c: 3; kind1: \\"C1\\"; kind2: \\"C2\\" };",
+              "nodeText": "type C = { c: 3; kind1: \\"C1\\"; kind2: \\"C2\\" };",
+              "typeText": "C",
+            },
+            "tsdoc": null,
+            "type": Object {
+              "kind": "typeIndexRef",
+              "link": "(a).C",
+            },
+          },
+        ],
+      },
+    },
+    "(a).B": Object {
+      "kind": "alias",
+      "name": "B",
+      "raw": Object {
+        "nodeFullText": "type B = { b: 2; kind1: \\"B1\\"; kind2: \\"B2\\" };",
+        "nodeText": "type B = { b: 2; kind1: \\"B1\\"; kind2: \\"B2\\" };",
+        "typeText": "B",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "b",
+            "type": Object {
+              "base": "number",
+              "kind": "literal",
+              "name": "2",
+            },
+          },
+          Object {
+            "kind": "prop",
+            "name": "kind1",
+            "type": Object {
+              "base": "string",
+              "kind": "literal",
+              "name": "\\"B1\\"",
+            },
+          },
+          Object {
+            "kind": "prop",
+            "name": "kind2",
+            "type": Object {
+              "base": "string",
+              "kind": "literal",
+              "name": "\\"B2\\"",
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "type B = { b: 2; kind1: \\"B1\\"; kind2: \\"B2\\" };",
+          "nodeText": "type B = { b: 2; kind1: \\"B1\\"; kind2: \\"B2\\" };",
+          "typeText": "B",
+        },
+      },
+    },
+    "(a).C": Object {
+      "kind": "alias",
+      "name": "C",
+      "raw": Object {
+        "nodeFullText": "type C = { c: 3; kind1: \\"C1\\"; kind2: \\"C2\\" };",
+        "nodeText": "type C = { c: 3; kind1: \\"C1\\"; kind2: \\"C2\\" };",
+        "typeText": "C",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "kind": "object",
+        "props": Array [
+          Object {
+            "kind": "prop",
+            "name": "c",
+            "type": Object {
+              "base": "number",
+              "kind": "literal",
+              "name": "3",
+            },
+          },
+          Object {
+            "kind": "prop",
+            "name": "kind1",
+            "type": Object {
+              "base": "string",
+              "kind": "literal",
+              "name": "\\"C1\\"",
+            },
+          },
+          Object {
+            "kind": "prop",
+            "name": "kind2",
+            "type": Object {
+              "base": "string",
+              "kind": "literal",
+              "name": "\\"C2\\"",
+            },
+          },
+        ],
+        "raw": Object {
+          "nodeFullText": "type C = { c: 3; kind1: \\"C1\\"; kind2: \\"C2\\" };",
+          "nodeText": "type C = { c: 3; kind1: \\"C1\\"; kind2: \\"C2\\" };",
+          "typeText": "C",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`if union members share multiple common properties then all are captured as discriminants interface 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "isMain": true,
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/src/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).A",
+          },
+        },
+      ],
+      "path": "/",
+      "tsdoc": null,
+    },
+  ],
+  "typeIndex": Object {
+    "(a).A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "export type A = B | C;",
+        "nodeText": "export type A = B | C;",
+        "typeText": "A",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "discriminantProperties": Array [
+          "kind1",
+          "kind2",
+        ],
+        "isDiscriminated": true,
+        "kind": "union",
+        "raw": Object {
+          "nodeFullText": "export type A = B | C;",
+          "nodeText": "export type A = B | C;",
+          "typeText": "A",
+        },
+        "types": Array [
+          Object {
+            "kind": "typeIndexRef",
+            "link": "(a).B",
+          },
+          Object {
+            "kind": "typeIndexRef",
+            "link": "(a).C",
+          },
+        ],
+      },
+    },
+    "(a).B": Object {
+      "kind": "interface",
+      "name": "B",
+      "props": Array [
+        Object {
+          "kind": "prop",
+          "name": "b",
+          "type": Object {
+            "base": "number",
+            "kind": "literal",
+            "name": "2",
+          },
+        },
+        Object {
+          "kind": "prop",
+          "name": "kind1",
+          "type": Object {
+            "base": "string",
+            "kind": "literal",
+            "name": "\\"B1\\"",
+          },
+        },
+        Object {
+          "kind": "prop",
+          "name": "kind2",
+          "type": Object {
+            "base": "string",
+            "kind": "literal",
+            "name": "\\"B2\\"",
+          },
+        },
+      ],
+      "raw": Object {
+        "nodeFullText": "interface B {
+  b: 2;
+  kind1: \\"B1\\";
+  kind2: \\"B2\\";
+}",
+        "nodeText": "interface B {
+  b: 2;
+  kind1: \\"B1\\";
+  kind2: \\"B2\\";
+}",
+        "typeText": "B",
+      },
+      "tsdoc": null,
+    },
+    "(a).C": Object {
+      "kind": "interface",
+      "name": "C",
+      "props": Array [
+        Object {
+          "kind": "prop",
+          "name": "c",
+          "type": Object {
+            "base": "number",
+            "kind": "literal",
+            "name": "3",
+          },
+        },
+        Object {
+          "kind": "prop",
+          "name": "kind1",
+          "type": Object {
+            "base": "string",
+            "kind": "literal",
+            "name": "\\"C1\\"",
+          },
+        },
+        Object {
+          "kind": "prop",
+          "name": "kind2",
+          "type": Object {
+            "base": "string",
+            "kind": "literal",
+            "name": "\\"C2\\"",
+          },
+        },
+      ],
+      "raw": Object {
+        "nodeFullText": "interface C {
+  c: 3;
+  kind1: \\"C1\\";
+  kind2: \\"C2\\";
+}",
+        "nodeText": "interface C {
+  c: 3;
+  kind1: \\"C1\\";
+  kind2: \\"C2\\";
+}",
+        "typeText": "C",
+      },
+      "tsdoc": null,
+    },
+  },
+}
+`;
+
+exports[`union types are extracted 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "isMain": true,
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/src/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).A",
+          },
+        },
+      ],
+      "path": "/",
+      "tsdoc": null,
+    },
+  ],
+  "typeIndex": Object {
+    "(a).A": Object {
+      "kind": "alias",
+      "name": "A",
+      "raw": Object {
+        "nodeFullText": "export type A = 1 | 2;",
+        "nodeText": "export type A = 1 | 2;",
+        "typeText": "A",
+      },
+      "tsdoc": null,
+      "type": Object {
+        "discriminantProperties": Array [
+          "toString",
+          "toFixed",
+          "toExponential",
+          "toPrecision",
+          "valueOf",
+          "toLocaleString",
+        ],
+        "isDiscriminated": true,
+        "kind": "union",
+        "raw": Object {
+          "nodeFullText": "export type A = 1 | 2;",
+          "nodeText": "export type A = 1 | 2;",
+          "typeText": "A",
+        },
+        "types": Array [
+          Object {
+            "base": "number",
+            "kind": "literal",
+            "name": "1",
+          },
+          Object {
+            "base": "number",
+            "kind": "literal",
+            "name": "2",
+          },
+        ],
+      },
+    },
+  },
+}
+`;

@@ -1,6 +1,10 @@
+import { intersectionBy } from 'lodash'
 import * as tsm from 'ts-morph'
 import { inspect } from 'util'
-import { dumpNode, dumpType } from './lib/extractor/utils'
+import {
+  dumpNode,
+  dumpType
+} from './lib/extractor/utils'
 
 export type ArrayOrVarg<T> = T[] | [T[]]
 
@@ -27,4 +31,21 @@ export function dump(...args: any[]) {
 
   const argsInspected = args.map((a) => inspect(a, { depth: 20 }))
   console.error(...argsInspected)
+}
+
+export function getDiscriminantPropertiesOfUnionMembers(
+  members: tsm.Type[]
+): (tsm.PropertySignature | tsm.MethodSignature)[] {
+  const membersProperties = members.map((m) => getProperties(m))
+  const commonMemberProperties = intersectionBy(...membersProperties, (p) => {
+    return p.getName()
+  })
+  return commonMemberProperties
+}
+
+export function getProperties(t: tsm.Type): (tsm.PropertySignature | tsm.MethodSignature)[] {
+  return t.getProperties().map((p) => {
+    const node = p.getDeclarations()[0] as tsm.PropertySignature | tsm.MethodSignature
+    return node
+  })
 }
