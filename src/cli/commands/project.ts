@@ -18,6 +18,7 @@ export class Project extends Command {
     }),
     projectDir: flags.string({
       char: 'p',
+      helpValue: './projects/my-awesome-project',
     }),
     json: flags.boolean({
       default: false,
