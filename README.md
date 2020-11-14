@@ -7,7 +7,6 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Features](#features)
   - [Future](#future)
 - [Feature Guide](#feature-guide)
@@ -787,7 +786,69 @@ export { foo }
 
 ### Callable Namespaces
 
-todo
+Tydoc supports callable namespaces. These are basically functions with properties. In TS they can be represented like so:
+
+```ts
+interface foo {
+  (x: string): boolean
+  bar: string
+  qux: number
+}
+```
+
+In JS it would look like:
+
+```ts
+function foo(x) {
+  //...
+}
+foo.bar = 'something'
+foo.qux = 0
+```
+
+In Tydoc:
+
+```json5
+{
+  typeIndex: {
+    '(a).foo': {
+      kind: 'callable',
+      hasProps: true, // <-- true
+      props: [
+        // filled with extracted properties
+        {
+          kind: 'prop',
+          name: 'a',
+          type: {
+            kind: 'literal',
+            base: 'number',
+            name: '1',
+          },
+        },
+        {
+          kind: 'prop',
+          name: 'b',
+          type: {
+            kind: 'literal',
+            base: 'number',
+            name: '2',
+          },
+        },
+      ],
+      sigs: [
+        {
+          kind: 'sig',
+          params: [],
+          return: {
+            kind: 'primitive',
+            type: 'boolean',
+          },
+        },
+      ],
+    },
+  },
+}
+```
 
 ## API
 
