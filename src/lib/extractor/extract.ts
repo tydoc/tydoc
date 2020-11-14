@@ -180,7 +180,8 @@ export function fromProject(opts: Options): Doc.DocPackage {
   const diagnostics = project.getPreEmitDiagnostics()
   if (diagnostics.length) {
     const message = project.formatDiagnosticsWithColorAndContext(diagnostics)
-    // throw new Error(message)
+    // TODO It would be nice to have a --force to not throw on errors here
+    throw new Error(message)
   }
 
   // If the project is empty dont' bother trying to extract docs
