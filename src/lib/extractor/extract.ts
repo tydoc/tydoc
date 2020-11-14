@@ -92,12 +92,6 @@ function readSettingsFromPackage(): Partial<Doc.Settings> {
  * exports will be considered part of the API.
  */
 export function fromProject(opts: Options): Doc.DocPackage {
-  const project =
-    opts.project ??
-    new tsm.Project({
-      tsConfigFilePath: path.join(process.cwd(), 'tsconfig.json'),
-    })
-
   // Wherever the user's package.json is. We assume for now that this tool is
   // running from project root.
   // todo there seems to be no way to get project dir from project instance??
@@ -110,6 +104,15 @@ export function fromProject(opts: Options): Doc.DocPackage {
     prjDir = process.cwd()
     debug('prjDir set to %s -- taken from current working directory', prjDir)
   }
+  const project =
+    opts.project ??
+    new tsm.Project({
+      tsConfigFilePath: path.join(prjDir, 'tsconfig.json'),
+      compilerOptions: {
+        skipLibCheck: true,
+        skipDefaultLibCheck: true
+      },
+    })
 
   // Find the source dir
   //
@@ -177,7 +180,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
   const diagnostics = project.getPreEmitDiagnostics()
   if (diagnostics.length) {
     const message = project.formatDiagnosticsWithColorAndContext(diagnostics)
-    throw new Error(message)
+    // throw new Error(message)
   }
 
   // If the project is empty dont' bother trying to extract docs
