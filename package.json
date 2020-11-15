@@ -9,6 +9,8 @@
   },
   "files": [
     "dist",
+    "./types.d.ts",
+    "./types.js",
     "/oclif.manifest.json"
   ],
   "scripts": {
