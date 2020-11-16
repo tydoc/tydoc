@@ -1,0 +1,25 @@
+name: pr
+
+on: [pull_request]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node-version: [14.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Test
+        run: yarn -s test
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '14.x'
+        uses: codecov/codecov-action@v1
+        with:
+          directory: ./coverage
