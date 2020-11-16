@@ -107,11 +107,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
   const project =
     opts.project ??
     new tsm.Project({
-      tsConfigFilePath: path.join(prjDir, 'tsconfig.json'),
-      compilerOptions: {
-        skipLibCheck: true,
-        skipDefaultLibCheck: true
-      },
+      tsConfigFilePath: path.join(prjDir, 'tsconfig.json')
     })
 
   // Find the source dir

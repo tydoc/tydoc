@@ -16,8 +16,8 @@ export class Project extends Command {
       char: 'm',
       exclusive: ['json'],
     }),
-    projectDir: flags.string({
-      char: 'p',
+    dir: flags.string({
+      char: 'd',
       helpValue: './projects/my-awesome-project',
     }),
     json: flags.boolean({
@@ -37,7 +37,7 @@ export class Project extends Command {
     const docs = TyDoc.fromProject({
       entrypoints: argv,
       readSettingsFromJSON: true,
-      prjDir: flags.projectDir ?? process.cwd(),
+      prjDir: flags.dir ?? process.cwd(),
     })
 
     if (flags.json) {
