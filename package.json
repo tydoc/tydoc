@@ -9,7 +9,9 @@
   },
   "files": [
     "dist",
-    "/oclif.manifest.json"
+    "types.d.ts",
+    "types.js",
+    "oclif.manifest.json"
   ],
   "scripts": {
     "build:docs:toc": "doctoc README.md",
