@@ -7,9 +7,10 @@ it('gets each member of the intersection', () => {
     Object {
       "modules": Array [
         Object {
+          "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/a.ts",
+            "absoluteFilePath": "/src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -21,27 +22,30 @@ it('gets each member of the intersection', () => {
               "name": "A",
               "type": Object {
                 "kind": "typeIndexRef",
-                "link": "(\\"/a\\").A",
+                "link": "(a).A",
               },
             },
           ],
+          "path": "/",
+          "tsdoc": null,
         },
       ],
       "typeIndex": Object {
-        "(\\"/a\\").A": Object {
+        "(a).A": Object {
           "kind": "alias",
           "name": "A",
           "raw": Object {
             "nodeFullText": "export type A = { s: string } & { b: boolean };",
             "nodeText": "export type A = { s: string } & { b: boolean };",
-            "typeText": "import(\\"/a\\").A",
+            "typeText": "A",
           },
+          "tsdoc": null,
           "type": Object {
             "kind": "intersection",
             "raw": Object {
               "nodeFullText": "export type A = { s: string } & { b: boolean };",
               "nodeText": "export type A = { s: string } & { b: boolean };",
-              "typeText": "import(\\"/a\\").A",
+              "typeText": "A",
             },
             "types": Array [
               Object {
@@ -88,7 +92,7 @@ it('gets each member of the intersection', () => {
   `)
 })
 
-it.only('gets each member of the intersection when inside a union', () => {
+it('gets each member of the intersection when inside a union', () => {
   expect(
     ctx.extract(`
       export type A = 1 | { s: string } & { b: boolean }

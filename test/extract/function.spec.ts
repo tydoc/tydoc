@@ -25,7 +25,7 @@ describe('parameters', () => {
       ],
     })
   })
-  it('of primitive types are documented inline', () => {
+  it('whose type are primitive are documented inline', () => {
     const docs = ctx.extract(`export function fa (pa: boolean, pb: string) {}`)
     expect(docs).toMatchObject({
       modules: [
@@ -48,7 +48,7 @@ describe('parameters', () => {
       ],
     })
   })
-  describe('refed interfaces', () => {
+  describe('parameters referencing an interface', () => {
     const docs = ctx.extract(`
         export function fa (a: A) {}
         interface A {}
@@ -60,7 +60,7 @@ describe('parameters', () => {
         },
       })
     })
-    it('ref the interface in the type index', () => {
+    it('function param references the interface in the type index', () => {
       expect(docs).toMatchObject({
         modules: [
           {
@@ -75,7 +75,7 @@ describe('parameters', () => {
         ],
       })
     })
-    it('inline interfaces are documented inline', () => {
+    it('inline objects are documented inline', () => {
       const docs = ctx.extract(`export function fa (pa: { a: boolean, b: {} }) {}`)
       expect(docs).toMatchObject({
         modules: [

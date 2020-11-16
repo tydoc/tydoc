@@ -1,10 +1,18 @@
-import { TSDocParser } from '@microsoft/tsdoc'
 import Debug from 'debug'
 import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
-import { Index, Thunk } from '../../utils'
-import { hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
+import { TSDocParser } from '@microsoft/tsdoc'
+import {
+  Index,
+  Thunk
+} from '../../utils'
+import {
+  hasAlias,
+  isPrimitive,
+  isTypeLevelNode,
+  renderTSDocNode
+} from './utils'
 
 const debug = Debug('tydoc:doc')
 
@@ -255,14 +263,17 @@ export type TypeNode =
 //
 
 export type TSDocFrag = {
+  /**
+   * The extracted tsdoc for this entity (module, type, term). If none, is null.
+   */
   tsdoc: null | TSDoc
 }
 
 export interface TSDoc {
-  raw: string
   summary: string
   examples: { text: string }[]
   customTags: { name: string; text: string }[]
+  raw: string
 }
 
 export type RawFrag = {
@@ -304,16 +315,25 @@ export function expor(input: ExporInput): Expor {
 // Module Node
 //
 
+/**
+ * A module (aka. file)
+ */
 export type DocModule = TSDocFrag & {
+  /**
+   * Tells you the kind of data (aka. schema) contained within this object.
+   */
   kind: 'module'
+  /**
+   * The name of the module (aka. file name). File extension or directory path not included.
+   */
   name: string
   /**
-   * The path to this module from package root. If this module is the root
+   * The path to this module from package root. If this module is the main
    * module then the path will be `/`.
    *
    * @remarks
    *
-   * This is what a user would place in their import `from `string _following_ the
+   * This is what a user would place in their import `from` string _following_ the
    * package name. For example:
    *
    * ```ts
@@ -322,10 +342,40 @@ export type DocModule = TSDocFrag & {
    * ```
    */
   path: string
+  /**
+   * Is this module the main one of the package?
+   *
+   * @remarks
+   *
+   * The main module of a package is the one that is specified in the
+   * package.json "main" field.
+   */
   isMain: boolean
+  /**
+   * Information about the main export from the module. If none, is null.
+   *
+   * @remarks
+   *
+   * The "main" export is the one exported using the `export default ...` syntax.
+   */
   mainExport: null | Node
+  /**
+   * Information about the named exports from the module. Being empty means the module
+   * does not have any named exports (it may still have a mainExport though).
+   */
   namedExports: Expor[]
+  /**
+   * Detailed location info about the module on disk.
+   */
   location: {
+    /**
+     *  The absolute location of the source file on disk
+     *  Note this points to the source TypeScript module, not the built JavaScript one.
+     *
+     *  An example value might be:
+     *
+     *  '/Users/jasonkuhrt/projects/prisma-labs/tydoc/src/lib/renderers/markdown.ts'
+     */
     absoluteFilePath: string
   }
 }
@@ -432,8 +482,34 @@ export function tsDocFromText(manager: Manager, raw: string) {
 // Package node
 //
 
+/**
+ * The root of the extracted JSON that Tydoc produces.
+ */
 export type DocPackage = {
+  /**
+   * List of the extracted modules. There may be more than one because a package
+   * may officially support importing from multiple modules.
+   */
   modules: DocModule[]
+  /**
+   * An index of the all the types that have been extracted. This includes three
+   * cases:
+   *
+   * 1. Directly exported types
+   * 2. Types referenced directly or indirectly by exported types.
+   *
+   * If a term is exported but the type it is annotated with is not exported
+   * then the type will not appear in the type index and the term's type info will
+   * inlined.
+   *
+   * If a term is exported and so it its annotated type then the term type info
+   * will be a reference to the type index.
+   *
+   * If a term is exported, but the type it is annotated with (A) is not, but the
+   * type (A) is referenced by another type (B) that _is_ exported, then the
+   * type (A) will appear in the type index referenced by type A, but the term
+   * will inline the type info of type A rather than be a type index reference.
+   */
   typeIndex: TypeIndex
 }
 
@@ -508,8 +584,22 @@ type objInput = Omit<DocTypeObject, 'kind'>
 export function obj(input: objInput ): DocTypeObject {
   return { kind: 'object', ...input }
 }
-// prettier-ignore
-export type DocTypeCallable = { kind: 'callable', isOverloaded: boolean, hasProps:boolean, sigs: DocSig[], props: DocProp[] } & RawFrag
+
+export type DocTypeCallable = {
+  kind: 'callable'
+  isOverloaded: boolean
+  // todo rename to isNamespace
+  hasProps: boolean
+  /**
+   * Signatures extracted for this function.
+   *
+   * @remarks
+   *
+   * This is an array because overloaded functions have multiple signatures. Look at property "isOverloaded" to know if this function is overloaded or not. If it is overloaded that means this array is guaranteed to have two or more signatures. Otherwise this array is guaranteed to have exactly one signature.
+   */
+  sigs: DocSig[]
+  props: DocProp[]
+} & RawFrag
 // prettier-ignore
 type callableInput = Omit<DocTypeCallable, 'kind' | 'isOverloaded' | 'hasProps'>
 // prettier-ignore

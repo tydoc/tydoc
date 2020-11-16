@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`a callable interface is marked as a callable namespace 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "isMain": true,
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/src/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).A",
+          },
+        },
+      ],
+      "path": "/",
+      "tsdoc": null,
+    },
+  ],
+  "typeIndex": Object {
+    "(a).A": Object {
+      "hasProps": true,
+      "isOverloaded": false,
+      "kind": "callable",
+      "props": Array [
+        Object {
+          "kind": "prop",
+          "name": "a",
+          "type": Object {
+            "base": "number",
+            "kind": "literal",
+            "name": "1",
+          },
+        },
+        Object {
+          "kind": "prop",
+          "name": "b",
+          "type": Object {
+            "base": "number",
+            "kind": "literal",
+            "name": "2",
+          },
+        },
+      ],
+      "raw": Object {
+        "nodeFullText": "export interface A {
+  (): boolean;
+  a: 1;
+  b: 2;
+}",
+        "nodeText": "export interface A {
+  (): boolean;
+  a: 1;
+  b: 2;
+}",
+        "typeText": "A",
+      },
+      "sigs": Array [
+        Object {
+          "kind": "sig",
+          "params": Array [],
+          "return": Object {
+            "kind": "primitive",
+            "type": "boolean",
+          },
+        },
+      ],
+    },
+  },
+}
+`;

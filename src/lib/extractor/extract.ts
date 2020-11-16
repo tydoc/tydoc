@@ -3,18 +3,9 @@ import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
-import {
-  getDiscriminantPropertiesOfUnionMembers,
-  getProperties
-} from '../../utils'
+import { getDiscriminantPropertiesOfUnionMembers, getProperties } from '../../utils'
 import * as Doc from './doc'
-import {
-  getLocationKind,
-  getNodeFromTypePreferingAlias,
-  hasAlias,
-  isCallable,
-  isPrimitive
-} from './utils'
+import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 
 const debug = Debug('tydoc:extract')
 const debugExport = Debug('tydoc:extract:export')
@@ -368,19 +359,8 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
       extractAliasIfOne(manager, t, Doc.array(fromType(manager, innerType)))
     )
   }
-  if (t.isInterface()) {
-    debugVisible('-> type is interface')
-    const s = t.getSymbolOrThrow()
-    return manager.indexTypeIfApplicable(t, () =>
-      Doc.inter({
-        name: s.getName(),
-        props: propertyDocsFromType(manager, t),
-        ...getTSDoc(manager, t),
-        ...getRaw(t),
-      })
-    )
-  }
   // Place before object becuase objects are superset.
+  // Place before interface becuase interfaces can be callable
   if (isCallable(t)) {
     debugVisible('-> type is callable')
     return manager.indexTypeIfApplicable(t, () =>
@@ -395,6 +375,19 @@ function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
       )
     )
   }
+  if (t.isInterface()) {
+    debugVisible('-> type is interface')
+    const s = t.getSymbolOrThrow()
+    return manager.indexTypeIfApplicable(t, () =>
+      Doc.inter({
+        name: s.getName(),
+        props: propertyDocsFromType(manager, t),
+        ...getTSDoc(manager, t),
+        ...getRaw(t),
+      })
+    )
+  }
+
   // Place after callable check because objects are superset.
   if (t.isObject()) {
     debugVisible('-> type is object')
