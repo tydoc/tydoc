@@ -33,13 +33,14 @@ Work in progress 👷‍
   - [Overloaded Functions](#overloaded-functions)
   - [Callable Namespaces](#callable-namespaces)
   - [Union Types](#union-types)
-  - [Discriminant Union Types Detection](#discriminant-union-types-detection)
+  - [Discriminant Union Types](#discriminant-union-types)
     - [Theory](#theory-1)
     - [Tydoc Support](#tydoc-support-1)
   - [Intersection Types](#intersection-types)
   - [Interface Types](#interface-types)
-  - [Arrays](#arrays)
+  - [Array Types](#array-types)
   - [Literal Types](#literal-types)
+  - [Inline Object types](#inline-object-types)
   - [`typeof` operator](#typeof-operator)
 - [AST Guide](#ast-guide)
 - [API](#api)
@@ -100,6 +101,7 @@ Work in progress 👷‍
 - Discriminant union types
 - Intersection types
 - Array types
+- Inline Object types
 - Typeof operator
 
 ## Features Still TODO
@@ -109,8 +111,11 @@ Work in progress 👷‍
 - [classes](https://www.typescriptlang.org/docs/handbook/classes.html)
 - [enums](https://www.typescriptlang.org/docs/handbook/enums.html)
 - [generics](https://www.typescriptlang.org/docs/handbook/generics.html)
-- `RegExp`
-- `Date`
+- `RegExp` Type
+- `Date` Type
+- Parameter defaults
+- Indexable Types
+- [Tuple Types](https://www.typescriptlang.org/docs/handbook/basic-types.html#tuple)
 
 ## General Features Overview
 
@@ -649,6 +654,8 @@ export { foo }
 
 ### Callable Namespaces
 
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/interfaces.html#function-types)
+
 Tydoc supports callable namespaces. These are basically functions with properties. In TS they can be represented like so:
 
 ```ts
@@ -749,7 +756,7 @@ export type Foo = 'a' | 'b'
 }
 ```
 
-### Discriminant Union Types Detection
+### Discriminant Union Types
 
 [Official TS Docs](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#discriminating-unions)
 
@@ -899,7 +906,9 @@ export interface foo {
 }
 ```
 
-### Arrays
+### Array Types
+
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays)
 
 Tydoc avoids extracting docs for array types since they are native. Tydoc simply traverses into the member types as you would expect.
 
@@ -926,6 +935,8 @@ export type foo = string[]
 ```
 
 ### Literal Types
+
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types)
 
 ```ts
 export type Foo = 'bar'
@@ -961,6 +972,38 @@ export type Wuf = false
         kind: 'literal',
         name: 'false',
         base: 'boolean',
+      },
+    },
+  },
+}
+```
+
+### Inline Object types
+
+```ts
+export type Foo = {
+  bar: string
+}
+```
+
+```json5
+{
+  typeIndex: {
+    '(example).Foo': {
+      kind: 'alias',
+      name: 'Foo',
+      type: {
+        kind: 'object', // <--
+        props: [
+          {
+            kind: 'prop',
+            name: 'bar',
+            type: {
+              kind: 'primitive',
+              type: 'string',
+            },
+          },
+        ],
       },
     },
   },
