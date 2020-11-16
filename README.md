@@ -7,40 +7,48 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Features](#features)
-  - [Future](#future)
-- [Feature Guide](#feature-guide)
+- [Features Still TODO](#features-still-todo)
+- [General Features Overview](#general-features-overview)
   - [CLI](#cli)
   - [JSON Representation](#json-representation)
   - [Markdown Representation](#markdown-representation)
   - [Automatic Main-Entrypoint Detection](#automatic-main-entrypoint-detection)
-    - [What is a "main" entrypoint](#what-is-a-main-entrypoint)
-    - [Tydoc support](#tydoc-support)
-  - [Support for `typeof` operator](#support-for-typeof-operator)
+    - [Theory](#theory)
+    - [Tydoc Support](#tydoc-support)
   - [Multiple Entrypoint Support](#multiple-entrypoint-support)
     - [What does "multiple entrypoints" mean](#what-does-multiple-entrypoints-mean)
-    - [Tydoc support](#tydoc-support-1)
+    - [Tydoc support](#tydoc-support)
   - [Named Exports](#named-exports)
   - [Main Export](#main-export)
-  - [Type Index](#type-index)
+- [Type Index Overview](#type-index-overview)
     - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
     - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
     - [Module Level TsDoc](#module-level-tsdoc)
     - [Qualified Module Paths](#qualified-module-paths)
-  - [Union Types](#union-types)
-  - [Discriminant Union Types Detection](#discriminant-union-types-detection)
-    - [About Discriminant Union Types in TypeScript](#about-discriminant-union-types-in-typescript)
-    - [About Discriminant Union Types in Tydoc](#about-discriminant-union-types-in-tydoc)
+  - [Avoids extracting docs for native types (Array, RegExp, etc.)](#avoids-extracting-docs-for-native-types-array-regexp-etc)
+- [TS Types Support Overview](#ts-types-support-overview)
   - [Functions](#functions)
   - [Overloaded Functions](#overloaded-functions)
   - [Callable Namespaces](#callable-namespaces)
+  - [Union Types](#union-types)
+  - [Discriminant Union Types Detection](#discriminant-union-types-detection)
+    - [Theory](#theory-1)
+    - [Tydoc Support](#tydoc-support-1)
+  - [Intersection Types](#intersection-types)
+  - [Interface Types](#interface-types)
+  - [Arrays](#arrays)
+  - [Literal Types](#literal-types)
+  - [`typeof` operator](#typeof-operator)
+- [AST Guide](#ast-guide)
 - [API](#api)
   - [`renderMarkdown`](#rendermarkdown)
   - [`fromProject`](#fromproject)
   - [`fromModule`](#frommodule)
   - [Exported Types](#exported-types)
     - [`I` `RenderMarkdownOptions`](#i-rendermarkdownoptions)
-  - [Type Index](#type-index-1)
+  - [Type Index](#type-index)
     - [`I` `Options`](#i-options)
     - [`T` `DocPackage`](#t-docpackage)
     - [`&` `DocModule`](#-docmodule)
@@ -83,21 +91,28 @@ Work in progress 👷‍
 - Support for different same-name types by using module paths to disambiguate (fully qualified type name aka. "FQTN")
 - Interfaces
 - Type aliases
-- Union types
-- Discriminant union detection
 - Support for unions with multiple discriminants
-- Functions
-- Overloaded functions
-- Callable namespaces (functions with properties)
+- Function types
+- Overloaded function types
+- Callable namespace types (functions with properties)
+- Union types
+- Literal types
+- Discriminant union types
+- Intersection types
+- Array types
 - Typeof operator
 
-### Future
+## Features Still TODO
 
 - Parse jsdoc on extracted items
 - Parse jsdoc on modules
-- classes
+- [classes](https://www.typescriptlang.org/docs/handbook/classes.html)
+- [enums](https://www.typescriptlang.org/docs/handbook/enums.html)
+- [generics](https://www.typescriptlang.org/docs/handbook/generics.html)
+- `RegExp`
+- `Date`
 
-## Feature Guide
+## General Features Overview
 
 > **Note**: The following feature examples show JSON in [JSON5](https://json5.org/) format so that comments may be rendered with the examples. Just understand that Tydoc actually emits JSON, not JSON5.
 
@@ -128,9 +143,9 @@ The structure is fully typed. You can leverage the typings like so:
 
 ```ts
 import docPackageJson from './docs.json'
-import DocPackage from 'tydoc/types'
+import { Doc } from 'tydoc/types'
 
-const docs = docPackageJson as DocPackage
+const docs = docPackageJson as Doc.DocPackage
 ```
 
 The types are extensively documented inline so read them to learn more about the shape/schema of the JSON data and semantics of fields therein (e.g. is a path relative or not).
@@ -147,7 +162,7 @@ For an example of what the output looks like see the [Tydoc repo `README.md` "AP
 
 ### Automatic Main-Entrypoint Detection
 
-#### What is a "main" entrypoint
+#### Theory
 
 All valid Node packages must specify their main entrtypoint in `package.json` like so:
 
@@ -166,7 +181,7 @@ import { bar } from 'somePackage/not/main/one'
 import { qux } from 'somePackage/not/main/two'
 ```
 
-#### Tydoc support
+#### Tydoc Support
 
 Tydoc takes advantage of this to automatically detect when the entrypoint it is extracting is the main one or not.
 
@@ -185,59 +200,6 @@ Leads to extracted JSON:
       isMain: true,
     },
   ],
-}
-```
-
-### Support for `typeof` operator
-
-Tydoc will respect instances of `typeof` usage.
-
-For example:
-
-```ts
-const foo = 1
-
-export type Bar = {
-  foo: typeof foo
-}
-```
-
-```json5
-{
-  modules: [
-    {
-      namedExports: [
-        {
-          name: 'Bar',
-          type: {
-            link: '(example).Bar',
-          },
-        },
-      ],
-    },
-  ],
-  typeIndex: {
-    '(example).Bar': {
-      kind: 'alias',
-      name: 'Bar',
-      type: {
-        kind: 'object',
-        props: [
-          {
-            kind: 'prop',
-            name: 'foo',
-            // Notice how the type result of calling
-            // `typeof` has been inlined here.
-            type: {
-              kind: 'literal',
-              name: '1',
-              base: 'number',
-            },
-          },
-        ],
-      },
-    },
-  },
 }
 ```
 
@@ -323,7 +285,7 @@ export default a
 }
 ```
 
-### Type Index
+## Type Index Overview
 
 The types in a package are a graph of references, so Tydoc always creates a type index. What this means is that when Tydoc is extracting type information from your package, it keeps extracted types in the type index rather than documenting types inline.
 
@@ -542,111 +504,13 @@ Would result in two `Foo` types in the type index, qualified with paths `b` and 
 }
 ```
 
-### Union Types
+### Avoids extracting docs for native types (Array, RegExp, etc.)
 
-Tydoc supports union types.
-
-For example:
-
-```ts
-export type Foo = 'a' | 'b'
-```
-
-```json5
-{
-  typeIndex: {
-    '(example).Foo': {
-      kind: 'alias',
-      name: 'Foo',
-      type: {
-        kind: 'union',
-        isDiscriminated: false,
-        discriminantProperties: null,
-        types: [
-          {
-            kind: 'literal',
-            name: '"a"',
-            base: 'string',
-          },
-          {
-            kind: 'literal',
-            name: '"b"',
-            base: 'string',
-          },
-        ],
-      },
-    },
-  },
-}
-```
-
-### Discriminant Union Types Detection
-
-#### About Discriminant Union Types in TypeScript
-
-TypeScript supports the concept of discriminant union types. It simply means that among the members of the union there is a common property that can be used at runtime to narrow which member is being worked with.
-
-```ts
-type Fruit = Apple | Banana
-type Apple = { kind: 'Apple'; crispy: boolean }
-type Banana = { kind: 'Banana'; slippery: boolean }
-
-const members = [
-  { kind: 'Apple', crispy: true },
-  { kind: 'Banana', slippery: false }
-] as const
-
-const fruit: Fruit = members[Math.floor(Math.random() * 2]
-
-if (fruit.kind === 'Apple') {
-  fruit.crispy // narrows to type Apple
-}
-
-if (fruit.kind === 'Banana') {
-  fruit.slippery // narrows to type Banana
-}
-```
-
-Although the type of a discriminant property is typically a string literal it does not have to be. The requirements are that:
-
-1. Must: The types do not overlap. For example if all `kind` properties above were of type `string` then the checks would not be sufficient to know which member is being worked with. TS statically enforces this.
-2. Should: The types can be checked predictably at runtime via equality operator `===`/`==`. For example if the `kind` properties above were of type `string` and `number` then the checks needed at runtime would be infinite... (and now if you're wondering if TS permits testing the discriminant with JS's `typeof` operator, the answer is no).
-
-#### About Discriminant Union Types in Tydoc
-
-Tydoc supports this pattern.
-
-Tydoc will detect if all members of a union type have a property in common whose type does not overlap and if so mark the union type as being descriminated and capture which property is the discriminant. If multiple properties could act as discriminants then Tydoc captures them all.
-
-For example:
-
-```ts
-export type A = B | C
-type B = { b: 2; kind1: 'B1'; kind2: 'B2' }
-type C = { c: 3; kind1: 'C1'; kind2: 'C2' }
-```
-
-```json5
-{
-  typeIndex: {
-    '(a).A': {
-      kind: 'alias',
-      name: 'A',
-      type: {
-        kind: 'union',
-        discriminantProperties: ['kind1', 'kind2'],
-        isDiscriminated: true,
-      },
-    },
-  },
-}
-```
+## TS Types Support Overview
 
 ### Functions
 
-Tydoc supports extracting documentation from functions. The Signature is extracted into an array because there can be multiple signatures in cases of overloaded functions. If `isOverloaded` is `false` then `sigs` is guaranteed to be an array of length one.
-
-For example:
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/functions.html)
 
 ```ts
 export function foo(x: string, y: boolean): number {
@@ -705,9 +569,7 @@ export function foo(x: string, y: boolean): number {
 
 ### Overloaded Functions
 
-Tydoc supports extracting documentation from overloaded functions. It sets `isOverloaded` to `true` in such cases.
-
-For example:
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/functions.html#overloads)
 
 ```ts
 function foo(x: RegExp): boolean
@@ -733,7 +595,8 @@ export { foo }
             isOverloaded: true, // <-- true
             hasProps: false,
             props: [],
-            sigs: [ <-- All signatures are contained in this array
+            sigs: [
+              // v-- All signatures are contained in this array
               {
                 kind: 'sig',
                 return: {
@@ -796,7 +659,7 @@ interface foo {
 }
 ```
 
-In JS it would look like:
+In JS it could look like:
 
 ```ts
 function foo(x) {
@@ -815,7 +678,7 @@ In Tydoc:
       kind: 'callable',
       hasProps: true, // <-- true
       props: [
-        // filled with extracted properties
+        // v--- all properties of the namespace are in this array
         {
           kind: 'prop',
           name: 'a',
@@ -850,7 +713,318 @@ In Tydoc:
 }
 ```
 
+### Union Types
+
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#union-types)
+
+```ts
+export type Foo = 'a' | 'b'
+```
+
+```json5
+{
+  typeIndex: {
+    '(example).Foo': {
+      kind: 'alias',
+      name: 'Foo',
+      type: {
+        kind: 'union',
+        isDiscriminated: false,
+        discriminantProperties: null,
+        types: [
+          {
+            kind: 'literal',
+            name: '"a"',
+            base: 'string',
+          },
+          {
+            kind: 'literal',
+            name: '"b"',
+            base: 'string',
+          },
+        ],
+      },
+    },
+  },
+}
+```
+
+### Discriminant Union Types Detection
+
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#discriminating-unions)
+
+#### Theory
+
+TypeScript supports the concept of discriminant union types. It simply means that among the members of the union there is a common property that can be used at runtime to narrow which member is being worked with.
+
+```ts
+type Fruit = Apple | Banana
+type Apple = { kind: 'Apple'; crispy: boolean }
+type Banana = { kind: 'Banana'; slippery: boolean }
+
+const members = [
+  { kind: 'Apple', crispy: true },
+  { kind: 'Banana', slippery: false }
+] as const
+
+const fruit: Fruit = members[Math.floor(Math.random() * 2]
+
+if (fruit.kind === 'Apple') {
+  fruit.crispy // narrows to type Apple
+}
+
+if (fruit.kind === 'Banana') {
+  fruit.slippery // narrows to type Banana
+}
+```
+
+Although the type of a discriminant property is typically a string literal it does not have to be. The requirements are that:
+
+1. Must: The types do not overlap. For example if all `kind` properties above were of type `string` then the checks would not be sufficient to know which member is being worked with. TS statically enforces this.
+2. Should: The types can be checked predictably at runtime via equality operator `===`/`==`. For example if the `kind` properties above were of type `string` and `number` then the checks needed at runtime would be infinite... (and now if you're wondering if TS permits testing the discriminant with JS's `typeof` operator, the answer is no).
+
+#### Tydoc Support
+
+Tydoc will detect if all members of a union type have a property in common whose type does not overlap and if so mark the union type as being descriminated and capture which property is the discriminant. If multiple properties could act as discriminants then Tydoc captures them all.
+
+```ts
+export type A = B | C
+type B = { b: 2; kind1: 'B1'; kind2: 'B2' }
+type C = { c: 3; kind1: 'C1'; kind2: 'C2' }
+```
+
+```json5
+{
+  typeIndex: {
+    '(a).A': {
+      kind: 'alias',
+      name: 'A',
+      type: {
+        kind: 'union',
+        discriminantProperties: ['kind1', 'kind2'],
+        isDiscriminated: true,
+      },
+    },
+  },
+}
+```
+
+### Intersection Types
+
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#intersection-types)
+
+```ts
+export type A = { s: string } & { b: boolean }
+```
+
+```json5
+{
+  typeIndex: {
+    '(a).A': {
+      kind: 'alias',
+      name: 'A',
+      type: {
+        kind: 'intersection',
+        types: [
+          {
+            kind: 'object',
+            props: [
+              {
+                kind: 'prop',
+                name: 's',
+                type: {
+                  kind: 'primitive',
+                  type: 'string',
+                },
+              },
+            ],
+          },
+          {
+            kind: 'object',
+            props: [
+              {
+                kind: 'prop',
+                name: 'b',
+                type: {
+                  kind: 'primitive',
+                  type: 'boolean',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  },
+}
+```
+
+### Interface Types
+
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/interfaces.html)
+
+```ts
+export interface foo {
+  bar: string
+  qux: number
+}
+```
+
+```json5
+{
+  typeIndex: {
+    '(example).foo': {
+      kind: 'interface',
+      name: 'foo',
+      props: [
+        {
+          kind: 'prop',
+          name: 'bar',
+          type: {
+            kind: 'primitive',
+            type: 'string',
+          },
+        },
+        {
+          kind: 'prop',
+          name: 'qux',
+          type: {
+            kind: 'primitive',
+            type: 'number',
+          },
+        },
+      ],
+    },
+  },
+}
+```
+
+### Arrays
+
+Tydoc avoids extracting docs for array types since they are native. Tydoc simply traverses into the member types as you would expect.
+
+```ts
+export type foo = string[]
+```
+
+```json5
+{
+  typeIndex: {
+    '(example).foo': {
+      kind: 'alias',
+      name: 'foo',
+      type: {
+        kind: 'array',
+        innerType: {
+          kind: 'primitive',
+          type: 'string',
+        },
+      },
+    },
+  },
+}
+```
+
+### Literal Types
+
+```ts
+export type Foo = 'bar'
+export type Qux = 1
+export type Wuf = false
+```
+
+```json5
+{
+  typeIndex: {
+    '(example).Foo': {
+      kind: 'alias',
+      name: 'Foo',
+      type: {
+        kind: 'literal',
+        name: '"bar"',
+        base: 'string',
+      },
+    },
+    '(example).Qux': {
+      kind: 'alias',
+      name: 'Qux',
+      type: {
+        kind: 'literal',
+        name: '1',
+        base: 'number',
+      },
+    },
+    '(example).Wuf': {
+      kind: 'alias',
+      name: 'Wuf',
+      type: {
+        kind: 'literal',
+        name: 'false',
+        base: 'boolean',
+      },
+    },
+  },
+}
+```
+
+### `typeof` operator
+
+[Official TS Docs](https://www.typescriptlang.org/docs/handbook/2/typeof-types.html#the-typeof-type-operator)
+
+```ts
+const foo = 1
+
+export type Bar = {
+  foo: typeof foo
+}
+```
+
+```json5
+{
+  modules: [
+    {
+      namedExports: [
+        {
+          name: 'Bar',
+          type: {
+            link: '(example).Bar',
+          },
+        },
+      ],
+    },
+  ],
+  typeIndex: {
+    '(example).Bar': {
+      kind: 'alias',
+      name: 'Bar',
+      type: {
+        kind: 'object',
+        props: [
+          {
+            kind: 'prop',
+            name: 'foo',
+            // Notice how the type result of calling
+            // `typeof` has been inlined here.
+            type: {
+              kind: 'literal',
+              name: '1',
+              base: 'number',
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+```
+
+## AST Guide
+
+todo
+
 ## API
+
+It is possible to use Tydoc in a programmatic way. The CLI is built using this API.
 
 <!-- START API DOCS --->
 
