@@ -1,4 +1,4 @@
-import * as Debug from 'Debug'
+import * as Debug from 'debug'
 import * as Prettier from 'prettier'
 import * as Doc from '../extractor/doc'
 import * as MD from '../lib/markdown'
