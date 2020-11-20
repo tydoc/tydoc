@@ -59,7 +59,7 @@ export class Project extends Command {
     if (flags['ignore-diagnostics-matching']) {
       haltOnDiagnostics = arrayify(JSON5.parse(flags['ignore-diagnostics-matching'])) as DiagnosticFilter[]
     } else {
-      haltOnDiagnostics = flags['ignore-diagnostics']
+      haltOnDiagnostics = !flags['ignore-diagnostics']
     }
 
     const docs = TyDoc.fromProject({

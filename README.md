@@ -75,6 +75,7 @@ Work in progress 👷‍
     - [`I` `Options`](#i-options-1)
     - [`I` `Settings`](#i-settings)
     - [`F` `Thunk`](#f-thunk)
+- [Debugging](#debugging)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1454,3 +1455,11 @@ export type Thunk<T> = () => T
 ```
 
 <!-- END API DOCS --->
+
+## Debugging
+
+Tydoc uses [debug](https://github.com/visionmedia/debug). When enabled via `*` it also causes Oclif to render stack traces for unexpected thrown errors.
+
+```
+DEBUG=* tydoc ...
+```
