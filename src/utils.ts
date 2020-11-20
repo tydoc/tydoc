@@ -40,9 +40,20 @@ export function getDiscriminantPropertiesOfUnionMembers(
   return commonMemberProperties
 }
 
+/**
+ * Get the properties of a type, if any. This may return methods or non-methods.
+ *
+ * @remarks
+ *
+ * Overloadeds are discarding, taking only the first declaration found.
+ */
 export function getProperties(t: tsm.Type): (tsm.PropertySignature | tsm.MethodSignature)[] {
   return t.getProperties().map((p) => {
     const node = p.getDeclarations()[0] as tsm.PropertySignature | tsm.MethodSignature
     return node
   })
+}
+
+export function arrayify<T>(x: T): T extends Array<any> ? T : T[] {
+  return Array.isArray(x) ? x : ([x] as any)
 }
