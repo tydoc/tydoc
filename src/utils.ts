@@ -1,10 +1,7 @@
 import { intersectionBy } from 'lodash'
 import * as tsm from 'ts-morph'
 import { inspect } from 'util'
-import {
-  dumpNode,
-  dumpType
-} from './lib/extractor/utils'
+import { dumpNode, dumpType } from './api/extractor/utils'
 
 export type ArrayOrVarg<T> = T[] | [T[]]
 
