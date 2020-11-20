@@ -4,6 +4,7 @@ import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { getDiscriminantPropertiesOfUnionMembers, getProperties } from '../../utils'
+import { applyDiagnosticFilters, DiagnosticFilter } from '../lib/ts-helpers'
 import * as Doc from './doc'
 import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 
@@ -32,6 +33,9 @@ interface Options {
    * @remarks This is useful for tests to avoid having to mock process.cwd
    */
   prjDir?: string
+  /**
+   * Should Tydoc settings be read from from the package file.
+   */
   readSettingsFromJSON: boolean
   /**
    * Sometimes a source entrypoint is fronted by a facade module that allows
@@ -62,6 +66,23 @@ interface Options {
    * ```
    */
   sourceModuleToPackagePathMappings?: Record<string, string>
+  /**
+   * Should Tydoc halt when TypeScript diagnostics are raised?
+   *
+   * Pass true to halt on any diagnostic
+   *
+   * Pass false to ignore all diagnostics
+   *
+   * Pass an array of filters to ignore only certain diagnostics.
+   *
+   * @default true
+   *
+   * @remarks
+   *
+   * Typically your package should be error free before documentation is extracted for it. However there may be cases where you want to bypass this check in general or for specific kinds of type check errors. For example a @ts-expect-error that is erroring because there is no error.
+   *
+   */
+  haltOnDiagnostics?: boolean | DiagnosticFilter[]
 }
 
 function readSettingsFromPackage(): Partial<Doc.Settings> {
@@ -82,23 +103,23 @@ function readSettingsFromPackage(): Partial<Doc.Settings> {
  * the given list of entrypoint modules. Everything that is reachable from the
  * exports will be considered part of the API.
  */
-export function fromProject(opts: Options): Doc.DocPackage {
+export function fromProject(options: Options): Doc.DocPackage {
   // Wherever the user's package.json is. We assume for now that this tool is
   // running from project root.
   // todo there seems to be no way to get project dir from project instance??
   // todo guard that cwd has tsconfig in it
   let prjDir: string
-  if (opts.prjDir) {
-    prjDir = opts.prjDir
+  if (options.prjDir) {
+    prjDir = options.prjDir
     debug('prjDir set to %s -- taken from passed config ', prjDir)
   } else {
     prjDir = process.cwd()
     debug('prjDir set to %s -- taken from current working directory', prjDir)
   }
   const project =
-    opts.project ??
+    options.project ??
     new tsm.Project({
-      tsConfigFilePath: path.join(prjDir, 'tsconfig.json')
+      tsConfigFilePath: path.join(prjDir, 'tsconfig.json'),
     })
 
   // Find the source dir
@@ -137,9 +158,9 @@ export function fromProject(opts: Options): Doc.DocPackage {
   // Find the package entrypoint
   //
   let packageMainEntrypoint: string
-  if (opts.packageMainEntrypoint) {
+  if (options.packageMainEntrypoint) {
     // useful for tests
-    packageMainEntrypoint = opts.packageMainEntrypoint
+    packageMainEntrypoint = options.packageMainEntrypoint
   } else {
     const pjson = fs.read('package.json', 'json')
     if (pjson.main) {
@@ -162,13 +183,20 @@ export function fromProject(opts: Options): Doc.DocPackage {
   })
   debug('mainModuleFilePathAbs is %s', mainModuleFilePathAbs)
 
-  // If the project is in a bad state don't bother trying to extract docs
-  //
-  const diagnostics = project.getPreEmitDiagnostics()
-  if (diagnostics.length) {
-    const message = project.formatDiagnosticsWithColorAndContext(diagnostics)
-    // TODO It would be nice to have a --force to not throw on errors here
-    throw new Error(message)
+  // todo use setset
+  const stopOnTypeErrors = options.haltOnDiagnostics ?? true
+
+  if (stopOnTypeErrors !== false) {
+    const diagnostics = project.getPreEmitDiagnostics()
+    if (diagnostics.length) {
+      if (stopOnTypeErrors === true || applyDiagnosticFilters(stopOnTypeErrors, diagnostics)) {
+        const message = project.formatDiagnosticsWithColorAndContext(diagnostics)
+        console.log(`
+        Tydoc stopped extracting documentation becuase the package was found to have type errors. You should fix these and then try again. If you do not care about these type errors and want to try extracting documentation anyways then try using one of the following flags:\n  --ignore-diagnostics\n  --ignore-diagnostics-matching
+      `)
+        throw new Error(message)
+      }
+    }
   }
 
   // If the project is empty dont' bother trying to extract docs
@@ -185,7 +213,7 @@ export function fromProject(opts: Options): Doc.DocPackage {
   // Get the entrypoints to crawl
   //
   const sourceFileEntrypoints = []
-  for (const findEntryPoint of opts.entrypoints) {
+  for (const findEntryPoint of options.entrypoints) {
     let entrypointModulePathAbs: string
     if (path.isAbsolute(findEntryPoint[0])) {
       debug('considering given entrypoint as absolute, disregarding srcDir: %s', findEntryPoint)
@@ -230,10 +258,10 @@ export function fromProject(opts: Options): Doc.DocPackage {
     srcDir: srcDir,
     prjDir: prjDir,
     mainModuleFilePathAbs: mainModuleFilePathAbs,
-    sourceModuleToPackagePathMappings: opts.sourceModuleToPackagePathMappings,
+    sourceModuleToPackagePathMappings: options.sourceModuleToPackagePathMappings,
   }
 
-  if (opts.readSettingsFromJSON) {
+  if (options.readSettingsFromJSON) {
     lo.merge(managerSettings, readSettingsFromPackage())
   } else {
     debug('reading user settings from package.json is disabled')

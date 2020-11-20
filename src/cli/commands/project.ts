@@ -1,5 +1,9 @@
 import Command, { flags } from '@oclif/command'
+import * as JSON5 from 'json5'
 import * as TyDoc from '../../'
+import { DiagnosticFilter } from '../../api/lib/ts-helpers'
+import { arrayify } from '../../utils'
+import dedent = require('dedent')
 
 export class Project extends Command {
   static strict = false
@@ -30,14 +34,39 @@ export class Project extends Command {
       description:
         'For use with markdown rendering. Whether or not the API terms section should have a title and nest its term entries under it. If false, term entry titles are de-nested by one level.',
     }),
+    'ignore-diagnostics': flags.boolean({
+      default: false,
+      description:
+        'Should Tydoc ignore any TypeScript diagnostics that are raised? If not ignored then Tydoc will refuse to extract when diagnostics are raised.',
+    }),
+    'ignore-diagnostics-matching': flags.string({
+      exclusive: ['ignore-diagnostics'],
+      description: dedent`
+        JSON5 of one (or an array of) diagnostic filters. Examples:
+
+          { path: '/foo/bar/.*' }
+          { code: '2\d{2}5' }
+          { category: 'error' }
+          [{ path: '/foo/bar/.*', code '24.*' }]
+        `,
+    }),
   }
   async run() {
     const { flags, argv } = this.parse(Project)
+
+    let haltOnDiagnostics
+
+    if (flags['ignore-diagnostics-matching']) {
+      haltOnDiagnostics = arrayify(JSON5.parse(flags['ignore-diagnostics-matching'])) as DiagnosticFilter[]
+    } else {
+      haltOnDiagnostics = flags['ignore-diagnostics']
+    }
 
     const docs = TyDoc.fromProject({
       entrypoints: argv,
       readSettingsFromJSON: true,
       prjDir: flags.dir ?? process.cwd(),
+      haltOnDiagnostics,
     })
 
     if (flags.json) {
