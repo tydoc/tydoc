@@ -672,15 +672,8 @@ Object {
       },
       "tsdoc": null,
       "type": Object {
-        "discriminantProperties": Array [
-          "toString",
-          "toFixed",
-          "toExponential",
-          "toPrecision",
-          "valueOf",
-          "toLocaleString",
-        ],
-        "isDiscriminated": true,
+        "discriminantProperties": null,
+        "isDiscriminated": false,
         "kind": "union",
         "raw": Object {
           "nodeFullText": "export type A = 1 | 2;",

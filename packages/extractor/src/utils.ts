@@ -33,8 +33,8 @@ export function dump(...args: any[]) {
 export function getDiscriminantPropertiesOfUnionMembers(
   members: tsm.Type[]
 ): (tsm.PropertySignature | tsm.MethodSignature)[] {
-  const membersProperties = members.map((m) => getProperties(m))
-  const commonMemberProperties = intersectionBy(...membersProperties, (p) => {
+  const membersLiteralProperties = members.map((m) => getProperties(m).filter((p) => p.getType().isLiteral()))
+  const commonMemberProperties = intersectionBy(...membersLiteralProperties, (p) => {
     return p.getName()
   })
   return commonMemberProperties
