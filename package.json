@@ -1,110 +1,13 @@
 {
-  "name": "tydoc",
-  "description": "The TypeScript documenter that meets you where you are",
-  "version": "0.0.0-dripip",
-  "main": "dist/index.js",
-  "license": "MIT",
-  "bin": {
-    "tydoc": "dist/cli/main.js"
-  },
-  "files": [
-    "dist",
-    "types.d.ts",
-    "types.js",
-    "oclif.manifest.json"
+  "private": true,
+  "workspaces": [
+    "packages/*"
   ],
-  "scripts": {
-    "build:docs:toc": "doctoc README.md",
-    "build:docs:api": "ts-node scripts/build-api-docs",
-    "build:docs": "yarn -s build:docs:api && yarn -s build:docs:toc",
-    "build:oclif": "oclif-dev manifest",
-    "build:ts": "tsc",
-    "build": "yarn clean && yarn -s build:oclif && yarn -s build:ts",
-    "dev": "tsc -w",
-    "clean": "rm -rf dist",
-    "dev:test": "jest --watch",
-    "test": "jest",
-    "test:dev": "yarn -s dev:test",
-    "format": "prettier --write .",
-    "prepublishOnly": "yarn build",
-    "release:stable": "dripip stable",
-    "release:preview": "dripip preview"
-  },
-  "dependencies": {
-    "@microsoft/tsdoc": "^0.12.21",
-    "@oclif/command": "^1.8.0",
-    "@oclif/config": "^1.17.0",
-    "@oclif/plugin-help": "^3.2.0",
-    "@types/debug": "^4.1.5",
-    "@types/lodash": "^4.14.149",
-    "debug": "^4.1.1",
-    "dedent": "^0.7.0",
-    "doctoc": "^1.4.0",
-    "fs-jetpack": "^2.2.3",
-    "globby": "^11.0.0",
-    "json5": "^2.1.3",
-    "lodash": "^4.17.15",
-    "prettier": "^2.1.2",
-    "ts-morph": "^7.0.0",
-    "typescript": "^3.7.4"
-  },
   "devDependencies": {
-    "@oclif/dev-cli": "1.22.2",
-    "@prisma-labs/prettier-config": "0.1.0",
-    "@types/dedent": "^0.7.0",
-    "@types/jest": "25.1.3",
-    "@types/json5": "^0.0.30",
-    "@types/node": "13.7.6",
-    "@types/prettier": "1.19.0",
-    "dripip": "0.10.0",
-    "jest": "25.1.0",
-    "jest-validate": "25.1.0",
-    "jest-watch-suspend": "1.1.2",
-    "jest-watch-toggle-config": "1.0.2",
-    "jest-watch-typeahead": "0.4.2",
-    "ts-jest": "25.2.1",
-    "ts-node": "8.6.2",
-    "ts-node-dev": "1.0.0-pre.44"
+    "typescript": "^4.1.2",
+    "typescript-snapshots-plugin": "^1.7.0"
   },
-  "prettier": "@prisma-labs/prettier-config",
-  "jest": {
-    "preset": "ts-jest",
-    "watchPlugins": [
-      "jest-watch-suspend",
-      "jest-watch-typeahead/filename",
-      "jest-watch-typeahead/testname",
-      [
-        "jest-watch-toggle-config",
-        {
-          "setting": "verbose"
-        }
-      ],
-      [
-        "jest-watch-toggle-config",
-        {
-          "setting": "bail"
-        }
-      ]
-    ],
-    "watchPathIgnorePatterns": [
-      "<rootDir>/dist/",
-      "<rootDir>/oclif.manifest.json"
-    ],
-    "setupFiles": [
-      "./test/setup.ts"
-    ],
-    "globals": {
-      "ts-jest": {
-        "tsConfig": "test/tsconfig.json",
-        "diagnostics": false
-      }
-    }
-  },
-  "oclif": {
-    "commands": "./dist/cli/commands",
-    "bin": "tydoc",
-    "plugins": [
-      "@oclif/plugin-help"
-    ]
+  "scripts": {
+    "g:tsc": "tsc"
   }
 }

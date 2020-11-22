@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
     "strict": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "target": "ES2019",
-    "outDir": "dist",
-    "rootDir": "src",
-    "declarationMap": true,
+    "incremental": true,
+    "composite": true,
     "declaration": true,
-    "sourceMap": true,
-    "lib": ["ESNext", "DOM"]
+    "baseUrl": "./packages/",
+    "paths": {
+      "tydoc": ["./extractor/src"]
+    }
   },
-  "include": ["src"]
+  "plugins": [
+    {
+      "name": "typescript-snapshots-plugin"
+    }
+  ]
 }

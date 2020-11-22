@@ -1,0 +1,6 @@
+node_modules
+dist
+oclif.manifest.json
+.vscode
+src/example*
+scratch.ts

@@ -1,0 +1,38 @@
+{
+  "name": "tydoc-web",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "storybook": "start-storybook -p 6006 --no-dll",
+    "build-storybook": "build-storybook --no-dll"
+  },
+  "dependencies": {
+    "next": "10.0.0",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "ts-morph": "^8.1.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@storybook/addon-actions": "^6.0.28",
+    "@storybook/addon-essentials": "^6.0.28",
+    "@storybook/addon-links": "^6.0.28",
+    "@storybook/react": "^6.0.28",
+    "@tailwindcss/ui": "^0.6.2",
+    "@types/node": "^14.14.6",
+    "@types/react": "^16.9.55",
+    "autoprefixer": "^9",
+    "babel-loader": "^8.1.0",
+    "prettier": "^2.1.2",
+    "react-is": "^17.0.1",
+    "tailwindcss": "^1.9.6",
+    "ts-node": "^9.0.0",
+    "tydoc": "workspace:packages/extractor",
+    "typescript": "^4.0.5"
+  }
+}

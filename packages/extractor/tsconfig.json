@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2019",
+    "outDir": "dist",
+    "rootDir": "src",
+    "declarationMap": true,
+    "sourceMap": true,
+    "lib": ["ESNext", "DOM"]
+  },
+  "include": ["src"]
+}
