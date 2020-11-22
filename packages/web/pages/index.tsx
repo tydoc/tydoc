@@ -1,8 +1,7 @@
-import { Content } from '../components/Content'
-import { Search, TSLogo } from '../components/svg'
-import Head from 'next/head'
 import Link from 'next/link'
 import React, { FC } from 'react'
+import { Package } from '../components/Content'
+import { Search, TSLogo } from '../components/svg'
 
 export default function Home() {
   return (
@@ -64,6 +63,8 @@ export default function Home() {
             latest
           </div>
         </div>
+
+        {/* Meta */}
         <div className="flex my-3 text-sm divide-gray-700">
           <div>
             Published: <strong>Jul 31, 2020</strong>
@@ -75,7 +76,7 @@ export default function Home() {
         {/* Content */}
         <div className="flex">
           <SideNav />
-          <Content />
+          <Package />
         </div>
       </div>
     </div>
