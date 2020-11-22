@@ -3,9 +3,10 @@
   "compilerOptions": {
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
+
     "allowJs": true,
     "skipLibCheck": true,
-    // "strict": false,
+
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -14,7 +15,9 @@
     "outDir": "dist",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+
+    "baseUrl": "."
   },
   "references": [{ "path": "../extractor" }],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

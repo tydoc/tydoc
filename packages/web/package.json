@@ -14,6 +14,7 @@
     "next": "10.0.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
+    "react-syntax-highlighter": "^15.3.0",
     "ts-morph": "^8.1.2"
   },
   "devDependencies": {
@@ -23,14 +24,14 @@
     "@storybook/addon-essentials": "^6.0.28",
     "@storybook/addon-links": "^6.0.28",
     "@storybook/react": "^6.0.28",
-    "@tailwindcss/ui": "^0.6.2",
     "@types/node": "^14.14.6",
     "@types/react": "^16.9.55",
+    "@types/react-syntax-highlighter": "^13.5.0",
     "autoprefixer": "^9",
     "babel-loader": "^8.1.0",
-    "prettier": "^2.1.2",
+    "postcss": "^8.1.9",
     "react-is": "^17.0.1",
-    "tailwindcss": "^1.9.6",
+    "tailwindcss": "^2.0.1",
     "ts-node": "^9.0.0",
     "tydoc": "workspace:packages/extractor",
     "typescript": "^4.0.5"

@@ -23,9 +23,6 @@ module.exports = {
     },
   },
   variants: {},
-  future: {
-    removeDeprecatedGapUtilities: true,
-    purgeLayersByDefault: true,
-  },
-  plugins: [require('@tailwindcss/ui')],
+  future: {},
+  plugins: [],
 }
