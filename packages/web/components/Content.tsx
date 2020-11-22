@@ -1,7 +1,8 @@
 import { FC, useEffect, useState } from 'react'
+import SyntaxHighlighter from 'react-syntax-highlighter'
 import { Doc } from 'tydoc/types'
 
-export const Content: FC = () => {
+export const Package: FC = () => {
   const json = useJson(
     'https://tydoc-output.jasonkuhrt.vercel.app/tydoc.docs.json',
   )
@@ -13,36 +14,90 @@ export const Content: FC = () => {
 
   return (
     <div className="">
-      {json.modules.map((m) => (
-        <div>
-          <div>
-            <b>{m.name}</b>
-          </div>
-          <div>
-            {m.namedExports.map((e) => (
-              <>
-                <div>{e.name}</div>
-                <TypeCode expor={e} />
-              </>
-            ))}
-          </div>
-        </div>
+      {/* Modules */}
+      {json.modules.map((module) => (
+        <Module key={module.name} module={module} typeIndex={json.typeIndex} />
       ))}
     </div>
   )
 }
 
-const TypeCode: FC<{ expor: Doc.Expor }> = ({ expor }) => {
-  const t = expor.type
-
-  let content = ''
-
-  if (t.kind === 'callable') {
-    content = t.raw.typeText
-  }
-
-  return <pre className="p-2 break-words bg-gray-200 w-96">{content}</pre>
+type ModuleProps = {
+  module: Doc.DocModule
+  typeIndex: Doc.TypeIndex
 }
+
+function Module({ module, typeIndex }: ModuleProps) {
+  return (
+    <div>
+      {/* Header */}
+      <div>
+        <b>{module.name}</b>
+        <p>{module.tsdoc?.summary}</p>
+      </div>
+
+      {/* Types */}
+      <div>
+        {module.namedExports.map((e) => (
+          <div key={e.name} className="my-3">
+            {/* Header */}
+            <div key={e.name}>
+              <h3 className="py-1 text-lg font-medium">{e.name}</h3>
+            </div>
+
+            {/* Type */}
+            <Type node={e.type} typeIndex={typeIndex} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+type TypeProps = { node: Doc.Node; typeIndex: Doc.TypeIndex }
+
+function Type({ node, typeIndex }: TypeProps) {
+  /* Draw a type */
+  switch (node.kind) {
+    case 'typeIndexRef':
+      const type = typeIndex[node.link]!
+      return (
+        <div className="">
+          {/* Type */}
+          <Code code={type.raw.typeText} />
+
+          {/* Description */}
+          {/* <p>{t.}</p> */}
+        </div>
+      )
+
+    case 'callable':
+      return (
+        <div className="">
+          {/* Type */}
+          <Code code={node.raw.typeText} />
+
+          {/* Description */}
+          {/* <p>{t.}</p> */}
+        </div>
+      )
+
+    default:
+      return <> </>
+  }
+}
+
+type CodeProps = { code: string }
+
+function Code({ code }: CodeProps) {
+  return (
+    <div className="rounded-md overflow-hidden border border-gray-300 ">
+      <SyntaxHighlighter language="typescript">{code}</SyntaxHighlighter>
+    </div>
+  )
+}
+
+/* Utility hooks */
 
 function useJson(url: string) {
   const [json, setJson] = useState<Doc.DocPackage | undefined>(undefined)
