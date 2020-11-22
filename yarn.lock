@@ -3704,6 +3704,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tailwindcss/aspect-ratio@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@tailwindcss/aspect-ratio@npm:0.2.0"
+  checksum: f33e8700710550c67bcf5292445d05b5fb44f94d6e7baf031da04229ee3bb5b38d2ac6a7b8136a28f63006aa3e1a28625bd740bf0c9ffccf16607a1bb19d6d98
+  languageName: node
+  linkType: hard
+
+"@tailwindcss/forms@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "@tailwindcss/forms@npm:0.2.1"
+  dependencies:
+    mini-svg-data-uri: ^1.2.3
+  checksum: 968520113161a4720f79af53e3efd1354ec7ab560ad457891246fb044cc1b23d31e909f9ac04b515a71acf5cf9642434c86a277475474cae5fe9b7efa2938804
+  languageName: node
+  linkType: hard
+
+"@tailwindcss/typography@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@tailwindcss/typography@npm:0.3.1"
+  peerDependencies:
+    tailwindcss: 2.0.0-alpha.24 || ^2.0.0
+  checksum: 341c009ec5d6a923103f625e73f93ccd5f94c6e11938c04f28d64203cc2c044f129b7afd2ddcf156fb3c144d660cef648bdb957edc3ede0a679583fbd5311017
+  languageName: node
+  linkType: hard
+
 "@textlint/ast-node-types@npm:^4.0.3":
   version: 4.3.4
   resolution: "@textlint/ast-node-types@npm:4.3.4"
@@ -5100,7 +5125,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:^9, autoprefixer@npm:^9.7.2":
+"autoprefixer@npm:^9.7.2":
   version: 9.8.6
   resolution: "autoprefixer@npm:9.8.6"
   dependencies:
@@ -5114,6 +5139,24 @@ __metadata:
   bin:
     autoprefixer: bin/autoprefixer
   checksum: b406d8047a97fcc39c9c6d208fd6f1974e5957800461d9a79457a3ecaca2c0ea090bd06f30c8653f48f751c31115c63a80502ff8c9a6bb7b8a5a5063021827d4
+  languageName: node
+  linkType: hard
+
+"autoprefixer@npm:latest":
+  version: 10.0.2
+  resolution: "autoprefixer@npm:10.0.2"
+  dependencies:
+    browserslist: ^4.14.7
+    caniuse-lite: ^1.0.30001157
+    colorette: ^1.2.1
+    normalize-range: ^0.1.2
+    num2fraction: ^1.2.2
+    postcss-value-parser: ^4.1.0
+  peerDependencies:
+    postcss: ^8.1.0
+  bin:
+    autoprefixer: bin/autoprefixer
+  checksum: 5c65432cf729339c985ed63d4c988877d53923019742e30361a88343e49d7e6b07b3c611eef8c1f2079e650026a48c3de24a035247e408b8136cddf25c42521f
   languageName: node
   linkType: hard
 
@@ -5941,7 +5984,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:^4.12.0, browserslist@npm:^4.14.5, browserslist@npm:^4.14.6":
+"browserslist@npm:^4.12.0, browserslist@npm:^4.14.5, browserslist@npm:^4.14.6, browserslist@npm:^4.14.7":
   version: 4.14.7
   resolution: "browserslist@npm:4.14.7"
   dependencies:
@@ -12607,6 +12650,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"mini-svg-data-uri@npm:^1.2.3":
+  version: 1.2.3
+  resolution: "mini-svg-data-uri@npm:1.2.3"
+  checksum: a354646418956856a3906dbe3418684d83084296a4d47a9d8945c256a7f9f9e06600e3d3760a0555229f09d8bf37a4817facd7ac5000cca334d3a6d7ec42a02f
+  languageName: node
+  linkType: hard
+
 "minimalistic-assert@npm:^1.0.0, minimalistic-assert@npm:^1.0.1":
   version: 1.0.1
   resolution: "minimalistic-assert@npm:1.0.1"
@@ -17567,10 +17617,13 @@ resolve@1.1.7:
     "@storybook/addon-essentials": ^6.0.28
     "@storybook/addon-links": ^6.0.28
     "@storybook/react": ^6.0.28
+    "@tailwindcss/aspect-ratio": ^0.2.0
+    "@tailwindcss/forms": ^0.2.1
+    "@tailwindcss/typography": ^0.3.1
     "@types/node": ^14.14.6
     "@types/react": ^16.9.55
     "@types/react-syntax-highlighter": ^13.5.0
-    autoprefixer: ^9
+    autoprefixer: latest
     babel-loader: ^8.1.0
     next: 10.0.0
     postcss: ^8.1.9

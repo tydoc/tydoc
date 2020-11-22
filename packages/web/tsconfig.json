@@ -15,9 +15,7 @@
     "outDir": "dist",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-
-    "baseUrl": "."
+    "jsx": "preserve"
   },
   "references": [{ "path": "../extractor" }],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
