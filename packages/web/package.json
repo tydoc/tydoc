@@ -30,13 +30,12 @@
     "@types/node": "^14.14.6",
     "@types/react": "^16.9.55",
     "@types/react-syntax-highlighter": "^13.5.0",
-    "autoprefixer": "latest",
+    "autoprefixer": "^10.0.2",
     "babel-loader": "^8.1.0",
     "postcss": "^8.1.9",
     "react-is": "^17.0.1",
     "tailwindcss": "^2.0.1",
-    "ts-node": "^9.0.0",
     "tydoc": "workspace:packages/extractor",
-    "typescript": "^4.0.5"
+    "typescript": "^4.1.2"
   }
 }
