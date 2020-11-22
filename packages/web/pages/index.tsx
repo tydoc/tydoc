@@ -24,7 +24,8 @@ export default function Home() {
               <Search className="w-5 h-5 text-gray-400" />
             </div>
             <input
-              className="block w-full pl-10 form-input sm:text-sm sm:leading-5"
+              type="text"
+              className="block w-full border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:ring-opacity-50 pl-10 form-input sm:text-sm sm:leading-5"
               placeholder="Search for a package"
             />
           </div>
@@ -43,17 +44,22 @@ export default function Home() {
       <div className="px-6 py-8">
         {/* Package information */}
         <div className="flex items-center">
+          {/* Name */}
           <div className="h-full px-3 py-2 font-mono font-bold leading-6 text-gray-700 bg-gray-200 border border-gray-200 rounded-md">
             ink
           </div>
+
+          {/* Version */}
           <select
             id="location"
-            className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 form-select focus:outline-none focus:ring focus:ring-blue focus:border-blue-300"
+            className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 form-select rounded-md focus:outline-none focus:ring focus:ring-blue-300"
             defaultValue="3.0.8"
           >
             <option>3.0.0</option>
             <option>3.0.8</option>
           </select>
+
+          {/* Tags */}
           <div className="inline-flex ml-2 items-center px-2.5 py-1 rounded-md text-sm font-medium leading-5 bg-blue-500 text-white">
             latest
           </div>
