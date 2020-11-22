@@ -1,4 +1,3 @@
-import { intersectionBy } from 'lodash'
 import * as tsm from 'ts-morph'
 import { inspect } from 'util'
 import { dumpNode, dumpType } from './api/extractor/utils'
@@ -30,28 +29,16 @@ export function dump(...args: any[]) {
   console.error(...argsInspected)
 }
 
-export function getDiscriminantPropertiesOfUnionMembers(
-  members: tsm.Type[]
-): (tsm.PropertySignature | tsm.MethodSignature)[] {
-  const membersLiteralProperties = members.map((m) => getProperties(m).filter((p) => p.getType().isLiteral()))
-  const commonMemberProperties = intersectionBy(...membersLiteralProperties, (p) => {
-    return p.getName()
-  })
-  return commonMemberProperties
-}
-
-/**
- * Get the properties of a type, if any. This may return methods or non-methods.
- *
- * @remarks
- *
- * Overloadeds are discarding, taking only the first declaration found.
- */
-export function getProperties(t: tsm.Type): (tsm.PropertySignature | tsm.MethodSignature)[] {
-  return t.getProperties().map((p) => {
-    const node = p.getDeclarations()[0] as tsm.PropertySignature | tsm.MethodSignature
-    return node
-  })
+export function indexBy<T extends object>(items: T[], property: keyof T | ((item: T) => string)): Index<T> {
+  const index = {} as any
+  for (const item of items) {
+    if (typeof property === 'function') {
+      index[property(item)] = item
+    } else {
+      index[item[property]] = item
+    }
+  }
+  return index
 }
 
 export function arrayify<T>(x: T): T extends Array<any> ? T : T[] {

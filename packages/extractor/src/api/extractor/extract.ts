@@ -3,8 +3,12 @@ import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
-import { getDiscriminantPropertiesOfUnionMembers, getProperties } from '../../utils'
-import { applyDiagnosticFilters, DiagnosticFilter } from '../lib/ts-helpers'
+import {
+  applyDiagnosticFilters,
+  DiagnosticFilter,
+  getDiscriminantPropertiesOfUnionMembers,
+  getProperties,
+} from '../lib/ts-helpers'
 import * as Doc from './doc'
 import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 
