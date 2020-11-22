@@ -1,6 +1,12 @@
-import { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { Doc } from 'tydoc/types'
+
+/* TypeIndex Context */
+
+const TypeIndexContext = React.createContext<Doc.TypeIndex>({})
+
+/* Component */
 
 export const Package: FC = () => {
   const json = useJson(
@@ -12,27 +18,37 @@ export const Package: FC = () => {
     return <div>Loading...</div>
   }
 
+  /* Data */
+
+  // const types = json.typeIndex.values()
+
+  /* View */
+
   return (
-    <div className="">
-      {/* Modules */}
-      {json.modules.map((module) => (
-        <Module key={module.name} module={module} typeIndex={json.typeIndex} />
-      ))}
-    </div>
+    <TypeIndexContext.Provider value={json.typeIndex}>
+      <div className="">
+        {/* Modules */}
+        {json.modules.map((module) => (
+          <Module key={module.name} module={module} />
+        ))}
+
+        {/* Types */}
+        {}
+      </div>
+    </TypeIndexContext.Provider>
   )
 }
 
 type ModuleProps = {
   module: Doc.DocModule
-  typeIndex: Doc.TypeIndex
 }
 
-function Module({ module, typeIndex }: ModuleProps) {
+function Module({ module }: ModuleProps) {
   return (
     <div>
       {/* Header */}
       <div>
-        <b>{module.name}</b>
+        <h2 className="text-2xl font-bold und">{module.name}</h2>
         <p>{module.tsdoc?.summary}</p>
       </div>
 
@@ -46,7 +62,9 @@ function Module({ module, typeIndex }: ModuleProps) {
             </div>
 
             {/* Type */}
-            <Type node={e.type} typeIndex={typeIndex} />
+            <div className="pt-2 inline rounded-md border border-gray-300 bg-gray-100 p-2">
+              <Type node={e.type} />
+            </div>
           </div>
         ))}
       </div>
@@ -54,28 +72,68 @@ function Module({ module, typeIndex }: ModuleProps) {
   )
 }
 
-type TypeProps = { node: Doc.Node; typeIndex: Doc.TypeIndex }
+type TypeProps = { node: Doc.Node }
 
-function Type({ node, typeIndex }: TypeProps) {
+/**
+ * Type recursively creates a representation of the provided type.
+ */
+function Type({ node }: TypeProps) {
+  /* Context */
+  const typeIndex = React.useContext(TypeIndexContext)
+
   /* Draw a type */
   switch (node.kind) {
-    case 'typeIndexRef':
-      const type = typeIndex[node.link]!
+    case 'primitive':
       return (
-        <div className="">
-          {/* Type */}
-          <Code code={type.raw.typeText} />
+        <span className="font-mono font-medium text-green-700">
+          {node.type}
+        </span>
+      )
+    case 'typeIndexRef':
+      /* 
+      References a type to the index that you may click and hover to get additional information.
+      */
+      const type = typeIndex[node.link]!
 
-          {/* Description */}
-          {/* <p>{t.}</p> */}
-        </div>
+      return (
+        <a href={`#${type.name}`}>
+          <span className="font-mono font-medium text-blue-600">
+            {type.raw.typeText}
+          </span>
+        </a>
       )
 
     case 'callable':
       return (
-        <div className="">
-          {/* Type */}
-          <Code code={node.raw.typeText} />
+        <div className="inline">
+          {/* Overloads */}
+          {node.sigs.map((sig) => (
+            <>
+              {/* Parameters */}
+              <span>
+                {`(`}
+                {sig.params.map((param, i) => (
+                  <span key={param.name} className="font-mono mx-1">
+                    {/* Parameter name */}
+                    <span className="font-normal pr-1">{param.name}:</span>
+
+                    {/* Parameter type */}
+                    <Type node={param.type} />
+
+                    {/* Separator */}
+                    {i < sig.params.length - 1 && (
+                      <span className="font-normal">{`,`}</span>
+                    )}
+                  </span>
+                ))}
+                {`)`}
+              </span>
+
+              <span className="font-mono px-2">{`=>`}</span>
+              {/* Return type */}
+              <Type node={sig.return} />
+            </>
+          ))}
 
           {/* Description */}
           {/* <p>{t.}</p> */}
@@ -83,9 +141,13 @@ function Type({ node, typeIndex }: TypeProps) {
       )
 
     default:
-      return <> </>
+      return <>TODO</>
   }
 }
+
+// function Params(props: React.PropsWithChildren<{}>) {
+//   return <span>({props.children})</span>
+// }
 
 type CodeProps = { code: string }
 
