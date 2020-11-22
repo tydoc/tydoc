@@ -7,13 +7,17 @@ import React, { FC } from 'react'
 export default function Home() {
   return (
     <div className="w-full">
+      {/* Header */}
       <div className="flex items-center w-full px-6 text-white bg-blue-500 h-14">
+        {/* Logo */}
         <Link href="/">
           <a className="flex items-center">
             <TSLogo />
             <div className="ml-1 font-medium">TyDoc</div>
           </a>
         </Link>
+
+        {/* Searchbar */}
         <div className="flex-1 mx-6">
           <div className="relative text-gray-700 rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -34,14 +38,17 @@ export default function Home() {
           </a>
         </div>
       </div>
+
+      {/* Package */}
       <div className="px-6 py-8">
+        {/* Package information */}
         <div className="flex items-center">
           <div className="h-full px-3 py-2 font-mono font-bold leading-6 text-gray-700 bg-gray-200 border border-gray-200 rounded-md">
             ink
           </div>
           <select
             id="location"
-            className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 form-select focus:outline-none focus:shadow-outline-blue focus:border-blue-300"
+            className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 form-select focus:outline-none focus:ring focus:ring-blue focus:border-blue-300"
             defaultValue="3.0.8"
           >
             <option>3.0.0</option>
@@ -58,6 +65,8 @@ export default function Home() {
           <div className="mx-2">|</div>
           <div>License: MIT</div>
         </div>
+
+        {/* Content */}
         <div className="flex">
           <SideNav />
           <Content />

@@ -23,9 +23,10 @@ module.exports = {
     },
   },
   variants: {},
-  future: {
-    removeDeprecatedGapUtilities: true,
-    purgeLayersByDefault: true,
-  },
-  plugins: [require('@tailwindcss/ui')],
+  future: {},
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/aspect-ratio'),
+  ],
 }

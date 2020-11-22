@@ -7,7 +7,6 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Features](#features)
 - [Features Still TODO](#features-still-todo)
 - [General Features Overview](#general-features-overview)
@@ -23,10 +22,10 @@ Work in progress 👷‍
   - [Named Exports](#named-exports)
   - [Main Export](#main-export)
 - [Type Index Overview](#type-index-overview)
-    - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
-    - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
-    - [Module Level TsDoc](#module-level-tsdoc)
-    - [Qualified Module Paths](#qualified-module-paths)
+  - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
+  - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
+  - [Module Level TsDoc](#module-level-tsdoc)
+  - [Qualified Module Paths](#qualified-module-paths)
   - [Avoids extracting docs for native types (Array, RegExp, etc.)](#avoids-extracting-docs-for-native-types-array-regexp-etc)
 - [TS Types Support Overview](#ts-types-support-overview)
   - [Functions](#functions)
@@ -786,10 +785,10 @@ if (fruit.kind === 'Banana') {
 }
 ```
 
-Although the type of a discriminant property is typically a string literal it does not have to be. The requirements are that:
+There are two requirements for a property to be discriminant:
 
-1. Must: The types do not overlap. For example if all `kind` properties above were of type `string` then the checks would not be sufficient to know which member is being worked with. TS statically enforces this.
-2. Should: The types can be checked predictably at runtime via equality operator `===`/`==`. For example if the `kind` properties above were of type `string` and `number` then the checks needed at runtime would be infinite... (and now if you're wondering if TS permits testing the discriminant with JS's `typeof` operator, the answer is no).
+1. The type of the property must be a literal. Often a string, but it could just as well be `1` `2` `false` etc. Another requirement
+2. The types of the properties between union members must not overlap. For example if all `kind` properties above were of type `hello` then the checks would not be sufficient to know which member is being worked with. TS statically enforces this.
 
 #### Tydoc Support
 
