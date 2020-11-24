@@ -7,10 +7,11 @@
     "moduleResolution": "node",
     "target": "ES2019",
     "outDir": "dist",
+    "strict":true,
     "rootDir": "src",
     "declarationMap": true,
     "sourceMap": true,
     "lib": ["ESNext", "DOM"]
   },
-  "include": ["src"]
+  "include": ["src"],
 }
