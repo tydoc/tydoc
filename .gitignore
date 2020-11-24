@@ -5,3 +5,4 @@ dist
 .yarn/cache
 .yarn/install-state.gz
 storybook-static
+tsconfig.tsbuildinfo
