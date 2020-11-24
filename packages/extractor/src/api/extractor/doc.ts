@@ -1,18 +1,9 @@
+import { TSDocParser } from '@microsoft/tsdoc'
 import Debug from 'debug'
-import * as lo from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
-import { TSDocParser } from '@microsoft/tsdoc'
-import {
-  Index,
-  Thunk
-} from '../../utils'
-import {
-  hasAlias,
-  isPrimitive,
-  isTypeLevelNode,
-  renderTSDocNode
-} from './utils'
+import { Index, Thunk } from '../../utils'
+import { hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
 
 const debug = Debug('tydoc:doc')
 
@@ -656,29 +647,4 @@ export function union(input: UnionInput): DocTypeUnion {
     isDiscriminated: input.discriminantProperties.length > 0,
     discriminantProperties: input.discriminantProperties.length > 0 ? input.discriminantProperties : null,
   }
-}
-
-function findDiscriminant(nodes: Node[]): null | string[] {
-  if (nodes.length === 0) return null
-  if (nodes.length === 1) return null
-  let possible: string[] = []
-  let isLoop1 = true
-  for (const n of nodes) {
-    if (n.kind !== 'callable' && n.kind !== 'interface' && n.kind !== 'object') {
-      return null
-    }
-
-    const props = n.props.map((p) => p.name)
-
-    if (isLoop1) {
-      possible = props
-      isLoop1 = false
-    } else {
-      possible = lo.intersection(possible, props)
-    }
-
-    if (possible.length === 0) return null
-  }
-
-  return possible
 }
