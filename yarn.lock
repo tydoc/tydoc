@@ -6277,6 +6277,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chaindown@npm:^0.1.0-next.1":
+  version: 0.1.0-next.1
+  resolution: "chaindown@npm:0.1.0-next.1"
+  dependencies:
+    lodash: ^4.17.20
+  checksum: 180161515a5fa476ebe6921b556b9baed6d1dc12d1a7ad244979d9d56e6433045f0a7163d469d7969d22c5b430e8d334104bb1d3c7f9324f7c53bb0316490b56
+  languageName: node
+  linkType: hard
+
 "chalk@npm:2.4.2, chalk@npm:^2.0.0, chalk@npm:^2.0.1, chalk@npm:^2.1.0, chalk@npm:^2.3.2, chalk@npm:^2.4.1, chalk@npm:^2.4.2":
   version: 2.4.2
   resolution: "chalk@npm:2.4.2"
@@ -17655,6 +17664,7 @@ resolve@1.1.7:
     "@types/lodash": ^4.14.149
     "@types/node": 13.7.6
     "@types/prettier": 1.19.0
+    chaindown: ^0.1.0-next.1
     debug: ^4.1.1
     dedent: ^0.7.0
     doctoc: ^1.4.0

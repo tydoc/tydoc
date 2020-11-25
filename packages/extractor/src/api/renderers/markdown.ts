@@ -1,8 +1,4 @@
-import * as Debug from 'debug'
-import * as Prettier from 'prettier'
-import { lookupOrThrow } from '../../utils'
-import * as Doc from '../extractor/doc'
-import * as MD from '../lib/markdown'
+import * as MD from 'chaindown'
 import {
   codeSpan,
   lines,
@@ -12,7 +8,11 @@ import {
   section,
   span,
   tsCodeBlock,
-} from '../lib/markdown'
+} from 'chaindown'
+import * as Debug from 'debug'
+import * as Prettier from 'prettier'
+import { lookupOrThrow } from '../../utils'
+import * as Doc from '../extractor/doc'
 
 const debug = Debug('tydoc:markdown')
 const debugModule = Debug('tydoc:markdown:module')
