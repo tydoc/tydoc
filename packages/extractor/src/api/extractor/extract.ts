@@ -162,7 +162,9 @@ export function fromProject(options: Options): Doc.DocPackage {
     
       Tydoc needs this information to discover the path to your source entrypoint.
 
-      Please update your tsconfig.json to meet Tydoc's discovery needs.
+      You can tell Tydoc explicitly about it via the ${Kleur.yellow('--entrypoint')} flag.
+
+      Otherwise please update your tsconfig.json to meet Tydoc's discovery needs.
     `)
   }
   if (!path.isAbsolute(outDir)) {
