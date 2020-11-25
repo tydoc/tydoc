@@ -13,6 +13,7 @@ import {
 import * as Doc from './doc'
 import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 import dedent = require('dedent')
+import Kleur = require('kleur')
 
 const debug = Debug('tydoc:extract')
 const debugExport = Debug('tydoc:extract:export')
@@ -154,7 +155,15 @@ export function fromProject(options: Options): Doc.DocPackage {
     outDir = compilerOptOutDir
   } else {
     // todo we could fallback to the source root dir which IIUC is what TS does?
-    throw new Error('Your tsconfig.json compilerOptions did not specify an outDir. It must.')
+    throw new Error(dedent`
+      Your ${Kleur.yellow('tsconfig.json')} compilerOptions does not have ${Kleur.yellow(
+      'compilerOptions.outDir'
+    )} specified.
+    
+      Tydoc needs this information to discover the path to your source entrypoint.
+
+      Please update your tsconfig.json to meet Tydoc's discovery needs.
+    `)
   }
   if (!path.isAbsolute(outDir)) {
     outDir = path.join(prjDir, outDir)
