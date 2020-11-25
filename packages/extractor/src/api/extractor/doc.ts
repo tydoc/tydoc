@@ -3,6 +3,7 @@ import Debug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { Index, Thunk } from '../../utils'
+import { getFirstDeclarationOrThrow } from '../lib/ts-helpers'
 import { hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
 
 const debug = Debug('tydoc:doc')
@@ -55,7 +56,9 @@ export class Manager {
   }
 
   getFromIndex(name: string): Node {
-    return this.data.typeIndex[name]
+    const node = this.data.typeIndex[name]
+    if (!node) throw new Error(`Could not find "${name}" in the EDD Type Index.`)
+    return node
   }
 
   getFQTN(t: tsm.Type): string {
@@ -190,11 +193,11 @@ export function getFQTNFromType(sourceRoot: string, t: tsm.Type): string {
   let sourceFile: tsm.SourceFile
   if (as) {
     typeName = as.getName()
-    sourceFile = as.getDeclarations()[0].getSourceFile()
+    sourceFile = getFirstDeclarationOrThrow(as).getSourceFile()
   } else if (s) {
     // todo what would get name be here then...?
     // typeName = sym.getName()
-    sourceFile = s.getDeclarations()[0].getSourceFile()
+    sourceFile = getFirstDeclarationOrThrow(s).getSourceFile()
     typeName = t.getText(undefined, tsm.ts.TypeFormatFlags.None)
   } else {
     throw new Error(`Given type ${t.getText()} has neither symbol nor alias symbol`)
@@ -414,7 +417,8 @@ export function modFromSourceFile(manager: Manager, sourceFile: tsm.SourceFile):
  * cause the one leading the module to be its doc.
  */
 function extractModuleLevelTSDoc(manager: Manager, sf: tsm.SourceFile): TSDocFrag['tsdoc'] {
-  const syntaxList = sf.getChildren()[0]
+  //todo why does getChildren return an array? Handle edge-case properly
+  const syntaxList = sf.getChildren()[0]!
 
   if (!tsm.Node.isSyntaxList(syntaxList)) {
     throw new Error(

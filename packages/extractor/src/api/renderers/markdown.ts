@@ -1,5 +1,6 @@
 import * as Debug from 'debug'
 import * as Prettier from 'prettier'
+import { lookupOrThrow } from '../../utils'
 import * as Doc from '../extractor/doc'
 import * as MD from '../lib/markdown'
 import {
@@ -63,8 +64,8 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
 
     if (docs.modules.length === 1) {
       // If there is only one module then no need to qualify it
-      debugModule('start module %s', docs.modules[0].path)
-      md.add(renderModule(opts, docs.modules[0], docs.typeIndex))
+      debugModule('start module %s', docs.modules[0]!.path)
+      md.add(renderModule(opts, docs.modules[0]!, docs.typeIndex))
     } else {
       md.add(
         docs.modules.map((mod) => {
@@ -126,7 +127,13 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
         termSection.add(sigCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
       } else if (ex.type.kind === 'typeIndexRef') {
         termSection.add(
-          span('Of type', link(codeSpan(ti[ex.type.link].name), typeTitleAnchorLink(ti[ex.type.link])))
+          span(
+            'Of type',
+            link(
+              codeSpan(lookupOrThrow(ti, ex.type.link).name),
+              typeTitleAnchorLink(lookupOrThrow(ti, ex.type.link))
+            )
+          )
         )
       } else {
         termSection.add(tsCodeBlock((ex.type as any)?.raw?.typeText ?? ''))
@@ -196,7 +203,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
       return typeIcon(t.type)
     }
     if (t.kind === 'typeIndexRef') {
-      return typeIcon(docs.typeIndex[t.link])
+      return typeIcon(lookupOrThrow(docs.typeIndex, t.link))
     }
     return '' // todo
   }
@@ -233,7 +240,7 @@ function renderExamples(md: MD.SmartNode, tsdoc: Doc.TSDoc): void {
   if (tsdoc.examples.length === 0) return
 
   if (tsdoc.examples.length === 1) {
-    md.add(section('Example').add(tsdoc.examples[0].text))
+    md.add(section('Example').add(tsdoc.examples[0]!.text))
   } else {
     md.add(section('Examples').add(tsdoc.examples.map((ex, i) => section(`Example ${i}`).add(ex.text))))
   }

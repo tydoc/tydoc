@@ -44,3 +44,16 @@ export function indexBy<T extends object>(items: T[], property: keyof T | ((item
 export function arrayify<T>(x: T): T extends Array<any> ? T : T[] {
   return Array.isArray(x) ? x : ([x] as any)
 }
+
+export function lookupOrThrow<T>(index: Index<T>, key: string): T {
+  const val = index[key]
+
+  if (val === undefined) {
+    const keyCount = Object.keys(index).length
+    throw new Error(
+      `Failed to lookup "${key}" in the given index (${keyCount} keys) because there was no such key.`
+    )
+  }
+
+  return val
+}

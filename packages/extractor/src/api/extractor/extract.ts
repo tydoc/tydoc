@@ -7,10 +7,12 @@ import {
   applyDiagnosticFilters,
   DiagnosticFilter,
   getDiscriminantPropertiesOfUnionMembers,
+  getFirstDeclarationOrThrow,
   getProperties,
 } from '../lib/ts-helpers'
 import * as Doc from './doc'
 import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
+import dedent = require('dedent')
 
 const debug = Debug('tydoc:extract')
 const debugExport = Debug('tydoc:extract:export')
@@ -219,7 +221,7 @@ export function fromProject(options: Options): Doc.DocPackage {
   const sourceFileEntrypoints = []
   for (const findEntryPoint of options.entrypoints) {
     let entrypointModulePathAbs: string
-    if (path.isAbsolute(findEntryPoint[0])) {
+    if (path.isAbsolute(findEntryPoint)) {
       debug('considering given entrypoint as absolute, disregarding srcDir: %s', findEntryPoint)
       entrypointModulePathAbs = path.join(
         path.dirname(findEntryPoint),
@@ -289,9 +291,20 @@ export function fromProject(options: Options): Doc.DocPackage {
 export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.DocPackage {
   const mod = Doc.modFromSourceFile(manager, sourceFile)
 
-  for (const ex of sourceFile.getExportedDeclarations()) {
-    const exportName = ex[0]
-    const n = ex[1][0]
+  for (const [exportName, exportedDeclarations] of sourceFile.getExportedDeclarations()) {
+    const n = exportedDeclarations[0]
+
+    if (!n) {
+      console.warn(
+        dedent`
+          Skipping named export "${exportName}" in module at "${sourceFile.getFilePath()}" because there were no exported declarations for it.
+
+          This should not normally happen. Please open an issue with your use-case/context so we can investigate the issue.
+        `
+      )
+      continue
+    }
+
     const t = n.getType()
     debugExport('start')
     debugExport('-> node kind is %s', n.getKindName())
@@ -490,13 +503,13 @@ function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
     return Doc.sig({
       return: fromType(docs, tRet),
       params: params.map((p) => {
-        const node = p.getDeclarations()[0]
+        const n = getFirstDeclarationOrThrow(p)
         const paramName = p.getName()
-        const paramType = node.getType()
+        const paramType = n.getType()
         // what is this method for then? It was just returning an `any` type
         // const paramType = p.getDeclaredType()
         // prettier-ignore
-        debugVisible('handle callable param: %s %s %s', node.getKindName(), paramName, paramType.getText())
+        debugVisible('handle callable param: %s %s %s', n.getKindName(), paramName, paramType.getText())
         return Doc.sigParam({
           name: paramName,
           type: fromType(docs, paramType),

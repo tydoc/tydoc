@@ -36,9 +36,22 @@ export function isTypeLevelNode(node: tsm.Node): boolean {
 
 export function getNodeFromTypePreferingAlias(t: tsm.Type): null | tsm.Node {
   const as = t.getAliasSymbol()
-  if (as) return as.getDeclarations()[0]
+
+  if (as) {
+    const declarations = as.getDeclarations()
+    if (declarations[0]) {
+      return declarations[0]
+    }
+  }
+
   const s = t.getSymbol()
-  if (s) return s.getDeclarations()[0]
+  if (s) {
+    const declarations = s.getDeclarations()
+    if (declarations[0]) {
+      return declarations[0]
+    }
+  }
+
   return null
 }
 

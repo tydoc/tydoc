@@ -135,3 +135,21 @@ export function getProperties(t: tsm.Type): (tsm.PropertySignature | tsm.MethodS
     return node
   })
 }
+
+/**
+ * Return the first declaration of the symbol, ignoring all others and throwing if no declaration can be found.
+ *
+ * @remarks
+ *
+ * TS has the concept of overloading. For example a function with multiple signatures.
+ */
+export function getFirstDeclarationOrThrow(symbol: tsm.Symbol): tsm.Node {
+  const decs = symbol.getDeclarations()
+  const dec = decs[0]
+  if (!dec) {
+    throw new Error(
+      `Failed to get first declaration for symbol "${symbol.getName()}" because it had no declarations.`
+    )
+  }
+  return dec
+}
