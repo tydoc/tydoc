@@ -68,7 +68,7 @@ function useJson(url: string) {
   useEffect(() => {
     ;(async () => {
       const res = await fetch(url)
-      if (res.headers.get('Content-Type')?.includes('application/json')) {
+      if (res.headers.get('content-type')?.includes('application/json')) {
         const _ = await res.json()
         setJson(_)
       } else {
