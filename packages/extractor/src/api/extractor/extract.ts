@@ -92,8 +92,8 @@ interface Options {
   haltOnDiagnostics?: boolean | DiagnosticFilter[]
 }
 
-function readSettingsFromPackage(): Partial<Doc.Settings> {
-  const userSettings = fs.read('package.json', 'json').tydoc
+function readSettingsFromPackage(prjDir: string): Partial<Doc.Settings> {
+  const userSettings = fs.read(path.join(prjDir, 'package.json'), 'json').tydoc
 
   // todo validation ... :(
   if (userSettings) {
@@ -177,7 +177,7 @@ export function fromProject(options: Options): Doc.DocPackage {
     // useful for tests
     packageMainEntrypoint = options.packageMainEntrypoint
   } else {
-    const pjson = fs.read('package.json', 'json')
+    const pjson = fs.read(path.join(prjDir, 'package.json'), 'json')
     if (pjson.main) {
       packageMainEntrypoint = pjson.main
     } else {
@@ -277,7 +277,7 @@ export function fromProject(options: Options): Doc.DocPackage {
   }
 
   if (options.readSettingsFromJSON) {
-    lo.merge(managerSettings, readSettingsFromPackage())
+    lo.merge(managerSettings, readSettingsFromPackage(prjDir))
   } else {
     debug('reading user settings from package.json is disabled')
   }

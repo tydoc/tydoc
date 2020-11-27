@@ -19,7 +19,7 @@
     "build:ts": "tsc",
     "build": "yarn clean && yarn build:oclif && yarn build:ts",
     "dev": "tsc -w",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "dev:test": "jest --watch",
     "test": "jest",
     "test:dev": "yarn -s dev:test",
