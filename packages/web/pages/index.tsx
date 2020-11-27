@@ -1,9 +1,31 @@
+import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import React, { FC } from 'react'
 import { Package } from '../components/Content'
 import { Search, TSLogo } from '../components/svg'
 
-export default function Home() {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { github, entrypoint } = context.query
+  if (!github) {
+    throw new Error(`No query param "github=[string]" provided`)
+  }
+
+  if (!entrypoint) {
+    throw new Error(`No query param "entrypoint=[string]" provided`)
+  }
+
+  return {
+    props: { github, entrypoint },
+  }
+}
+
+export default function Home({
+  github,
+  entrypoint,
+}: {
+  github: string
+  entrypoint: string
+}) {
   return (
     <div className="w-full">
       {/* Header */}
@@ -24,7 +46,7 @@ export default function Home() {
             </div>
             <input
               type="text"
-              className="block w-full border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:ring-opacity-50 pl-10 form-input sm:text-sm sm:leading-5"
+              className="block w-full pl-10 border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:ring-opacity-50 form-input sm:text-sm sm:leading-5"
               placeholder="Search for a package"
             />
           </div>
@@ -51,7 +73,7 @@ export default function Home() {
           {/* Version */}
           <select
             id="location"
-            className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 form-select rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+            className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 rounded-md form-select focus:outline-none focus:ring focus:ring-blue-300"
             defaultValue="3.0.8"
           >
             <option>3.0.0</option>
@@ -76,7 +98,7 @@ export default function Home() {
         {/* Content */}
         <div className="flex">
           <SideNav />
-          <Package />
+          <Package {...{ github, entrypoint }} />
         </div>
       </div>
     </div>
