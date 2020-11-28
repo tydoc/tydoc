@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { DocPackage } from 'tydoc/dist/api/extractor/doc'
 import { Doc } from 'tydoc/types'
 
 import { Heading } from './Heading'
@@ -8,37 +9,27 @@ import { Type } from './Type'
 import { TypeIndexContext } from './TypeIndexContext'
 
 export interface PackageProps {
-  github: string
-  entrypoint: string
+  docPackage: DocPackage
 }
 
 /**
  * Displays package.
  */
-export function Package({ github, entrypoint }: PackageProps): JSX.Element {
-  const json = useJson(
-    `https://tydoc-source-proxy.vercel.app/api?github=${github}&entrypoint=${entrypoint}`,
-  )
-  console.log({ json })
-
-  if (json === undefined) {
-    return <div>Loading...</div>
-  }
-
+export function Package({ docPackage }: PackageProps): JSX.Element {
   /* Data */
 
-  const types = Object.values(json.typeIndex)
+  const types = Object.values(docPackage.typeIndex)
 
   /* View */
 
   return (
-    <TypeIndexContext.Provider value={json.typeIndex}>
+    <TypeIndexContext.Provider value={docPackage.typeIndex}>
       <div className="">
         {/* Modules */}
         <div>
           <Heading>Modules</Heading>
 
-          {json.modules.map((module) => (
+          {docPackage.modules.map((module) => (
             <Module key={`modules-${module.name}`} module={module} />
           ))}
         </div>
@@ -54,25 +45,4 @@ export function Package({ github, entrypoint }: PackageProps): JSX.Element {
       </div>
     </TypeIndexContext.Provider>
   )
-}
-
-/* Utility hooks */
-
-function useJson(url: string) {
-  const [json, setJson] = useState<Doc.DocPackage | undefined>(undefined)
-
-  useEffect(() => {
-    ;(async () => {
-      const res = await fetch(url)
-      if (res.headers.get('content-type')?.includes('application/json')) {
-        const _ = await res.json()
-        setJson(_)
-      } else {
-        const text = await res.text()
-        throw new Error(text)
-      }
-    })()
-  }, [url])
-
-  return json
 }
