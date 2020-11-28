@@ -34,7 +34,7 @@ export const getStaticProps = defineStaticProps(async (context) => {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: [],
+    paths: [{ params: { entrypoint: 'types', pkg: ['graphql-request'] } }],
     // fallback: 'blocking',
     fallback: true,
   }
