@@ -32,7 +32,6 @@ function createContextt() {
       rootDir: './src',
       outDir: './dist',
     },
-    addFilesFromTsConfig: false,
     useInMemoryFileSystem: true,
   })
 

@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as TyDoc from "../src"
+import * as tsm from 'ts-morph'
+
 const PACKAGES_DIR = path.join(__dirname, "__packages__");
 
 describe("tests extraction of packages", () => {
@@ -10,12 +12,16 @@ describe("tests extraction of packages", () => {
     test(packageDirName, async () => {
       const pkg = JSON.parse(fs.readFileSync(path.join(projectDir,"package.json"), { encoding: "utf8" }))
       const {main, module, typings } = pkg
-      const mainEntry = path.join(projectDir,'./lib/index.ts')
+      const mainEntry = path.join(projectDir,'./dist/index.ts')
+      const tsProject = new tsm.Project({
+        
+      })
       const docs = TyDoc.fromProject({
         entrypoints: [mainEntry],
         readSettingsFromJSON: false,
-        
+        packageMainEntrypoint: path.join(path.dirname(main),'index.d.ts'),
         prjDir: projectDir,
+        project: tsProject,
         haltOnDiagnostics: false,
       })
   
