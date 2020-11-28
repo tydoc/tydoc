@@ -3,7 +3,7 @@ import Debug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { Index, Thunk } from '../../utils'
-import { getFirstDeclarationOrThrow } from '../lib/ts-helpers'
+import { getFirstDeclarationOrThrow, getSourceFileModulePath } from '../lib/ts-helpers'
 import { hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
 
 const debug = Debug('tydoc:doc')
@@ -90,7 +90,7 @@ export class Manager {
   }
 
   isMainModule(sf: tsm.SourceFile): boolean {
-    return this.settings.mainModuleFilePathAbs === getModulePath(sf)
+    return this.settings.mainModuleFilePathAbs === getSourceFileModulePath(sf)
   }
 
   getImportFromPath(sf: tsm.SourceFile): string {
@@ -99,7 +99,7 @@ export class Manager {
       return '/'
     }
 
-    const modulePath = getModulePath(sf)
+    const modulePath = getSourceFileModulePath(sf)
 
     // handle mapped non-root module case
     const srcRelModulePath = path.relative(this.settings.srcDir, modulePath)
@@ -112,38 +112,6 @@ export class Manager {
     // handle non-root module case
     return path.join('/', path.relative(this.settings.prjDir, modulePath))
   }
-}
-
-/**
- * Get the path to the main TypeScript module in the package.
- *
- * @remarks If relative paths are given then the result will be relative.
- * otherwise if absolute paths are given the result will be absolute. Do not mix
- * relative and absolute paths!
- */
-export function getMainModule({
-  outDir,
-  srcDir,
-  packageMainEntrypoint,
-}: {
-  outDir: string
-  srcDir: string
-  packageMainEntrypoint: string
-}): string {
-  // todo assertion that all paths are relative or absolute––no mixing
-  const jsFilePathRel = path.relative(outDir, packageMainEntrypoint)
-  const mainModuleName = path.basename(jsFilePathRel, '.js')
-  const MainModulePathRel = path.join(path.dirname(jsFilePathRel), mainModuleName)
-  const MainModulePathAbs = path.join(srcDir, MainModulePathRel)
-  return MainModulePathAbs
-}
-
-/**
- * Get the module path of the given source file. The difference froma  file path
- * is that a module path does not have a file extension.
- */
-function getModulePath(sf: tsm.SourceFile): string {
-  return path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
 }
 
 // // todo move to test suite

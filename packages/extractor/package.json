@@ -64,7 +64,8 @@
     "jest-watch-typeahead": "0.4.2",
     "ts-jest": "25.2.1",
     "ts-node": "8.6.2",
-    "ts-node-dev": "1.0.0-pre.44"
+    "ts-node-dev": "1.0.0-pre.44",
+    "type-fest": "^0.20.2"
   },
   "prettier": "@prisma-labs/prettier-config",
   "jest": {

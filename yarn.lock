@@ -17691,6 +17691,7 @@ resolve@1.1.7:
     ts-morph: ^7.0.0
     ts-node: 8.6.2
     ts-node-dev: 1.0.0-pre.44
+    type-fest: ^0.20.2
     typescript: ^4.1.2
   bin:
     tydoc: dist/cli/main.js
@@ -17717,6 +17718,13 @@ resolve@1.1.7:
   version: 0.11.0
   resolution: "type-fest@npm:0.11.0"
   checksum: 02e5cadf13590a5724cacf8d9133320efd173f6fb1b695fcb29e56551a315bf0f07ca988a780a1999b7b55bb3eaaa7f37223615207236d393af17bba6749dc95
+  languageName: node
+  linkType: hard
+
+"type-fest@npm:^0.20.2":
+  version: 0.20.2
+  resolution: "type-fest@npm:0.20.2"
+  checksum: 1f887bc6150e632fb772fd28e33c22a4ab036c6f484fa9ac2e2115f6cae9d62bba7ca0368e3332b539d85bd2c8391c7bff22ad410abcbc9ab3774d61e250b210
   languageName: node
   linkType: hard
 

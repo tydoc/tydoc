@@ -50,7 +50,11 @@ export class Project extends Command {
           [{ path: '/foo/bar/.*', code '24.*' }]
         `,
     }),
+    sourceMainEntrypointPath: flags.string({
+      description: `Absolute path to the source main entrypoint. By default a discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups.`,
+    }),
   }
+
   async run() {
     const { flags, argv } = this.parse(Project)
 
@@ -65,8 +69,9 @@ export class Project extends Command {
     const docs = TyDoc.fromProject({
       entrypoints: argv,
       readSettingsFromJSON: true,
-      prjDir: flags.dir ?? process.cwd(),
+      projectDir: flags.dir ?? process.cwd(),
       haltOnDiagnostics,
+      sourceMainEntrypointPath: flags.sourceMainEntrypointPath,
     })
 
     if (flags.json) {

@@ -1,6 +1,6 @@
 import Debug from 'debug'
-import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
+import { isEmpty } from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import {
@@ -11,6 +11,7 @@ import {
   getProperties,
 } from '../lib/ts-helpers'
 import * as Doc from './doc'
+import { scan } from './layout'
 import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 import dedent = require('dedent')
 import Kleur = require('kleur')
@@ -22,10 +23,9 @@ const debugWarn = Debug('tydoc:warn')
 
 interface Options {
   /**
-   * Paths to modules in project, relative to project root or absolute.
+   * Paths to modules in project, relative to source root or absolute.
    */
   entrypoints: string[]
-  project?: tsm.Project
   /**
    * Specify the path to the package's entrypoint file.
    *
@@ -39,7 +39,7 @@ interface Options {
    * @default The current working directory
    * @remarks This is useful for tests to avoid having to mock process.cwd
    */
-  prjDir?: string
+  projectDir?: string
   /**
    * Should Tydoc settings be read from from the package file.
    */
@@ -48,7 +48,7 @@ interface Options {
    * Sometimes a source entrypoint is fronted by a facade module that allows
    * package consumers to do e.g. `import foo from "bar/toto"` _instead of_
    * `import foo from "bar/dist/toto". Use this mapping to force tydoc to view
-   * the given source modules (keys) at the given package path (values).
+   * the given source modules (the keys) at the given package path (the values).
    *
    * @example
    *
@@ -90,19 +90,13 @@ interface Options {
    *
    */
   haltOnDiagnostics?: boolean | DiagnosticFilter[]
-}
-
-function readSettingsFromPackage(prjDir: string): Partial<Doc.Settings> {
-  const userSettings = fs.read(path.join(prjDir, 'package.json'), 'json').tydoc
-
-  // todo validation ... :(
-  if (userSettings) {
-    debug('read user settings from package.json %O', userSettings)
-    return userSettings
-  }
-
-  debug('no user settings to read from package.json')
-  return {}
+  project?: tsm.Project
+  /**
+   * Absolute path to the source main entrypoint.
+   *
+   * @default A discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups.
+   */
+  sourceMainEntrypointPath?: string
 }
 
 /**
@@ -113,100 +107,24 @@ function readSettingsFromPackage(prjDir: string): Partial<Doc.Settings> {
 export function fromProject(options: Options): Doc.DocPackage {
   // Wherever the user's package.json is. We assume for now that this tool is
   // running from project root.
-  // todo there seems to be no way to get project dir from project instance??
-  // todo guard that cwd has tsconfig in it
-  let prjDir: string
-  if (options.prjDir) {
-    prjDir = options.prjDir
-    debug('prjDir set to %s -- taken from passed config ', prjDir)
-  } else {
-    prjDir = process.cwd()
-    debug('prjDir set to %s -- taken from current working directory', prjDir)
-  }
+
+  const layout = scan({
+    projectDir: options.projectDir,
+    sourceMainModulePath: options.sourceMainEntrypointPath,
+  })
+
   const project =
     options.project ??
     new tsm.Project({
-      tsConfigFilePath: path.join(prjDir, 'tsconfig.json'),
+      tsConfigFilePath: layout.tsconfigPath,
     })
 
-  // Find the source dir
-  //
-  let srcDir: string
-  const compilerOptRootDir = project.getCompilerOptions().rootDir
-  if (compilerOptRootDir) {
-    if (path.isAbsolute(compilerOptRootDir)) {
-      srcDir = compilerOptRootDir
-    } else {
-      srcDir = path.resolve(prjDir, compilerOptRootDir)
-    }
-  } else {
-    srcDir = prjDir
-  }
-  if (!path.isAbsolute(srcDir)) {
-    srcDir = path.join(prjDir, srcDir)
-  }
-  debug('srcDir set to %s', srcDir)
+  const haltOnDiagnostics = options.haltOnDiagnostics ?? true
 
-  // Find the out dir
-  //
-  let outDir: string
-  const compilerOptOutDir = project.getCompilerOptions().outDir
-  if (compilerOptOutDir !== undefined) {
-    outDir = compilerOptOutDir
-  } else {
-    // todo we could fallback to the source root dir which IIUC is what TS does?
-    throw new Error(dedent`
-      Your ${Kleur.yellow('tsconfig.json')} compilerOptions does not have ${Kleur.yellow(
-      'compilerOptions.outDir'
-    )} specified.
-    
-      Tydoc needs this information to discover the path to your source entrypoint.
-
-      You can tell Tydoc explicitly about it via the ${Kleur.yellow('--entrypoint')} flag.
-
-      Otherwise please update your tsconfig.json to meet Tydoc's discovery needs.
-    `)
-  }
-  if (!path.isAbsolute(outDir)) {
-    outDir = path.join(prjDir, outDir)
-  }
-  debug('outDir set to %s', outDir)
-
-  // Find the package entrypoint
-  //
-  let packageMainEntrypoint: string
-  if (options.packageMainEntrypoint) {
-    // useful for tests
-    packageMainEntrypoint = options.packageMainEntrypoint
-  } else {
-    const pjson = fs.read(path.join(prjDir, 'package.json'), 'json')
-    if (pjson.main) {
-      packageMainEntrypoint = pjson.main
-    } else {
-      throw new Error('Your package.json main field is missing or empty. It must be present.')
-    }
-  }
-  if (!path.isAbsolute(packageMainEntrypoint)) {
-    packageMainEntrypoint = path.join(prjDir, packageMainEntrypoint)
-  }
-  debug('packageMainEntrypoint is %s', packageMainEntrypoint)
-
-  // Find the package _source_ entrypoint
-  //
-  const mainModuleFilePathAbs = Doc.getMainModule({
-    outDir,
-    packageMainEntrypoint,
-    srcDir,
-  })
-  debug('mainModuleFilePathAbs is %s', mainModuleFilePathAbs)
-
-  // todo use setset
-  const stopOnTypeErrors = options.haltOnDiagnostics ?? true
-
-  if (stopOnTypeErrors !== false) {
+  if (haltOnDiagnostics !== false) {
     const diagnostics = project.getPreEmitDiagnostics()
     if (diagnostics.length) {
-      if (stopOnTypeErrors === true || applyDiagnosticFilters(stopOnTypeErrors, diagnostics)) {
+      if (haltOnDiagnostics === true || applyDiagnosticFilters(haltOnDiagnostics, diagnostics)) {
         const message = project.formatDiagnosticsWithColorAndContext(diagnostics)
         console.log(`
         Tydoc stopped extracting documentation becuase the package was found to have type errors. You should fix these and then try again. If you do not care about these type errors and want to try extracting documentation anyways then try using one of the following flags:\n  --ignore-diagnostics\n  --ignore-diagnostics-matching
@@ -216,19 +134,21 @@ export function fromProject(options: Options): Doc.DocPackage {
     }
   }
 
-  // If the project is empty dont' bother trying to extract docs
-  //
+  /**
+   * Get the entrypoint modules to crawl
+   */
+
   const sourceFiles = project.getSourceFiles()
-  if (sourceFiles.length === 0) {
+
+  if (isEmpty(sourceFiles)) {
     throw new Error('No source files found in project to document.')
   }
+
   debug(
     'found project source files ',
     sourceFiles.map((sf) => sf.getFilePath())
   )
 
-  // Get the entrypoints to crawl
-  //
   const sourceFileEntrypoints = []
   for (const findEntryPoint of options.entrypoints) {
     let entrypointModulePathAbs: string
@@ -241,7 +161,7 @@ export function fromProject(options: Options): Doc.DocPackage {
     } else {
       debug('considering given entrypoint relative to srcDir: %s', findEntryPoint)
       entrypointModulePathAbs = path.join(
-        srcDir,
+        layout.sourceDir,
         path.dirname(findEntryPoint),
         path.basename(findEntryPoint, path.extname(findEntryPoint))
       )
@@ -269,29 +189,34 @@ export function fromProject(options: Options): Doc.DocPackage {
     sourceFileEntrypoints.push(sf)
   }
 
-  // Setup manager settings
-  //
+  /**
+   * Setup manager
+   */
+
   const managerSettings = {
-    srcDir: srcDir,
-    prjDir: prjDir,
-    mainModuleFilePathAbs: mainModuleFilePathAbs,
+    srcDir: layout.sourceDir,
+    prjDir: layout.projectDir,
+    mainModuleFilePathAbs: layout.sourceMainModulePath,
     sourceModuleToPackagePathMappings: options.sourceModuleToPackagePathMappings,
   }
 
   if (options.readSettingsFromJSON) {
-    lo.merge(managerSettings, readSettingsFromPackage(prjDir))
+    lo.merge(managerSettings, layout.tydocSettingsInPackage)
   } else {
     debug('reading user settings from package.json is disabled')
   }
 
-  // Create manager extract doc and return final docs AST
-  //
   const manager = new Doc.Manager(managerSettings)
+
+  /**
+   * Get EDD
+   */
 
   sourceFileEntrypoints.forEach((sf) => {
     fromModule(manager, sf)
   })
 
+  // todo rename to edd
   return manager.data
 }
 
