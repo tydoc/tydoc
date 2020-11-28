@@ -41,15 +41,15 @@ export const Node: FC<NodeProps> = ({ node }) => {
       return (
         <div className="inline">
           {/* Overloads */}
-          {node.sigs.map((sig) => (
-            <>
+          {node.sigs.map((sig, index) => (
+            <React.Fragment key={index}>
               {/* Parameters */}
               <span>
                 {`(`}
                 {sig.params.map((param, i) => (
-                  <span key={param.name} className="font-mono mx-1">
+                  <span key={param.name} className="mx-1 font-mono">
                     {/* Parameter name */}
-                    <span className="font-normal pr-1">{param.name}:</span>
+                    <span className="pr-1 font-normal">{param.name}:</span>
 
                     {/* Parameter type */}
                     <Node node={param.type} />
@@ -63,10 +63,10 @@ export const Node: FC<NodeProps> = ({ node }) => {
                 {`)`}
               </span>
 
-              <span className="font-mono px-2">{`=>`}</span>
+              <span className="px-2 font-mono">{`=>`}</span>
               {/* Return type */}
               <Node node={sig.return} />
-            </>
+            </React.Fragment>
           ))}
 
           {/* Description */}
@@ -91,7 +91,7 @@ export const Node: FC<NodeProps> = ({ node }) => {
           <span>
             {`{`}
             {node.props.map((param, i) => (
-              <div key={param.name} className="font-mono ml-5 mx-1">
+              <div key={param.name} className="mx-1 ml-5 font-mono">
                 {/* Documentation */}
                 <Documentation node={param.type} />
                 {/* Type declaration */}
@@ -122,13 +122,13 @@ export const Node: FC<NodeProps> = ({ node }) => {
           {/* Parameters */}
           <span>
             {node.types.map((type, i) => (
-              <span key={`${node.types}`} className="font-mono mx-1">
+              <span key={`${node.types}`} className="mx-1 font-mono">
                 {/* Parameter type */}
                 <Node node={type} />
 
                 {/* Separator */}
                 {i < node.types.length - 1 && (
-                  <span className="font-normal text-red-400 ml-1">{`|`}</span>
+                  <span className="ml-1 font-normal text-red-400">{`|`}</span>
                 )}
               </span>
             ))}
@@ -144,9 +144,10 @@ export const Node: FC<NodeProps> = ({ node }) => {
           <span>
             {`{`}
             {node.props.map((param, i) => (
-              <div key={param.name} className="font-mono ml-5 mx-1">
+              <div key={param.name} className="mx-1 ml-5 font-mono">
                 {/* Documentation */}
-                <Documentation node={param.type} />
+                {/* TODO need to remove regex bomb */}
+                {/* <Documentation node={param.type} /> */}
 
                 {/* Type declaration */}
                 <div>
@@ -192,7 +193,7 @@ interface DocumentationProps {
 const Documentation: FC<DocumentationProps> = ({ node }) => {
   // Data
 
-  var docs: string | null | undefined = getDocumentationOfNode(node)
+  let docs: string | null | undefined = getDocumentationOfNode(node)
   docs = docs?.match(/(\/\*(?:.|\s)*)\*\//)?.[0]
   // docs?.match(/(\/\*(?:.|\s)*)\*\//)?.[0]
 

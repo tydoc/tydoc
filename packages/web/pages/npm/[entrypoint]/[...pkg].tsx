@@ -27,13 +27,13 @@ export const getStaticProps = defineStaticProps(async (context) => {
 
   return {
     props: { docPackage, npmInfo },
-    // revalidate: 60 * 5, // every 5min
+    revalidate: 60 * 5, // every 5min
   }
 })
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: [{ params: { entrypoint: 'types', pkg: ['graphql-request'] } }],
+    paths: [],
     // fallback: 'blocking',
     fallback: true,
   }
@@ -43,7 +43,7 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
   docPackage,
   npmInfo,
 }) => {
-  if (docPackage === undefined) {
+  if (docPackage === undefined || npmInfo === undefined) {
     return <div>Loading ...</div>
   }
 
