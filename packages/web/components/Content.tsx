@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { DocPackage } from 'tydoc/dist/api/extractor/doc'
 import { Doc } from 'tydoc/types'
 
 import { Heading } from './Heading'
@@ -9,7 +8,7 @@ import { Type } from './Type'
 import { TypeIndexContext } from './TypeIndexContext'
 
 export interface PackageProps {
-  docPackage: DocPackage
+  docPackage: Doc.DocPackage
 }
 
 /**
