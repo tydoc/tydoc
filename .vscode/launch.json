@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "command": "npm run cli -- project /home/will/tydoc/tydoc/packages/extractor/example/fp-ts/src/index -d=./example/fp-ts/ --ignore-diagnostics -m",
+      "command": "npm run cli -- project ${workspaceFolder}/packages/extractor/example/fp-ts/src/index -d=./example/fp-ts/ --ignore-diagnostics -m",
       "name": "Run npm cli",
       "cwd": "${workspaceFolder}/packages/extractor",
       "request": "launch",
