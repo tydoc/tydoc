@@ -10,8 +10,12 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
 
   return {
     props: {
-      github: github as string | null,
-      entrypoint: entrypoint as string | null,
+      // github: 'https://github.com/gcanti/fp-ts',
+      // entrypoint: 'src/index',
+      github: 'https://github.com/maticzav/sponsorsme',
+      entrypoint: 'index',
+      // github: github as string | null,
+      // entrypoint: entrypoint as string | null,
     },
   }
 }

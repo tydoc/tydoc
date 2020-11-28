@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { Doc } from 'tydoc/types'
 
 import { useTypeIndex } from './TypeIndexContext'
@@ -8,19 +8,21 @@ type NodeProps = { node: Doc.Node }
 /**
  * Type recursively creates a representation of the provided type.
  */
-export function Node({ node }: NodeProps) {
+export const Node: FC<NodeProps> = ({ node }) => {
   /* Context */
   const typeIndex = useTypeIndex()
 
   /* Draw a type */
   switch (node.kind) {
-    case 'primitive':
+    case 'primitive': {
       return (
         <span className="font-mono font-medium text-green-700">
           {node.type}
         </span>
       )
-    case 'typeIndexRef':
+    }
+
+    case 'typeIndexRef': {
       /* 
       References a type to the index that you may click and hover to get additional information.
       */
@@ -33,8 +35,9 @@ export function Node({ node }: NodeProps) {
           </span>
         </a>
       )
+    }
 
-    case 'callable':
+    case 'callable': {
       return (
         <div className="inline">
           {/* Overloads */}
@@ -70,8 +73,73 @@ export function Node({ node }: NodeProps) {
           {/* <p>{t.}</p> */}
         </div>
       )
+    }
+
+    case 'alias': {
+      /* Forwards the rendering to the aliased module. */
+      return (
+        <>
+          <Node node={node.type} />
+        </>
+      )
+    }
+
+    case 'object': {
+      return (
+        <>
+          {/* Parameters */}
+          <span>
+            {`{`}
+            {node.props.map((param, i) => (
+              <div key={param.name} className="font-mono ml-5 mx-1">
+                {/* Documentation */}
+                <div className="text-gray-500">/* docs */</div>
+                {/* Type declaration */}
+                <div>
+                  {/* Parameter name */}
+                  <span className="font-normal">{param.name}</span>
+                  <span className="pr-2 text-indigo-600-700">:</span>
+
+                  {/* Parameter type */}
+                  <Node node={param.type} />
+
+                  {/* Separator */}
+                  {i < node.props.length - 1 && (
+                    <span className="font-normal">{`,`}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+            {`}`}
+          </span>
+        </>
+      )
+    }
+
+    case 'union': {
+      return (
+        <>
+          {/* Parameters */}
+          <span>
+            {node.types.map((type, i) => (
+              <div key={`${node.types}`} className="font-mono ml-5 mx-1">
+                {/* Parameter type */}
+                <Node node={type} />
+
+                {/* Separator */}
+                {i < node.types.length - 1 && (
+                  <span className="font-normal text-red-400">{`|`}</span>
+                )}
+              </div>
+            ))}
+          </span>
+        </>
+      )
+    }
 
     default:
-      return <p>{JSON.stringify(node, null, 2)}</p>
+      console.log(node.kind, node)
+      // return <p>{JSON.stringify(node, null, 2)}</p>
+      return <span>'todo'</span>
   }
 }

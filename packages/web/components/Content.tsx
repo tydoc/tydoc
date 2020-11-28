@@ -4,6 +4,7 @@ import { Doc } from 'tydoc/types'
 import { Heading } from './Heading'
 import { Module } from './Module'
 import { Node } from './Node'
+import { Type } from './Type'
 import { TypeIndexContext } from './TypeIndexContext'
 
 export interface PackageProps {
@@ -47,11 +48,7 @@ export function Package({ github, entrypoint }: PackageProps): JSX.Element {
           <Heading>Types</Heading>
 
           {types.map((type) => (
-            <div key={`typeindex-${type.name}`} id={type.name} className="py-3">
-              <h3 className="font-mono text-xl">{type.name}</h3>
-              <Node node={type} />
-              {/* <CodeBlock code={type.raw.nodeText} /> */}
-            </div>
+            <Type key={`typeindex-${type.name}`} type={type} />
           ))}
         </div>
       </div>
