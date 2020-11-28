@@ -12,9 +12,12 @@ import { TypeIndexContext } from './TypeIndexContext'
 
 /* Component */
 
-export const Package: FC = () => {
+export const Package: FC<{
+  github: string
+  entrypoint: string
+}> = ({ github, entrypoint }) => {
   const json = useJson(
-    'https://tydoc-output.jasonkuhrt.vercel.app/tydoc.docs.json',
+    `https://tydoc-source-proxy.vercel.app/api?github=${github}&entrypoint=${entrypoint}`,
   )
   console.log({ json })
 
@@ -46,7 +49,7 @@ export const Package: FC = () => {
 
           {types.map((type) => (
             <div key={`typeindex-${type.name}`} id={type.name} className="py-3">
-              <h3 className="text-xl font-mono">{type.name}</h3>
+              <h3 className="font-mono text-xl">{type.name}</h3>
               <Node node={type} />
               {/* <CodeBlock code={type.raw.nodeText} /> */}
             </div>
@@ -63,9 +66,16 @@ function useJson(url: string) {
   const [json, setJson] = useState<Doc.DocPackage | undefined>(undefined)
 
   useEffect(() => {
-    fetch(url)
-      .then((r) => r.json())
-      .then((r) => setJson(r))
+    ;(async () => {
+      const res = await fetch(url)
+      if (res.headers.get('content-type')?.includes('application/json')) {
+        const _ = await res.json()
+        setJson(_)
+      } else {
+        const text = await res.text()
+        throw new Error(text)
+      }
+    })()
   }, [url])
 
   return json

@@ -8,4 +8,9 @@ export default {
   component: Package,
 } as Meta
 
-export const Default = () => <Package />
+export const Default = () => (
+  <Package
+    github="https://github.com/prisma-labs/graphql-request"
+    entrypoint="types"
+  />
+)
