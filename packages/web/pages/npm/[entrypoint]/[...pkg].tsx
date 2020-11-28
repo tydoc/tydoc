@@ -28,7 +28,6 @@ export const getStaticProps = defineStaticProps(async (context) => {
   return {
     props: { docPackage, npmInfo },
     // revalidate: 60 * 5, // every 5min
-    revalidate: 10, // every 5min
   }
 })
 
