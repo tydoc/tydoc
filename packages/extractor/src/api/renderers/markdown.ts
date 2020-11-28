@@ -9,7 +9,7 @@ import {
   span,
   tsCodeBlock,
 } from 'chaindown'
-import * as Debug from 'debug'
+import Debug from 'debug'
 import * as Prettier from 'prettier'
 import { lookupOrThrow } from '../../utils'
 import * as Doc from '../extractor/doc'

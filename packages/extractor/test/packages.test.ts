@@ -10,22 +10,20 @@ describe("tests extraction of packages", () => {
   for (const packageDirName of packages) {
     const projectDir = path.join(PACKAGES_DIR, packageDirName)
     test(packageDirName, async () => {
-      const pkg = JSON.parse(fs.readFileSync(path.join(projectDir,"package.json"), { encoding: "utf8" }))
-      const {main, module, typings } = pkg
-      const mainEntry = path.join(projectDir,'./dist/index.ts')
-      const tsProject = new tsm.Project({
-        
-      })
-      const docs = TyDoc.fromProject({
-        entrypoints: [mainEntry],
-        readSettingsFromJSON: false,
-        packageMainEntrypoint: path.join(path.dirname(main),'index.d.ts'),
-        prjDir: projectDir,
-        project: tsProject,
-        haltOnDiagnostics: false,
-      })
-  
-      expect(docs).toMatchSnapshot()
+      expect.assertions(1)
+      const tsProject = new tsm.Project()
+      try {
+        const docs = TyDoc.fromProject({
+          readSettingsFromJSON: false,
+          prjDir: projectDir,
+          project: tsProject,
+          haltOnDiagnostics: false,
+        })
+        expect(docs).toMatchSnapshot()
+      } finally {
+
+      }
+      
     })
   }
 })

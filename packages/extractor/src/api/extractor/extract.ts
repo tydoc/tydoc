@@ -21,10 +21,6 @@ const debugVisible = Debug('tydoc:extract:visible')
 const debugWarn = Debug('tydoc:warn')
 
 interface Options {
-  /**
-   * Paths to modules in project, relative to project root or absolute.
-   */
-  entrypoints: string[]
   project?: tsm.Project
   /**
    * Specify the path to the package's entrypoint file.
@@ -173,13 +169,19 @@ export function fromProject(options: Options): Doc.DocPackage {
   // Find the package entrypoint
   //
   let packageMainEntrypoint: string
+  let typesMainEntrypoint: string
+
   if (options.packageMainEntrypoint) {
     // useful for tests
+    const pjson = fs.read(path.join(prjDir, 'package.json'), 'json')
+    typesMainEntrypoint = pjson.typings
+
     packageMainEntrypoint = options.packageMainEntrypoint
   } else {
     const pjson = fs.read(path.join(prjDir, 'package.json'), 'json')
     if (pjson.main) {
       packageMainEntrypoint = pjson.main
+      typesMainEntrypoint = pjson?.typings ?? path.join(prjDir, path.basename(pjson.main, '.js') + '.d.ts')
     } else {
       throw new Error('Your package.json main field is missing or empty. It must be present.')
     }
@@ -189,9 +191,13 @@ export function fromProject(options: Options): Doc.DocPackage {
   }
   debug('packageMainEntrypoint is %s', packageMainEntrypoint)
 
+  if (!path.isAbsolute(typesMainEntrypoint)) {
+    typesMainEntrypoint = path.join(prjDir, typesMainEntrypoint)
+  }
+  debug('packageTypingsEntrypoint is %s', packageMainEntrypoint)
   // Find the package _source_ entrypoint
   //
-  const mainModuleFilePathAbs = path.join(prjDir, 'dist', 'index.d.ts')
+  const mainModuleFilePathAbs = path.join(prjDir, typesMainEntrypoint)
   debug('mainModuleFilePathAbs is %s', mainModuleFilePathAbs)
 
   // todo use setset
@@ -225,44 +231,44 @@ export function fromProject(options: Options): Doc.DocPackage {
 
   // Get the entrypoints to crawl
   //
-  const sourceFileEntrypoints = []
-  for (const findEntryPoint of options.entrypoints) {
-    let entrypointModulePathAbs: string
-    if (path.isAbsolute(findEntryPoint)) {
-      debug('considering given entrypoint as absolute, disregarding srcDir: %s', findEntryPoint)
-      entrypointModulePathAbs = path.join(
-        path.dirname(findEntryPoint),
-        path.basename(findEntryPoint, path.extname(findEntryPoint))
-      )
-    } else {
-      debug('considering given entrypoint relative to srcDir: %s', findEntryPoint)
-      entrypointModulePathAbs = path.join(
-        srcDir,
-        path.dirname(findEntryPoint),
-        path.basename(findEntryPoint, path.extname(findEntryPoint))
-      )
-    }
-    debug('entrypointModulePathAbs is %s', entrypointModulePathAbs)
+  // const sourceFileEntrypoints = []
+  // for (const findEntryPoint of options.entrypoints) {
+  //   let entrypointModulePathAbs: string
+  //   if (path.isAbsolute(findEntryPoint)) {
+  //     debug('considering given entrypoint as absolute, disregarding srcDir: %s', findEntryPoint)
+  //     entrypointModulePathAbs = path.join(
+  //       path.dirname(findEntryPoint),
+  //       path.basename(findEntryPoint, path.extname(findEntryPoint))
+  //     )
+  //   } else {
+  //     debug('considering given entrypoint relative to srcDir: %s', findEntryPoint)
+  //     entrypointModulePathAbs = path.join(
+  //       srcDir,
+  //       path.dirname(findEntryPoint),
+  //       path.basename(findEntryPoint, path.extname(findEntryPoint))
+  //     )
+  //   }
+  //   debug('entrypointModulePathAbs is %s', entrypointModulePathAbs)
 
-    // todo if given entrypoint is a folder then infer that to mean looking for
-    // an index within it (just like how node module resolution works)
+  //   // todo if given entrypoint is a folder then infer that to mean looking for
+  //   // an index within it (just like how node module resolution works)
 
-    const tried: string[] = []
-    const sf = sourceFiles.find((sf) => {
-      const absoluteModulePath = path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
-      tried.push(absoluteModulePath)
-      return absoluteModulePath === entrypointModulePathAbs
-    })
+  //   const tried: string[] = []
+  //   const sf = sourceFiles.find((sf) => {
+  //     const absoluteModulePath = path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
+  //     tried.push(absoluteModulePath)
+  //     return absoluteModulePath === entrypointModulePathAbs
+  //   })
 
-    if (!sf) {
-      throw new Error(
-        `Given entrypoint not found in project: ${entrypointModulePathAbs}. Source files were:\n\n${tried.join(
-          ', '
-        )}`
-      )
-    }
-    sourceFileEntrypoints.push(sf)
-  }
+  //   if (!sf) {
+  //     throw new Error(
+  //       `Given entrypoint not found in project: ${entrypointModulePathAbs}. Source files were:\n\n${tried.join(
+  //         ', '
+  //       )}`
+  //     )
+  //   }
+  //   sourceFileEntrypoints.push(sf)
+  // }
 
   // Setup manager settings
   //
@@ -283,7 +289,7 @@ export function fromProject(options: Options): Doc.DocPackage {
   //
   const manager = new Doc.Manager(managerSettings)
 
-  sourceFileEntrypoints.forEach((sf) => {
+  project.getSourceFiles().forEach((sf) => {
     fromModule(manager, sf)
   })
 
