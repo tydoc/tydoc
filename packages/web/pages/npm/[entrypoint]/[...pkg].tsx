@@ -11,14 +11,13 @@ import { getJson } from '../../../utils/utils'
 export const getStaticProps = defineStaticProps(async (context) => {
   // TODO remove once implemented in extractor
   const entrypoint = (context.params!.entrypoint as string).replace('_', '/')
-  const docPackage = await fetchDocPackage({
+  const { docPackage, npmInfo } = await fetchDocPackage({
     packageName: context.params!.pkg as string,
     entrypoint,
   })
-  console.log({ docPackage })
 
   return {
-    props: { docPackage },
+    props: { docPackage, npmInfo },
   }
 })
 
@@ -31,6 +30,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
   docPackage,
+  npmInfo,
 }) => {
   const router = useRouter()
   const { pkg } = router.query
@@ -38,6 +38,15 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
   if (docPackage === undefined) {
     return <div>Loading ...</div>
   }
+
+  const inverseDistTags = Object.entries(npmInfo['dist-tags']).reduce(
+    (acc, [tag, version]) => {
+      acc[version] ??= []
+      acc[version].push(tag)
+      return acc
+    },
+    {} as { [version: string]: string[] },
+  )
 
   return (
     <Layout>
@@ -47,17 +56,23 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
         <div className="flex items-center">
           {/* Name */}
           <div className="h-full px-3 py-2 font-mono font-bold leading-6 text-gray-700 bg-gray-200 border border-gray-200 rounded-md">
-            ink
+            {npmInfo.name}
           </div>
 
           {/* Version */}
           <select
             id="location"
             className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 rounded-md form-select focus:outline-none focus:ring focus:ring-blue-300"
-            defaultValue="3.0.8"
+            defaultValue={npmInfo['dist-tags'].latest}
           >
-            <option>3.0.0</option>
-            <option>3.0.8</option>
+            {Object.entries(npmInfo.versions).map(([version]) => (
+              <option key={version} value={version}>
+                {version}
+                {inverseDistTags[version]
+                  ? ` (${inverseDistTags[version].join(', ')})`
+                  : ''}
+              </option>
+            ))}
           </select>
 
           {/* Tags */}
@@ -112,17 +127,15 @@ async function fetchDocPackage({
   packageName: string
   organization?: string
   entrypoint: string
-}): Promise<DocPackage> {
+}): Promise<{ docPackage: DocPackage; npmInfo: NPM.Response }> {
   const fullPackageName = organization
     ? `${organization}/${packageName}`
     : packageName
-  const npmResponse = await getJson<NPM.Response>(
+  const npmInfo = await getJson<NPM.Response>(
     `https://registry.npmjs.org/${fullPackageName}`,
   )
 
-  // console.log({ packageInfo: npmResponse })
-
-  const [, ghOwner, ghName] = npmResponse.repository.url.match(
+  const [, ghOwner, ghName] = npmInfo.repository.url.match(
     /github\.com\/(.+)\/(.+)\.git$/,
   )!
 
@@ -131,5 +144,5 @@ async function fetchDocPackage({
     `https://tydoc-source-proxy.vercel.app/api?github=${github}&entrypoint=${entrypoint}`,
   )
 
-  return docPackage
+  return { docPackage, npmInfo }
 }
