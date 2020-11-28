@@ -38,11 +38,12 @@ export const Node: FC<NodeProps> = ({ node }) => {
     }
 
     case 'callable': {
+      /* Functions */
       return (
         <div className="inline">
           {/* Overloads */}
-          {node.sigs.map((sig, index) => (
-            <React.Fragment key={index}>
+          {node.sigs.map((sig, i) => (
+            <span key={`${node.raw.typeText}-${i}`}>
               {/* Parameters */}
               <span>
                 {`(`}
@@ -66,7 +67,7 @@ export const Node: FC<NodeProps> = ({ node }) => {
               <span className="px-2 font-mono">{`=>`}</span>
               {/* Return type */}
               <Node node={sig.return} />
-            </React.Fragment>
+            </span>
           ))}
 
           {/* Description */}
@@ -77,97 +78,84 @@ export const Node: FC<NodeProps> = ({ node }) => {
 
     case 'alias': {
       /* Forwards the rendering to the aliased module. */
-      return (
-        <>
-          <Node node={node.type} />
-        </>
-      )
+      return <Node node={node.type} />
     }
 
     case 'object': {
       return (
-        <>
-          {/* Parameters */}
-          <span>
-            {`{`}
-            {node.props.map((param, i) => (
-              <div key={param.name} className="mx-1 ml-5 font-mono">
-                {/* Documentation */}
-                <Documentation node={param.type} />
-                {/* Type declaration */}
-                <div>
-                  {/* Parameter name */}
-                  <span className="font-normal">{param.name}</span>
-                  <span className="pr-2 text-indigo-600-700">:</span>
+        <span>
+          {`{`}
+          {node.props.map((param, i) => (
+            <div key={param.name} className="mx-1 ml-5 font-mono">
+              {/* Documentation */}
+              <Documentation node={param.type} />
+              {/* Type declaration */}
+              <div>
+                {/* Parameter name */}
+                <span className="font-normal">{param.name}</span>
+                <span className="pr-2 text-indigo-600-700">:</span>
 
-                  {/* Parameter type */}
-                  <Node node={param.type} />
+                {/* Parameter type */}
+                <Node node={param.type} />
 
-                  {/* Separator */}
-                  {i < node.props.length - 1 && (
-                    <span className="font-normal">{`,`}</span>
-                  )}
-                </div>
+                {/* Separator */}
+                {i < node.props.length - 1 && (
+                  <span className="font-normal">{`,`}</span>
+                )}
               </div>
-            ))}
-            {`}`}
-          </span>
-        </>
+            </div>
+          ))}
+          {`}`}
+        </span>
       )
     }
 
     case 'union': {
       return (
-        <>
-          {/* Parameters */}
-          <span>
-            {node.types.map((type, i) => (
-              <span key={`${node.types}`} className="mx-1 font-mono">
-                {/* Parameter type */}
-                <Node node={type} />
+        <span>
+          {node.types.map((type, i) => (
+            <span key={`${node.types}`} className="mx-1 font-mono">
+              {/* Parameter type */}
+              <Node node={type} />
 
-                {/* Separator */}
-                {i < node.types.length - 1 && (
-                  <span className="ml-1 font-normal text-red-400">{`|`}</span>
-                )}
-              </span>
-            ))}
-          </span>
-        </>
+              {/* Separator */}
+              {i < node.types.length - 1 && (
+                <span className="ml-1 font-normal text-red-400">{`|`}</span>
+              )}
+            </span>
+          ))}
+        </span>
       )
     }
 
     case 'interface': {
       return (
-        <>
-          {/* Parameters */}
-          <span>
-            {`{`}
-            {node.props.map((param, i) => (
-              <div key={param.name} className="mx-1 ml-5 font-mono">
-                {/* Documentation */}
-                {/* TODO need to remove regex bomb */}
-                {/* <Documentation node={param.type} /> */}
+        <span>
+          {`{`}
+          {node.props.map((param, i) => (
+            <div key={param.name} className="mx-1 ml-5 font-mono">
+              {/* Documentation */}
+              {/* TODO need to remove regex bomb */}
+              {/* <Documentation node={param.type} /> */}
 
-                {/* Type declaration */}
-                <div>
-                  {/* Parameter name */}
-                  <span className="font-normal">{param.name}</span>
-                  <span className="pr-2 text-indigo-600-700">:</span>
+              {/* Type declaration */}
+              <div>
+                {/* Parameter name */}
+                <span className="font-normal">{param.name}</span>
+                <span className="pr-2 text-indigo-600-700">:</span>
 
-                  {/* Parameter type */}
-                  <Node node={param.type} />
+                {/* Parameter type */}
+                <Node node={param.type} />
 
-                  {/* Separator */}
-                  {i < node.props.length - 1 && (
-                    <span className="font-normal">{`,`}</span>
-                  )}
-                </div>
+                {/* Separator */}
+                {i < node.props.length - 1 && (
+                  <span className="font-normal">{`,`}</span>
+                )}
               </div>
-            ))}
-            {`}`}
-          </span>
-        </>
+            </div>
+          ))}
+          {`}`}
+        </span>
       )
     }
 
@@ -180,9 +168,9 @@ export const Node: FC<NodeProps> = ({ node }) => {
     }
 
     default:
-      console.log(node.kind, node)
+      // console.log(node.kind, node)
       // return <p>{JSON.stringify(node, null, 2)}</p>
-      return <span>'todo'</span>
+      return <span>'unimplemented'</span>
   }
 }
 
