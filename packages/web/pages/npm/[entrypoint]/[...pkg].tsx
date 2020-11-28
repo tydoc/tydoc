@@ -1,7 +1,6 @@
 import { GetStaticPaths, InferGetStaticPropsType } from 'next'
-import { useRouter } from 'next/router'
 import React, { FC } from 'react'
-import { DocPackage } from 'tydoc/dist/api/extractor/doc'
+import { Doc } from 'tydoc/types'
 import { Package } from '../../../components/Content'
 import { Layout } from '../../../components/Layout'
 import { defineStaticProps } from '../../../utils/next'
@@ -32,9 +31,6 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
   docPackage,
   npmInfo,
 }) => {
-  const router = useRouter()
-  const { pkg } = router.query
-
   if (docPackage === undefined) {
     return <div>Loading ...</div>
   }
@@ -127,7 +123,7 @@ async function fetchDocPackage({
   packageName: string
   organization?: string
   entrypoint: string
-}): Promise<{ docPackage: DocPackage; npmInfo: NPM.Response }> {
+}): Promise<{ docPackage: Doc.DocPackage; npmInfo: NPM.Response }> {
   const fullPackageName = organization
     ? `${organization}/${packageName}`
     : packageName
@@ -140,7 +136,7 @@ async function fetchDocPackage({
   )!
 
   const github = `https://github.com/${ghOwner}/${ghName}`
-  const docPackage = await getJson<DocPackage>(
+  const docPackage = await getJson<Doc.DocPackage>(
     `https://tydoc-source-proxy.vercel.app/api?github=${github}&entrypoint=${entrypoint}`,
   )
 
