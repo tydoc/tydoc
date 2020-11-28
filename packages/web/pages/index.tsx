@@ -2,17 +2,10 @@ import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import React, { FC } from 'react'
 import { Package } from '../components/Content'
-import { Search, TSLogo } from '../components/svg'
+import { Search, TSLogo, Vercel } from '../components/svg'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { github, entrypoint } = context.query
-  if (!github) {
-    throw new Error(`No query param "github=[string]" provided`)
-  }
-
-  if (!entrypoint) {
-    throw new Error(`No query param "entrypoint=[string]" provided`)
-  }
+  const { github = null, entrypoint = null } = context.query
 
   return {
     props: { github, entrypoint },
@@ -23,9 +16,17 @@ export default function Home({
   github,
   entrypoint,
 }: {
-  github: string
-  entrypoint: string
+  github?: string
+  entrypoint?: string
 }) {
+  if (!github) {
+    return <div>No query param "github=[string]" provided</div>
+  }
+
+  if (!entrypoint) {
+    return <div>No query param "entrypoint=[string]" provided</div>
+  }
+
   return (
     <div className="w-full">
       {/* Header */}
@@ -100,6 +101,11 @@ export default function Home({
           <SideNav />
           <Package {...{ github, entrypoint }} />
         </div>
+      </div>
+      <div>
+        <a href="https:/www.vercel.com" target="_blank">
+          <Vercel className="h-8" />
+        </a>
       </div>
     </div>
   )
