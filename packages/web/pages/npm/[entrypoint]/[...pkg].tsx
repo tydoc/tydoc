@@ -10,8 +10,18 @@ import { getJson } from '../../../utils/utils'
 export const getStaticProps = defineStaticProps(async (context) => {
   // TODO remove once implemented in extractor
   const entrypoint = (context.params!.entrypoint as string).replace('_', '/')
+  const { packageName, organization } = (() => {
+    const pkg = context.params!.pkg! as string[]
+    if (pkg.length === 2) {
+      return { organization: pkg[0], packageName: pkg[1] }
+    } else {
+      return { packageName: pkg[0] }
+    }
+  })()
+
   const { docPackage, npmInfo } = await fetchDocPackage({
-    packageName: context.params!.pkg as string,
+    packageName,
+    organization,
     entrypoint,
   })
 

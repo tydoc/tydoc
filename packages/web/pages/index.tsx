@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React, { FC } from 'react'
-import { Layout } from 'web/components/Layout'
+import { Layout } from '../components/Layout'
 
 export default function Home() {
   return (
@@ -8,6 +8,10 @@ export default function Home() {
       <ul>
         <ListEl link="/npm/types/graphql-request" name="graphql-request" />
         <ListEl link="/npm/src_index/swrv" name="swrv" />
+        <ListEl
+          link="/npm/src_index/@tony_win2win/common"
+          name="@tony_win2win/common"
+        />
       </ul>
     </Layout>
   )

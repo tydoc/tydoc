@@ -39,7 +39,7 @@ export const Layout: FC = ({ children }) => {
       </div>
 
       {children}
-      <div>
+      <div className="my-4">
         <a href="https:/www.vercel.com" target="_blank">
           <logos.Vercel className="h-8" />
         </a>
