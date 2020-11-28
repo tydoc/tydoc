@@ -4,6 +4,7 @@ import { Doc } from 'tydoc/types'
 import { CodeBlock } from './CodeBlock'
 
 import { Node } from './Node'
+import { Playground } from './Playground'
 
 type ModuleProps = {
   module: Doc.DocModule
@@ -26,7 +27,7 @@ export function Module({ module }: ModuleProps) {
         )}
         {/* Other exports */}
         {module.namedExports.map((e) => (
-          <NamedExport key={e.name} name={e.name} type={e.type} />
+          <NamedExport key={`module-${e.name}`} name={e.name} type={e.type} />
         ))}
       </div>
     </div>
@@ -49,6 +50,10 @@ function NamedExport(props: NamedExportProps) {
       <div>
         <h4 className="py-1 text-lg font-medium">{name}</h4>
       </div>
+
+      {/* Playground */}
+
+      <Playground code={``} />
 
       {/* Type */}
       <CodeBlock>
