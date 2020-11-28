@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { Doc } from 'tydoc/types'
 
 import { Heading } from './Heading'
@@ -14,7 +14,7 @@ export interface PackageProps {
 /**
  * Displays package.
  */
-export function Package({ docPackage }: PackageProps): JSX.Element {
+export const Package: FC<PackageProps> = ({ docPackage }) => {
   /* Data */
 
   const types = Object.values(docPackage.typeIndex)
