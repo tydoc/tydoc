@@ -1,21 +1,20 @@
-import React, { FC, useEffect, useState } from 'react'
-
+import React, { useEffect, useState } from 'react'
 import { Doc } from 'tydoc/types'
-import CodeBlock from './CodeBlock'
 
-import Heading from './Heading'
-import Module from './Module'
-import Node from './Node'
+import { Heading } from './Heading'
+import { Module } from './Module'
+import { Node } from './Node'
 import { TypeIndexContext } from './TypeIndexContext'
 
-/* TypeIndex Context */
-
-/* Component */
-
-export const Package: FC<{
+export interface PackageProps {
   github: string
   entrypoint: string
-}> = ({ github, entrypoint }) => {
+}
+
+/**
+ * Displays package.
+ */
+export function Package({ github, entrypoint }: PackageProps): JSX.Element {
   const json = useJson(
     `https://tydoc-source-proxy.vercel.app/api?github=${github}&entrypoint=${entrypoint}`,
   )

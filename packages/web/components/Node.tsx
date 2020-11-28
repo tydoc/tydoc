@@ -8,7 +8,7 @@ type NodeProps = { node: Doc.Node }
 /**
  * Type recursively creates a representation of the provided type.
  */
-export default function Node({ node }: NodeProps) {
+export function Node({ node }: NodeProps) {
   /* Context */
   const typeIndex = useTypeIndex()
 
@@ -72,6 +72,6 @@ export default function Node({ node }: NodeProps) {
       )
 
     default:
-      return <>TODO</>
+      return <p>{JSON.stringify(node, null, 2)}</p>
   }
 }

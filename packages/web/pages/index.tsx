@@ -3,21 +3,25 @@ import React, { FC } from 'react'
 import { Layout } from 'web/components/Layout'
 import { Package } from '../components/Content'
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<HomeProps> = async (
+  context,
+) => {
   const { github = null, entrypoint = null } = context.query
 
   return {
-    props: { github, entrypoint },
+    props: {
+      github: github as string | null,
+      entrypoint: entrypoint as string | null,
+    },
   }
 }
 
-export default function Home({
-  github,
-  entrypoint,
-}: {
-  github?: string
-  entrypoint?: string
-}) {
+interface HomeProps {
+  github: string | null
+  entrypoint: string | null
+}
+
+export default function Home({ github, entrypoint }: HomeProps) {
   if (!github) {
     return <div>No query param "github=[string]" provided</div>
   }
