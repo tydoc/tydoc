@@ -93,7 +93,7 @@ export const Node: FC<NodeProps> = ({ node }) => {
             {node.props.map((param, i) => (
               <div key={param.name} className="font-mono ml-5 mx-1">
                 {/* Documentation */}
-                <div className="text-gray-500">/* docs */</div>
+                <Documentation node={param.type} />
                 {/* Type declaration */}
                 <div>
                   {/* Parameter name */}
@@ -122,18 +122,59 @@ export const Node: FC<NodeProps> = ({ node }) => {
           {/* Parameters */}
           <span>
             {node.types.map((type, i) => (
-              <div key={`${node.types}`} className="font-mono ml-5 mx-1">
+              <span key={`${node.types}`} className="font-mono mx-1">
                 {/* Parameter type */}
                 <Node node={type} />
 
                 {/* Separator */}
                 {i < node.types.length - 1 && (
-                  <span className="font-normal text-red-400">{`|`}</span>
+                  <span className="font-normal text-red-400 ml-1">{`|`}</span>
                 )}
-              </div>
+              </span>
             ))}
           </span>
         </>
+      )
+    }
+
+    case 'interface': {
+      return (
+        <>
+          {/* Parameters */}
+          <span>
+            {`{`}
+            {node.props.map((param, i) => (
+              <div key={param.name} className="font-mono ml-5 mx-1">
+                {/* Documentation */}
+                <Documentation node={param.type} />
+
+                {/* Type declaration */}
+                <div>
+                  {/* Parameter name */}
+                  <span className="font-normal">{param.name}</span>
+                  <span className="pr-2 text-indigo-600-700">:</span>
+
+                  {/* Parameter type */}
+                  <Node node={param.type} />
+
+                  {/* Separator */}
+                  {i < node.props.length - 1 && (
+                    <span className="font-normal">{`,`}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+            {`}`}
+          </span>
+        </>
+      )
+    }
+
+    case 'literal': {
+      return (
+        <span className="font-mono font-medium text-yellow-500">
+          {node.base}
+        </span>
       )
     }
 
@@ -141,5 +182,84 @@ export const Node: FC<NodeProps> = ({ node }) => {
       console.log(node.kind, node)
       // return <p>{JSON.stringify(node, null, 2)}</p>
       return <span>'todo'</span>
+  }
+}
+
+interface DocumentationProps {
+  node: Doc.Node
+}
+
+const Documentation: FC<DocumentationProps> = ({ node }) => {
+  // Data
+
+  var docs: string | null | undefined = getDocumentationOfNode(node)
+  docs = docs?.match(/(\/\*(?:.|\s)*)\*\//)?.[0]
+  // docs?.match(/(\/\*(?:.|\s)*)\*\//)?.[0]
+
+  // View
+
+  return <div className="text-gray-500">{docs || ''}</div>
+}
+
+/**
+ * Gets documentation from the given node by checking raw data.
+ */
+function getDocumentationOfNode(node: Doc.Node): string | null {
+  switch (node.kind) {
+    case 'object': {
+      return node.raw.nodeFullText
+    }
+
+    case 'function': {
+      return null
+    }
+
+    case 'union': {
+      return null
+    }
+
+    case 'primitive': {
+      return null
+    }
+
+    case 'literal': {
+      return null
+    }
+
+    case 'alias': {
+      return node.raw.nodeFullText
+    }
+
+    case 'interface': {
+      return node.raw.nodeFullText
+    }
+
+    case 'callable': {
+      return node.raw.nodeFullText
+    }
+
+    case 'array': {
+      return null
+    }
+
+    case 'typeIndexRef': {
+      return null
+    }
+
+    case 'unsupported': {
+      return null
+    }
+
+    case 'intersection': {
+      return null
+    }
+
+    case 'callable_object': {
+      return node.raw.nodeFullText
+    }
+
+    case 'callable_interface': {
+      return node.raw.nodeFullText
+    }
   }
 }

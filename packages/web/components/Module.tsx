@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Doc } from 'tydoc/types'
+import { CodeBlock } from './CodeBlock'
 
 import { Node } from './Node'
 
@@ -19,8 +20,13 @@ export function Module({ module }: ModuleProps) {
 
       {/* Types */}
       <div>
+        {/* Main export */}
+        {module.mainExport !== null && (
+          <NamedExport name="Main" type={module.mainExport} />
+        )}
+        {/* Other exports */}
         {module.namedExports.map((e) => (
-          <NamedExport key={e.name} export={e} />
+          <NamedExport key={e.name} name={e.name} type={e.type} />
         ))}
       </div>
     </div>
@@ -28,12 +34,13 @@ export function Module({ module }: ModuleProps) {
 }
 
 type NamedExportProps = {
-  export: Doc.Expor
+  name: string
+  type: Doc.Node
 }
 
 function NamedExport(props: NamedExportProps) {
   /* Data */
-  const { name, type } = props.export
+  const { name, type } = props
 
   /* View */
   return (
@@ -44,9 +51,9 @@ function NamedExport(props: NamedExportProps) {
       </div>
 
       {/* Type */}
-      <div className="pt-2 inline rounded-md border border-gray-300 bg-gray-100 p-2">
+      <CodeBlock>
         <Node node={type} />
-      </div>
+      </CodeBlock>
     </div>
   )
 }
