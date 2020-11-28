@@ -2,14 +2,19 @@ import { GetStaticPaths, InferGetStaticPropsType } from 'next'
 import { useRouter } from 'next/router'
 import React, { FC } from 'react'
 import { DocPackage } from 'tydoc/dist/api/extractor/doc'
-import { Package } from '../../components/Content'
-import { Layout } from '../../components/Layout'
-import { defineStaticProps } from '../../utils/next'
-import { NPM } from '../../utils/types'
-import { getJson } from '../../utils/utils'
+import { Package } from '../../../components/Content'
+import { Layout } from '../../../components/Layout'
+import { defineStaticProps } from '../../../utils/next'
+import { NPM } from '../../../utils/types'
+import { getJson } from '../../../utils/utils'
 
 export const getStaticProps = defineStaticProps(async (context) => {
-  const docPackage = await fetchDocPackage({ packageName: 'swrv' })
+  // TODO remove once implemented in extractor
+  const entrypoint = (context.params!.entrypoint as string).replace('_', '/')
+  const docPackage = await fetchDocPackage({
+    packageName: context.params!.pkg as string,
+    entrypoint,
+  })
   console.log({ docPackage })
 
   return {
@@ -102,9 +107,11 @@ const SideNavItem: FC<{ name: string; url: string; active?: boolean }> = ({
 async function fetchDocPackage({
   packageName,
   organization,
+  entrypoint,
 }: {
   packageName: string
   organization?: string
+  entrypoint: string
 }): Promise<DocPackage> {
   const fullPackageName = organization
     ? `${organization}/${packageName}`
@@ -120,7 +127,6 @@ async function fetchDocPackage({
   )!
 
   const github = `https://github.com/${ghOwner}/${ghName}`
-  const entrypoint = 'src/index'
   const docPackage = await getJson<DocPackage>(
     `https://tydoc-source-proxy.vercel.app/api?github=${github}&entrypoint=${entrypoint}`,
   )
