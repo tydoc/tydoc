@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`modules test fp-ts 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "isMain": true,
+      "kind": "module",
+      "location": Object {
+        "absoluteFilePath": "/home/will/tydoc/tydoc/packages/extractor/test/__fixtures__/fp-ts/lib/index.js",
+      },
+      "mainExport": null,
+      "name": "index",
+      "namedExports": Array [],
+      "path": "/",
+      "tsdoc": null,
+    },
+  ],
+  "typeIndex": Object {},
+}
+`;

@@ -9096,6 +9096,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fp-ts@npm:^2.9.0":
+  version: 2.9.0
+  resolution: "fp-ts@npm:2.9.0"
+  checksum: 7695e32896e5fb9103283c97e755d70982f235faed17f4be0fcb4d95b1d7373a10c081b0cf9895b15fecbeaff50669b8a0a037bdf048ee091e842476be03b7b8
+  languageName: node
+  linkType: hard
+
 "fragment-cache@npm:^0.2.1":
   version: 0.2.1
   resolution: "fragment-cache@npm:0.2.1"
@@ -15800,6 +15807,7 @@ resolve@1.1.7:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
+    fp-ts: ^2.9.0
     prettier: ^2.2.0
     typescript: ^4.1.2
     typescript-snapshots-plugin: ^1.7.0
