@@ -51,7 +51,6 @@ function findEntry(prjDir: string){
   // TODO This logic is hacky and need to be cleanup
   const pjson = fs.read(path.join(prjDir, 'package.json'), 'json')
   let entryPoint: string = '';
-  console.log(pjson);
   if(pjson && pjson.typings){
     entryPoint = path.join(prjDir, pjson.typings)
   } else if(pjson && pjson.main){

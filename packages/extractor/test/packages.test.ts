@@ -21,7 +21,6 @@ describe("tests extraction of packages", () => {
       const outputDir = await downloadFromNPM(pkg)
       const tsProject = new tsm.Project()
       const projectDir = path.join(outputDir, 'package')
-      console.log({projectDir});
       try {
         const docs = TyDoc.fromPublished({
           prjDir: projectDir,
@@ -58,7 +57,6 @@ async function extract(path: string): Promise<string>{
   const outputDir = tempy.directory()
   return new Promise<string>((resolve, reject) => {
     decompress(path, outputDir).then((files: any) => {
-      console.log('done!');
       resolve(outputDir)
     }).catch(reject)
   })
