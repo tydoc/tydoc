@@ -21,6 +21,10 @@ const debugVisible = Debug('tydoc:extract:visible')
 const debugWarn = Debug('tydoc:warn')
 
 interface Options {
+  /**
+   * Paths to modules in project, relative to project root or absolute.
+   */
+  entrypoints: string[]
   project?: tsm.Project
   /**
    * Specify the path to the package's entrypoint file.
@@ -143,45 +147,39 @@ export function fromProject(options: Options): Doc.DocPackage {
   }
   debug('srcDir set to %s', srcDir)
 
-  // // Find the out dir
-  // //
-  // let outDir: string
-  // const compilerOptOutDir = project.getCompilerOptions().outDir
-  // if (compilerOptOutDir !== undefined) {
-  //   outDir = compilerOptOutDir
-  // } else {
-  //   // todo we could fallback to the source root dir which IIUC is what TS does?
-  //   throw new Error(dedent`
-  //     Your ${Kleur.yellow('tsconfig.json')} compilerOptions does not have ${Kleur.yellow(
-  //     'compilerOptions.outDir'
-  //   )} specified.
+  // Find the out dir
+  //
+  let outDir: string
+  const compilerOptOutDir = project.getCompilerOptions().outDir
+  if (compilerOptOutDir !== undefined) {
+    outDir = compilerOptOutDir
+  } else {
+    // todo we could fallback to the source root dir which IIUC is what TS does?
+    throw new Error(dedent`
+      Your ${Kleur.yellow('tsconfig.json')} compilerOptions does not have ${Kleur.yellow(
+      'compilerOptions.outDir'
+    )} specified.
+    
+      Tydoc needs this information to discover the path to your source entrypoint.
 
-  //     Tydoc needs this information to discover the path to your source entrypoint.
-
-  //     Please update your tsconfig.json to meet Tydoc's discovery needs.
-  //   `)
-  // }
-  // if (!path.isAbsolute(outDir)) {
-  //   outDir = path.join(prjDir, outDir)
-  // }
-  // debug('outDir set to %s', outDir)
+      Please update your tsconfig.json to meet Tydoc's discovery needs.
+    `)
+  }
+  if (!path.isAbsolute(outDir)) {
+    outDir = path.join(prjDir, outDir)
+  }
+  debug('outDir set to %s', outDir)
 
   // Find the package entrypoint
   //
   let packageMainEntrypoint: string
-  let typesMainEntrypoint: string
-
   if (options.packageMainEntrypoint) {
     // useful for tests
-    const pjson = fs.read(path.join(prjDir, 'package.json'), 'json')
-    typesMainEntrypoint = pjson.typings
-
     packageMainEntrypoint = options.packageMainEntrypoint
   } else {
     const pjson = fs.read(path.join(prjDir, 'package.json'), 'json')
     if (pjson.main) {
       packageMainEntrypoint = pjson.main
-      typesMainEntrypoint = pjson?.typings ?? path.join(prjDir, path.basename(pjson.main, '.js') + '.d.ts')
     } else {
       throw new Error('Your package.json main field is missing or empty. It must be present.')
     }
@@ -191,13 +189,13 @@ export function fromProject(options: Options): Doc.DocPackage {
   }
   debug('packageMainEntrypoint is %s', packageMainEntrypoint)
 
-  if (!path.isAbsolute(typesMainEntrypoint)) {
-    typesMainEntrypoint = path.join(prjDir, typesMainEntrypoint)
-  }
-  debug('packageTypingsEntrypoint is %s', packageMainEntrypoint)
   // Find the package _source_ entrypoint
   //
-  const mainModuleFilePathAbs = path.join(prjDir, typesMainEntrypoint)
+  const mainModuleFilePathAbs = Doc.getMainModule({
+    outDir,
+    packageMainEntrypoint,
+    srcDir,
+  })
   debug('mainModuleFilePathAbs is %s', mainModuleFilePathAbs)
 
   // todo use setset
@@ -218,11 +216,9 @@ export function fromProject(options: Options): Doc.DocPackage {
 
   // If the project is empty dont' bother trying to extract docs
   //
-  let sourceFiles = project.getSourceFiles()
+  const sourceFiles = project.getSourceFiles()
   if (sourceFiles.length === 0) {
-    sourceFiles = project.addSourceFilesAtPaths(path.dirname(packageMainEntrypoint) + '/index.d.ts')
-
-    // throw new Error('No source files found in project to document.')
+    throw new Error('No source files found in project to document.')
   }
   debug(
     'found project source files ',
@@ -231,44 +227,45 @@ export function fromProject(options: Options): Doc.DocPackage {
 
   // Get the entrypoints to crawl
   //
-  // const sourceFileEntrypoints = []
-  // for (const findEntryPoint of options.entrypoints) {
-  //   let entrypointModulePathAbs: string
-  //   if (path.isAbsolute(findEntryPoint)) {
-  //     debug('considering given entrypoint as absolute, disregarding srcDir: %s', findEntryPoint)
-  //     entrypointModulePathAbs = path.join(
-  //       path.dirname(findEntryPoint),
-  //       path.basename(findEntryPoint, path.extname(findEntryPoint))
-  //     )
-  //   } else {
-  //     debug('considering given entrypoint relative to srcDir: %s', findEntryPoint)
-  //     entrypointModulePathAbs = path.join(
-  //       srcDir,
-  //       path.dirname(findEntryPoint),
-  //       path.basename(findEntryPoint, path.extname(findEntryPoint))
-  //     )
-  //   }
-  //   debug('entrypointModulePathAbs is %s', entrypointModulePathAbs)
+  const sourceFileEntrypoints = []
+  for (const findEntryPoint of options.entrypoints) {
+    let entrypointModulePathAbs: string
+    if (path.isAbsolute(findEntryPoint)) {
+      debug('considering given entrypoint as absolute, disregarding srcDir: %s', findEntryPoint)
+      entrypointModulePathAbs = path.join(
+        path.dirname(findEntryPoint),
+        path.basename(findEntryPoint, path.extname(findEntryPoint))
+      )
+    } else {
+      debug('considering given entrypoint relative to srcDir: %s', findEntryPoint)
+      entrypointModulePathAbs = path.join(
+        srcDir,
+        path.dirname(findEntryPoint),
+        path.basename(findEntryPoint, path.extname(findEntryPoint))
+      )
+    }
+    debug('entrypointModulePathAbs is %s', entrypointModulePathAbs)
 
-  //   // todo if given entrypoint is a folder then infer that to mean looking for
-  //   // an index within it (just like how node module resolution works)
+    // todo if given entrypoint is a folder then infer that to mean looking for
+    // an index within it (just like how node module resolution works)
 
-  //   const tried: string[] = []
-  //   const sf = sourceFiles.find((sf) => {
-  //     const absoluteModulePath = path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
-  //     tried.push(absoluteModulePath)
-  //     return absoluteModulePath === entrypointModulePathAbs
-  //   })
+    const tried: string[] = []
+    const sf = sourceFiles.find((sf) => {
+      const absoluteModulePath = path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
+      tried.push(absoluteModulePath)
+      return absoluteModulePath === entrypointModulePathAbs
+    })
 
-  //   if (!sf) {
-  //     throw new Error(
-  //       `Given entrypoint not found in project: ${entrypointModulePathAbs}. Source files were:\n\n${tried.join(
-  //         ', '
-  //       )}`
-  //     )
-  //   }
-  //   sourceFileEntrypoints.push(sf)
-  // }
+    if (!sf) {
+      throw new Error(
+        `Given entrypoint not found in project: ${entrypointModulePathAbs}. Source files were:\n\n${tried.join(
+          ', '
+        )}`
+      )
+    }
+
+    sourceFileEntrypoints.push(sf)
+  }
 
   // Setup manager settings
   //
@@ -289,25 +286,23 @@ export function fromProject(options: Options): Doc.DocPackage {
   //
   const manager = new Doc.Manager(managerSettings)
 
-  project.getSourceFiles().forEach((sf) => {
+  sourceFileEntrypoints.forEach((sf) => {
     fromModule(manager, sf)
   })
 
   return manager.data
 }
-let done:string[] = []
 
 /**
  * Recursively extract docs starting from exports of the given module.
  * Everything that is reachable will be considered.
  */
-export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.Manager {
+export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.DocPackage {
   const mod = Doc.modFromSourceFile(manager, sourceFile)
-  const exportedDeclarations = sourceFile.getExportedDeclarations()
-  debugExport(`filepath: ${sourceFile.getFilePath()}`)
-  debugExport({ exportedDeclarations, mod })
-  for (const [exportName, expDeclarations] of exportedDeclarations) {
-    let n = expDeclarations[0]
+
+  for (const [exportName, exportedDeclarations] of sourceFile.getExportedDeclarations()) {
+    const n = exportedDeclarations[0]
+
     if (!n) {
       console.warn(
         dedent`
@@ -318,19 +313,8 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
       )
       continue
     }
-    debugExport('-> export declaration %s', exportName)
-    debugExport(n)
 
-    debugExport('-> export declaration %s', n.getKindName())
-    if(tsm.Node.isSourceFile(n)){
-      if(!done.includes(n.getFilePath())){
-        done.push(n.getFilePath())
-        manager = fromModule(manager, n)
-      } 
-      continue
-    } 
-    const t = n?.getType()
-    if(!t) continue
+    const t = n.getType()
     debugExport('start')
     debugExport('-> node kind is %s', n.getKindName())
     debugExport('-> type text is %j', n.getType().getText())
@@ -343,8 +327,7 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
       debugExport('type alias pointing to type that cannot back reference to the type alias %s', n.getText())
       doc = manager.indexTypeAliasNode(n, () =>
         Doc.alias({
-          // @ts-ignore
-          name: n.getName ? n.getName() : n.getKindName(),
+          name: n.getName(),
           raw: {
             nodeFullText: n.getFullText(),
             nodeText: n.getText(),
@@ -374,7 +357,7 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
   }
 
   manager.data.modules.push(mod)
-  return manager
+  return manager.data
 }
 
 function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
@@ -549,7 +532,7 @@ function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
  * Extract docs from the type's properties.
  */
 function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
-  return getProperties(t).filter(Boolean).map((p) => {
+  return getProperties(t).map((p) => {
     const propName = p.getName()
     const propType = p.getType()
     // what is this method for then? It was just returning an `any` type
