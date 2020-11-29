@@ -90,6 +90,7 @@
         }
       ]
     ],
+    "snapshotSerializers": ["./test/__helpers__/snapshotSerializer.ts"],
     "watchPathIgnorePatterns": [
       "<rootDir>/dist/",
       "<rootDir>/oclif.manifest.json"

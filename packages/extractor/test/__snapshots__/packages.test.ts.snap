@@ -1,122 +1,95 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`tests extraction of packages fp-ts 1`] = `
-Object {
-  "modules": Array [
-    Object {
-      "isMain": false,
-      "kind": "module",
-      "location": Object {
-        "absoluteFilePath": "/home/will/tydoc/tydoc/packages/extractor/test/__packages__/fp-ts/lib/index.d.ts",
-      },
-      "mainExport": null,
-      "name": "index",
-      "namedExports": Array [],
-      "path": "/lib/index",
-      "tsdoc": Object {
-        "customTags": Array [],
-        "examples": Array [],
-        "raw": "/**
- * @since 2.0.0
- */",
-        "summary": "@since 2.0.0",
-      },
-    },
-  ],
-  "typeIndex": Object {},
-}
-`;
-
 exports[`tests extraction of packages sponsorsme 1`] = `
 Object {
-  "modules": Array [
+  modules: Array [
     Object {
-      "isMain": false,
-      "kind": "module",
-      "location": Object {
-        "absoluteFilePath": "/home/will/tydoc/tydoc/packages/extractor/test/__packages__/sponsorsme/dist/index.d.ts",
+      isMain: false,
+      kind: module,
+      location: Object {
+        absoluteFilePath: /tmp/dir/package/dist/index.d.ts,
       },
-      "mainExport": Object {
-        "kind": "object",
-        "props": Array [
+      mainExport: Object {
+        kind: object,
+        props: Array [
           Object {
-            "kind": "prop",
-            "name": "token",
-            "type": Object {
-              "kind": "primitive",
-              "type": "any",
+            kind: prop,
+            name: token,
+            type: Object {
+              kind: primitive,
+              type: any,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "options",
-            "type": Object {
-              "kind": "primitive",
-              "type": "any",
+            kind: prop,
+            name: options,
+            type: Object {
+              kind: primitive,
+              type: any,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "cached",
-            "type": Object {
-              "kind": "primitive",
-              "type": "any",
+            kind: prop,
+            name: cached,
+            type: Object {
+              kind: primitive,
+              type: any,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "cursor",
-            "type": Object {
-              "kind": "primitive",
-              "type": "any",
+            kind: prop,
+            name: cursor,
+            type: Object {
+              kind: primitive,
+              type: any,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "hasNextPage",
-            "type": Object {
-              "kind": "primitive",
-              "type": "any",
+            kind: prop,
+            name: hasNextPage,
+            type: Object {
+              kind: primitive,
+              type: any,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "getInfo",
-            "type": Object {
-              "hasProps": false,
-              "isOverloaded": false,
-              "kind": "callable",
-              "props": Array [],
-              "raw": Object {
-                "nodeFullText": "/**
+            kind: prop,
+            name: getInfo,
+            type: Object {
+              hasProps: false,
+              isOverloaded: false,
+              kind: callable,
+              props: Array [],
+              raw: Object {
+                nodeFullText: /**
      * Returns information about the sponsor if it exists.
      *
      * \`\`\`ts
-     * let sponsors = Sponsors({ token: \\"token\\" })
-     * await sponsors.getInfo(\\"maticzav\\")
+     * let sponsors = Sponsors({ token: "token" })
+     * await sponsors.getInfo("maticzav")
      * \`\`\`
      */
-    getInfo(login: string): Promise<Optional<Sponsorship>>;",
-                "nodeText": "getInfo(login: string): Promise<Optional<Sponsorship>>;",
-                "typeText": "(login: string) => Promise<Sponsorship>",
+    getInfo(login: string): Promise<Optional<Sponsorship>>;,
+                nodeText: getInfo(login: string): Promise<Optional<Sponsorship>>;,
+                typeText: (login: string) => Promise<Sponsorship>,
               },
-              "sigs": Array [
+              sigs: Array [
                 Object {
-                  "kind": "sig",
-                  "params": Array [
+                  kind: sig,
+                  params: Array [
                     Object {
-                      "kind": "sigParam",
-                      "name": "login",
-                      "type": Object {
-                        "kind": "primitive",
-                        "type": "string",
+                      kind: sigParam,
+                      name: login,
+                      type: Object {
+                        kind: primitive,
+                        type: string,
                       },
                     },
                   ],
-                  "return": Object {
-                    "kind": "unsupported",
-                    "raw": Object {
-                      "nodeFullText": "/**
+                  return: Object {
+                    kind: unsupported,
+                    raw: Object {
+                      nodeFullText: /**
  * Represents the completion of an asynchronous operation
  */
 interface Promise<T> {
@@ -134,8 +107,8 @@ interface Promise<T> {
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
-}",
-                      "nodeText": "interface Promise<T> {
+},
+                      nodeText: interface Promise<T> {
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -150,8 +123,8 @@ interface Promise<T> {
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
-}",
-                      "typeText": "Promise<Sponsorship>",
+},
+                      typeText: Promise<Sponsorship>,
                     },
                   },
                 },
@@ -159,43 +132,43 @@ interface Promise<T> {
             },
           },
           Object {
-            "kind": "prop",
-            "name": "isSponsor",
-            "type": Object {
-              "hasProps": false,
-              "isOverloaded": false,
-              "kind": "callable",
-              "props": Array [],
-              "raw": Object {
-                "nodeFullText": "/**
+            kind: prop,
+            name: isSponsor,
+            type: Object {
+              hasProps: false,
+              isOverloaded: false,
+              kind: callable,
+              props: Array [],
+              raw: Object {
+                nodeFullText: /**
      * Tells whether there exists a sponsor with the given login.
      *
      * \`\`\`ts
-     * let sponsors = Sponsors({ token: \\"token\\" })
-     * await sponsors.isSponsor(\\"maticzav\\")
+     * let sponsors = Sponsors({ token: "token" })
+     * await sponsors.isSponsor("maticzav")
      * \`\`\`
      */
-    isSponsor(login: string): Promise<boolean>;",
-                "nodeText": "isSponsor(login: string): Promise<boolean>;",
-                "typeText": "(login: string) => Promise<boolean>",
+    isSponsor(login: string): Promise<boolean>;,
+                nodeText: isSponsor(login: string): Promise<boolean>;,
+                typeText: (login: string) => Promise<boolean>,
               },
-              "sigs": Array [
+              sigs: Array [
                 Object {
-                  "kind": "sig",
-                  "params": Array [
+                  kind: sig,
+                  params: Array [
                     Object {
-                      "kind": "sigParam",
-                      "name": "login",
-                      "type": Object {
-                        "kind": "primitive",
-                        "type": "string",
+                      kind: sigParam,
+                      name: login,
+                      type: Object {
+                        kind: primitive,
+                        type: string,
                       },
                     },
                   ],
-                  "return": Object {
-                    "kind": "unsupported",
-                    "raw": Object {
-                      "nodeFullText": "/**
+                  return: Object {
+                    kind: unsupported,
+                    raw: Object {
+                      nodeFullText: /**
  * Represents the completion of an asynchronous operation
  */
 interface Promise<T> {
@@ -213,8 +186,8 @@ interface Promise<T> {
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
-}",
-                      "nodeText": "interface Promise<T> {
+},
+                      nodeText: interface Promise<T> {
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -229,8 +202,8 @@ interface Promise<T> {
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
-}",
-                      "typeText": "Promise<boolean>",
+},
+                      typeText: Promise<boolean>,
                     },
                   },
                 },
@@ -238,57 +211,57 @@ interface Promise<T> {
             },
           },
           Object {
-            "kind": "prop",
-            "name": "flush",
-            "type": Object {
-              "hasProps": false,
-              "isOverloaded": false,
-              "kind": "callable",
-              "props": Array [],
-              "raw": Object {
-                "nodeFullText": "/**
+            kind: prop,
+            name: flush,
+            type: Object {
+              hasProps: false,
+              isOverloaded: false,
+              kind: callable,
+              props: Array [],
+              raw: Object {
+                nodeFullText: /**
      * Clears the cache.
      *
      * \`\`\`ts
-     * let sponsors = Sponsors({ token: \\"token\\" })
+     * let sponsors = Sponsors({ token: "token" })
      * sponsors.flush()
      * \`\`\`
      */
-    flush(): void;",
-                "nodeText": "flush(): void;",
-                "typeText": "() => void",
+    flush(): void;,
+                nodeText: flush(): void;,
+                typeText: () => void,
               },
-              "sigs": Array [
+              sigs: Array [
                 Object {
-                  "kind": "sig",
-                  "params": Array [],
-                  "return": Object {
-                    "kind": "primitive",
-                    "type": "void",
+                  kind: sig,
+                  params: Array [],
+                  return: Object {
+                    kind: primitive,
+                    type: void,
                   },
                 },
               ],
             },
           },
           Object {
-            "kind": "prop",
-            "name": "find",
-            "type": Object {
-              "kind": "primitive",
-              "type": "any",
+            kind: prop,
+            name: find,
+            type: Object {
+              kind: primitive,
+              type: any,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "sponsorshipFromEdge",
-            "type": Object {
-              "kind": "primitive",
-              "type": "any",
+            kind: prop,
+            name: sponsorshipFromEdge,
+            type: Object {
+              kind: primitive,
+              type: any,
             },
           },
         ],
-        "raw": Object {
-          "nodeFullText": "/**
+        raw: Object {
+          nodeFullText: /**
  * # sponsorme
  *
  * A lightweight client that lets you check your GitHub sponsors.
@@ -302,9 +275,9 @@ interface Promise<T> {
  * ## Example
  *
  * \`\`\`ts
- * let sponsors = Sponsors({ token: \\"token\\" })
+ * let sponsors = Sponsors({ token: "token" })
  *
- * await sponsors.getInfo(\\"maticzav\\")
+ * await sponsors.getInfo("maticzav")
  * \`\`\`
  *
  * That's it!
@@ -323,8 +296,8 @@ export default class Sponsors {
      * Returns information about the sponsor if it exists.
      *
      * \`\`\`ts
-     * let sponsors = Sponsors({ token: \\"token\\" })
-     * await sponsors.getInfo(\\"maticzav\\")
+     * let sponsors = Sponsors({ token: "token" })
+     * await sponsors.getInfo("maticzav")
      * \`\`\`
      */
     getInfo(login: string): Promise<Optional<Sponsorship>>;
@@ -332,8 +305,8 @@ export default class Sponsors {
      * Tells whether there exists a sponsor with the given login.
      *
      * \`\`\`ts
-     * let sponsors = Sponsors({ token: \\"token\\" })
-     * await sponsors.isSponsor(\\"maticzav\\")
+     * let sponsors = Sponsors({ token: "token" })
+     * await sponsors.isSponsor("maticzav")
      * \`\`\`
      */
     isSponsor(login: string): Promise<boolean>;
@@ -341,7 +314,7 @@ export default class Sponsors {
      * Clears the cache.
      *
      * \`\`\`ts
-     * let sponsors = Sponsors({ token: \\"token\\" })
+     * let sponsors = Sponsors({ token: "token" })
      * sponsors.flush()
      * \`\`\`
      */
@@ -355,8 +328,8 @@ export default class Sponsors {
      */
     private sponsorshipFromEdge;
     private static query;
-}",
-          "nodeText": "export default class Sponsors {
+},
+          nodeText: export default class Sponsors {
     private token;
     private options;
     private cached;
@@ -367,8 +340,8 @@ export default class Sponsors {
      * Returns information about the sponsor if it exists.
      *
      * \`\`\`ts
-     * let sponsors = Sponsors({ token: \\"token\\" })
-     * await sponsors.getInfo(\\"maticzav\\")
+     * let sponsors = Sponsors({ token: "token" })
+     * await sponsors.getInfo("maticzav")
      * \`\`\`
      */
     getInfo(login: string): Promise<Optional<Sponsorship>>;
@@ -376,8 +349,8 @@ export default class Sponsors {
      * Tells whether there exists a sponsor with the given login.
      *
      * \`\`\`ts
-     * let sponsors = Sponsors({ token: \\"token\\" })
-     * await sponsors.isSponsor(\\"maticzav\\")
+     * let sponsors = Sponsors({ token: "token" })
+     * await sponsors.isSponsor("maticzav")
      * \`\`\`
      */
     isSponsor(login: string): Promise<boolean>;
@@ -385,7 +358,7 @@ export default class Sponsors {
      * Clears the cache.
      *
      * \`\`\`ts
-     * let sponsors = Sponsors({ token: \\"token\\" })
+     * let sponsors = Sponsors({ token: "token" })
      * sponsors.flush()
      * \`\`\`
      */
@@ -399,63 +372,63 @@ export default class Sponsors {
      */
     private sponsorshipFromEdge;
     private static query;
-}",
-          "typeText": "Sponsors",
+},
+          typeText: Sponsors,
         },
       },
-      "name": "index",
-      "namedExports": Array [
+      name: index,
+      namedExports: Array [
         Object {
-          "isTerm": false,
-          "isType": true,
-          "kind": "export",
-          "name": "SponsorsOptions",
-          "type": Object {
-            "kind": "typeIndexRef",
-            "link": "(dist/index).SponsorsOptions",
+          isTerm: false,
+          isType: true,
+          kind: export,
+          name: SponsorsOptions,
+          type: Object {
+            kind: typeIndexRef,
+            link: (dist/index).SponsorsOptions,
           },
         },
         Object {
-          "isTerm": false,
-          "isType": true,
-          "kind": "export",
-          "name": "Sponsorship",
-          "type": Object {
-            "kind": "typeIndexRef",
-            "link": "(dist/index).Sponsorship",
+          isTerm: false,
+          isType: true,
+          kind: export,
+          name: Sponsorship,
+          type: Object {
+            kind: typeIndexRef,
+            link: (dist/index).Sponsorship,
           },
         },
         Object {
-          "isTerm": false,
-          "isType": true,
-          "kind": "export",
-          "name": "SponsorshipSponsor",
-          "type": Object {
-            "kind": "typeIndexRef",
-            "link": "(dist/index).SponsorshipSponsor",
+          isTerm: false,
+          isType: true,
+          kind: export,
+          name: SponsorshipSponsor,
+          type: Object {
+            kind: typeIndexRef,
+            link: (dist/index).SponsorshipSponsor,
           },
         },
         Object {
-          "isTerm": false,
-          "isType": true,
-          "kind": "export",
-          "name": "SponsorshipTier",
-          "type": Object {
-            "kind": "typeIndexRef",
-            "link": "(dist/index).SponsorshipTier",
+          isTerm: false,
+          isType: true,
+          kind: export,
+          name: SponsorshipTier,
+          type: Object {
+            kind: typeIndexRef,
+            link: (dist/index).SponsorshipTier,
           },
         },
       ],
-      "path": "/dist/index",
-      "tsdoc": null,
+      path: /dist/index,
+      tsdoc: null,
     },
   ],
-  "typeIndex": Object {
-    "(dist/index).SponsorsOptions": Object {
-      "kind": "alias",
-      "name": "SponsorsOptions",
-      "raw": Object {
-        "nodeFullText": "export declare type SponsorsOptions = {
+  typeIndex: Object {
+    (dist/index).SponsorsOptions: Object {
+      kind: alias,
+      name: SponsorsOptions,
+      raw: Object {
+        nodeFullText: export declare type SponsorsOptions = {
     /**
      * Whether the client should use internal cache or not.
      */
@@ -464,8 +437,8 @@ export default class Sponsors {
      * Viewer's GitHub token used for authentication.
      */
     token: string;
-};",
-        "nodeText": "export declare type SponsorsOptions = {
+};,
+        nodeText: export declare type SponsorsOptions = {
     /**
      * Whether the client should use internal cache or not.
      */
@@ -474,32 +447,32 @@ export default class Sponsors {
      * Viewer's GitHub token used for authentication.
      */
     token: string;
-};",
-        "typeText": "SponsorsOptions",
+};,
+        typeText: SponsorsOptions,
       },
-      "tsdoc": null,
-      "type": Object {
-        "kind": "object",
-        "props": Array [
+      tsdoc: null,
+      type: Object {
+        kind: object,
+        props: Array [
           Object {
-            "kind": "prop",
-            "name": "cache",
-            "type": Object {
-              "kind": "primitive",
-              "type": "boolean",
+            kind: prop,
+            name: cache,
+            type: Object {
+              kind: primitive,
+              type: boolean,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "token",
-            "type": Object {
-              "kind": "primitive",
-              "type": "string",
+            kind: prop,
+            name: token,
+            type: Object {
+              kind: primitive,
+              type: string,
             },
           },
         ],
-        "raw": Object {
-          "nodeFullText": "export declare type SponsorsOptions = {
+        raw: Object {
+          nodeFullText: export declare type SponsorsOptions = {
     /**
      * Whether the client should use internal cache or not.
      */
@@ -508,8 +481,8 @@ export default class Sponsors {
      * Viewer's GitHub token used for authentication.
      */
     token: string;
-};",
-          "nodeText": "export declare type SponsorsOptions = {
+};,
+          nodeText: export declare type SponsorsOptions = {
     /**
      * Whether the client should use internal cache or not.
      */
@@ -518,16 +491,16 @@ export default class Sponsors {
      * Viewer's GitHub token used for authentication.
      */
     token: string;
-};",
-          "typeText": "SponsorsOptions",
+};,
+          typeText: SponsorsOptions,
         },
       },
     },
-    "(dist/index).Sponsorship": Object {
-      "kind": "alias",
-      "name": "Sponsorship",
-      "raw": Object {
-        "nodeFullText": "export declare type Sponsorship = {
+    (dist/index).Sponsorship: Object {
+      kind: alias,
+      name: Sponsorship,
+      raw: Object {
+        nodeFullText: export declare type Sponsorship = {
     id: string;
     createdAt: string;
     /**
@@ -542,8 +515,8 @@ export default class Sponsors {
      * Information about the tier.
      */
     tier: SponsorshipTier;
-};",
-        "nodeText": "export declare type Sponsorship = {
+};,
+        nodeText: export declare type Sponsorship = {
     id: string;
     createdAt: string;
     /**
@@ -558,56 +531,56 @@ export default class Sponsors {
      * Information about the tier.
      */
     tier: SponsorshipTier;
-};",
-        "typeText": "Sponsorship",
+};,
+        typeText: Sponsorship,
       },
-      "tsdoc": null,
-      "type": Object {
-        "kind": "object",
-        "props": Array [
+      tsdoc: null,
+      type: Object {
+        kind: object,
+        props: Array [
           Object {
-            "kind": "prop",
-            "name": "id",
-            "type": Object {
-              "kind": "primitive",
-              "type": "string",
+            kind: prop,
+            name: id,
+            type: Object {
+              kind: primitive,
+              type: string,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "createdAt",
-            "type": Object {
-              "kind": "primitive",
-              "type": "string",
+            kind: prop,
+            name: createdAt,
+            type: Object {
+              kind: primitive,
+              type: string,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "sponsor",
-            "type": Object {
-              "kind": "typeIndexRef",
-              "link": "(dist/index).SponsorshipSponsor",
+            kind: prop,
+            name: sponsor,
+            type: Object {
+              kind: typeIndexRef,
+              link: (dist/index).SponsorshipSponsor,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "public",
-            "type": Object {
-              "kind": "primitive",
-              "type": "boolean",
+            kind: prop,
+            name: public,
+            type: Object {
+              kind: primitive,
+              type: boolean,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "tier",
-            "type": Object {
-              "kind": "typeIndexRef",
-              "link": "(dist/index).SponsorshipTier",
+            kind: prop,
+            name: tier,
+            type: Object {
+              kind: typeIndexRef,
+              link: (dist/index).SponsorshipTier,
             },
           },
         ],
-        "raw": Object {
-          "nodeFullText": "export declare type Sponsorship = {
+        raw: Object {
+          nodeFullText: export declare type Sponsorship = {
     id: string;
     createdAt: string;
     /**
@@ -622,8 +595,8 @@ export default class Sponsors {
      * Information about the tier.
      */
     tier: SponsorshipTier;
-};",
-          "nodeText": "export declare type Sponsorship = {
+};,
+          nodeText: export declare type Sponsorship = {
     id: string;
     createdAt: string;
     /**
@@ -638,16 +611,16 @@ export default class Sponsors {
      * Information about the tier.
      */
     tier: SponsorshipTier;
-};",
-          "typeText": "Sponsorship",
+};,
+          typeText: Sponsorship,
         },
       },
     },
-    "(dist/index).SponsorshipSponsor": Object {
-      "kind": "alias",
-      "name": "SponsorshipSponsor",
-      "raw": Object {
-        "nodeFullText": "export declare type SponsorshipSponsor = {
+    (dist/index).SponsorshipSponsor: Object {
+      kind: alias,
+      name: SponsorshipSponsor,
+      raw: Object {
+        nodeFullText: export declare type SponsorshipSponsor = {
     /**
      * Login handle of the sponsor.
      */
@@ -656,8 +629,8 @@ export default class Sponsors {
      * Sponsor's email if available.
      */
     email?: string;
-};",
-        "nodeText": "export declare type SponsorshipSponsor = {
+};,
+        nodeText: export declare type SponsorshipSponsor = {
     /**
      * Login handle of the sponsor.
      */
@@ -666,32 +639,32 @@ export default class Sponsors {
      * Sponsor's email if available.
      */
     email?: string;
-};",
-        "typeText": "SponsorshipSponsor",
+};,
+        typeText: SponsorshipSponsor,
       },
-      "tsdoc": null,
-      "type": Object {
-        "kind": "object",
-        "props": Array [
+      tsdoc: null,
+      type: Object {
+        kind: object,
+        props: Array [
           Object {
-            "kind": "prop",
-            "name": "login",
-            "type": Object {
-              "kind": "primitive",
-              "type": "string",
+            kind: prop,
+            name: login,
+            type: Object {
+              kind: primitive,
+              type: string,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "email",
-            "type": Object {
-              "kind": "primitive",
-              "type": "string",
+            kind: prop,
+            name: email,
+            type: Object {
+              kind: primitive,
+              type: string,
             },
           },
         ],
-        "raw": Object {
-          "nodeFullText": "export declare type SponsorshipSponsor = {
+        raw: Object {
+          nodeFullText: export declare type SponsorshipSponsor = {
     /**
      * Login handle of the sponsor.
      */
@@ -700,8 +673,8 @@ export default class Sponsors {
      * Sponsor's email if available.
      */
     email?: string;
-};",
-          "nodeText": "export declare type SponsorshipSponsor = {
+};,
+          nodeText: export declare type SponsorshipSponsor = {
     /**
      * Login handle of the sponsor.
      */
@@ -710,16 +683,16 @@ export default class Sponsors {
      * Sponsor's email if available.
      */
     email?: string;
-};",
-          "typeText": "SponsorshipSponsor",
+};,
+          typeText: SponsorshipSponsor,
         },
       },
     },
-    "(dist/index).SponsorshipTier": Object {
-      "kind": "alias",
-      "name": "SponsorshipTier",
-      "raw": Object {
-        "nodeFullText": "export declare type SponsorshipTier = {
+    (dist/index).SponsorshipTier: Object {
+      kind: alias,
+      name: SponsorshipTier,
+      raw: Object {
+        nodeFullText: export declare type SponsorshipTier = {
     id: string;
     createdAt: string;
     /**
@@ -731,8 +704,8 @@ export default class Sponsors {
      * The amount sponsoree receives each month.
      */
     monthlyPriceInCents: number;
-};",
-        "nodeText": "export declare type SponsorshipTier = {
+};,
+        nodeText: export declare type SponsorshipTier = {
     id: string;
     createdAt: string;
     /**
@@ -744,56 +717,56 @@ export default class Sponsors {
      * The amount sponsoree receives each month.
      */
     monthlyPriceInCents: number;
-};",
-        "typeText": "SponsorshipTier",
+};,
+        typeText: SponsorshipTier,
       },
-      "tsdoc": null,
-      "type": Object {
-        "kind": "object",
-        "props": Array [
+      tsdoc: null,
+      type: Object {
+        kind: object,
+        props: Array [
           Object {
-            "kind": "prop",
-            "name": "id",
-            "type": Object {
-              "kind": "primitive",
-              "type": "string",
+            kind: prop,
+            name: id,
+            type: Object {
+              kind: primitive,
+              type: string,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "createdAt",
-            "type": Object {
-              "kind": "primitive",
-              "type": "string",
+            kind: prop,
+            name: createdAt,
+            type: Object {
+              kind: primitive,
+              type: string,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "name",
-            "type": Object {
-              "kind": "primitive",
-              "type": "string",
+            kind: prop,
+            name: name,
+            type: Object {
+              kind: primitive,
+              type: string,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "description",
-            "type": Object {
-              "kind": "primitive",
-              "type": "string",
+            kind: prop,
+            name: description,
+            type: Object {
+              kind: primitive,
+              type: string,
             },
           },
           Object {
-            "kind": "prop",
-            "name": "monthlyPriceInCents",
-            "type": Object {
-              "kind": "primitive",
-              "type": "number",
+            kind: prop,
+            name: monthlyPriceInCents,
+            type: Object {
+              kind: primitive,
+              type: number,
             },
           },
         ],
-        "raw": Object {
-          "nodeFullText": "export declare type SponsorshipTier = {
+        raw: Object {
+          nodeFullText: export declare type SponsorshipTier = {
     id: string;
     createdAt: string;
     /**
@@ -805,8 +778,8 @@ export default class Sponsors {
      * The amount sponsoree receives each month.
      */
     monthlyPriceInCents: number;
-};",
-          "nodeText": "export declare type SponsorshipTier = {
+};,
+          nodeText: export declare type SponsorshipTier = {
     id: string;
     createdAt: string;
     /**
@@ -818,8 +791,8 @@ export default class Sponsors {
      * The amount sponsoree receives each month.
      */
     monthlyPriceInCents: number;
-};",
-          "typeText": "SponsorshipTier",
+};,
+          typeText: SponsorshipTier,
         },
       },
     },
