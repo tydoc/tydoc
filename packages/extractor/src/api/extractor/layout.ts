@@ -1,20 +1,31 @@
 import createDebug from 'debug'
-import dedent from 'dedent'
-import kleur from 'kleur'
+import * as dedent from 'dedent'
+import * as kleur from 'kleur'
 import * as path from 'path'
+import { PackageJson } from 'type-fest'
 import {
   absolutify,
+  assertDirExists,
+  assertFileExists,
   assertPathAbsolute,
-  assertPathExists,
   readPackageJson,
   readTsconfigJson,
+  stripExtension,
 } from '../lib/package-helpers'
 
 const debug = createDebug('tydoc:package')
 
 type Givens = {
+  /**
+   * Should the projectDir and sourceMainModulePath be validated that they exist on disk?
+   *
+   * @default true
+   */
+  validateExists?: boolean
   projectDir?: string
   sourceMainModulePath?: string
+  packageJson?: PackageJson
+  sourceDir?: string
 }
 
 /**
@@ -33,10 +44,12 @@ export function scan(givens?: Givens) {
       givens.projectDir,
       `Layout scan received a relative path for "projectDir". It must be an absolute path.`
     )
-    assertPathExists(
-      givens.projectDir,
-      'Layout received a path for "projectDir" that does not actually exist.'
-    )
+    if (givens.validateExists) {
+      assertDirExists(
+        givens.projectDir,
+        'Layout received a path for "projectDir" that is not a directory or does not actually exist.'
+      )
+    }
     debug('prjDir set to %s -- taken from passed config ', projectDir)
   } else {
     projectDir = process.cwd()
@@ -49,7 +62,7 @@ export function scan(givens?: Givens) {
 
   let packageMain: string
 
-  const packageJson = readPackageJson(projectDir)
+  const packageJson = givens?.packageJson ?? readPackageJson(projectDir)
 
   if (!packageJson) {
     throw new Error(`Your project at ${kleur.yellow(projectDir)} is missing a package.json file.`)
@@ -71,6 +84,7 @@ export function scan(givens?: Givens) {
    * Read tsconfig.json
    */
 
+  // todo does not support tsconfig inheritance
   const tsconfigJson = readTsconfigJson(projectDir)
 
   if (!tsconfigJson) {
@@ -83,16 +97,23 @@ export function scan(givens?: Givens) {
 
   let sourceDir: string
 
-  const tsconfigRootDir = tsconfigJson.compilerOptions?.rootDir
-
-  if (tsconfigRootDir) {
-    if (path.isAbsolute(tsconfigRootDir)) {
-      sourceDir = tsconfigRootDir
-    } else {
-      sourceDir = path.resolve(projectDir, tsconfigRootDir)
+  if (givens?.sourceDir) {
+    sourceDir = absolutify(projectDir, givens.sourceDir)
+    if (givens.validateExists) {
+      assertDirExists(givens.sourceDir)
     }
   } else {
-    sourceDir = projectDir
+    const tsconfigRootDir = tsconfigJson.compilerOptions?.rootDir
+
+    if (tsconfigRootDir) {
+      if (path.isAbsolute(tsconfigRootDir)) {
+        sourceDir = tsconfigRootDir
+      } else {
+        sourceDir = path.resolve(projectDir, tsconfigRootDir)
+      }
+    } else {
+      sourceDir = projectDir
+    }
   }
 
   debug('sourceDir set to %s', sourceDir)
@@ -104,15 +125,14 @@ export function scan(givens?: Givens) {
   let sourceMainModulePath: string
 
   if (givens?.sourceMainModulePath) {
-    sourceMainModulePath = givens?.sourceMainModulePath
-    assertPathAbsolute(
-      sourceMainModulePath,
-      'Layout received a relative path for "sourceMainModulePath". It must be absolute.'
-    )
-    assertPathExists(
-      sourceMainModulePath,
-      'Layout received a path for "sourceMainModulePath" that does not actually exist.'
-    )
+    sourceMainModulePath = absolutify(projectDir, givens.sourceMainModulePath)
+    if (givens.validateExists) {
+      assertFileExists(
+        sourceMainModulePath,
+        'Layout received a path for "sourceMainModulePath" that is not a file or does not actually exist.'
+      )
+    }
+    sourceMainModulePath = stripExtension(sourceMainModulePath)
   } else {
     let outDir: string
 
@@ -168,7 +188,7 @@ export function scan(givens?: Givens) {
     tydocSettingsInPackage = {}
   }
 
-  return {
+  const layout = {
     projectDir,
     sourceDir,
     sourceMainModulePath,
@@ -177,4 +197,8 @@ export function scan(givens?: Givens) {
     packageJson,
     tsconfigJson,
   }
+
+  debug(`layout calculated:`, layout)
+
+  return layout
 }

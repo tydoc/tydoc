@@ -9,13 +9,13 @@ import { hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils
 const debug = Debug('tydoc:doc')
 
 export interface Settings {
+  projectDir: string
   /**
    * Absolute path to the source root. This should match the path that rootDir
    * resolves to from the project's tsconfig.json.
    */
-  srcDir: string
-  prjDir: string
-  mainModuleFilePathAbs: string
+  sourceDir: string
+  sourceMainModulePath: string
   sourceModuleToPackagePathMappings?: Record<string, string>
 }
 
@@ -62,11 +62,11 @@ export class Manager {
   }
 
   getFQTN(t: tsm.Type): string {
-    return getFQTNFromType(this.settings.srcDir, t)
+    return getFQTNFromType(this.settings.sourceDir, t)
   }
 
   indexTypeAliasNode(n: tsm.TypeAliasDeclaration, doc: Thunk<Node>): Node {
-    const fqtn = getFQTNFromTypeAliasNode(this.settings.srcDir, n)
+    const fqtn = getFQTNFromTypeAliasNode(this.settings.sourceDir, n)
     this.data.typeIndex[fqtn] = {} as any
     const result = doc() as IndexableNode
     this.data.typeIndex[fqtn] = result
@@ -75,7 +75,7 @@ export class Manager {
 
   indexTypeIfApplicable(t: tsm.Type, doc: Thunk<Node>) {
     if (this.isIndexable(t)) {
-      const fqtn = getFQTNFromType(this.settings.srcDir, t)
+      const fqtn = getFQTNFromType(this.settings.sourceDir, t)
       if (!this.isIndexed(fqtn)) {
         // register then hydrate, this prevents infinite loops
         debug('provisioning entry in type index: %s', fqtn)
@@ -90,7 +90,7 @@ export class Manager {
   }
 
   isMainModule(sf: tsm.SourceFile): boolean {
-    return this.settings.mainModuleFilePathAbs === getSourceFileModulePath(sf)
+    return this.settings.sourceMainModulePath === getSourceFileModulePath(sf)
   }
 
   getImportFromPath(sf: tsm.SourceFile): string {
@@ -102,7 +102,7 @@ export class Manager {
     const modulePath = getSourceFileModulePath(sf)
 
     // handle mapped non-root module case
-    const srcRelModulePath = path.relative(this.settings.srcDir, modulePath)
+    const srcRelModulePath = path.relative(this.settings.sourceDir, modulePath)
     const packageMapping = this.settings.sourceModuleToPackagePathMappings?.[srcRelModulePath]
     if (packageMapping) {
       debug('getting module path (%s) from settings mappings', packageMapping)
@@ -110,7 +110,7 @@ export class Manager {
     }
 
     // handle non-root module case
-    return path.join('/', path.relative(this.settings.prjDir, modulePath))
+    return path.join('/', path.relative(this.settings.projectDir, modulePath))
   }
 }
 

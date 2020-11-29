@@ -3,6 +3,7 @@ import * as lo from 'lodash'
 import { isEmpty } from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
+import { PackageJson } from 'type-fest'
 import {
   applyDiagnosticFilters,
   DiagnosticFilter,
@@ -27,23 +28,9 @@ interface Options {
    */
   entrypoints: string[]
   /**
-   * Specify the path to the package's entrypoint file.
-   *
-   * @defualt Read from package.json main field
-   * @remarks This is useful for tests to avoid mocks or environment setup
-   */
-  packageMainEntrypoint?: string
-  /**
-   * Specify the root of the project.
-   *
-   * @default The current working directory
-   * @remarks This is useful for tests to avoid having to mock process.cwd
-   */
-  projectDir?: string
-  /**
    * Should Tydoc settings be read from from the package file.
    */
-  readSettingsFromJSON: boolean
+  readSettingsFromJSON?: boolean
   /**
    * Sometimes a source entrypoint is fronted by a facade module that allows
    * package consumers to do e.g. `import foo from "bar/toto"` _instead of_
@@ -91,12 +78,29 @@ interface Options {
    */
   haltOnDiagnostics?: boolean | DiagnosticFilter[]
   project?: tsm.Project
-  /**
-   * Absolute path to the source main entrypoint.
-   *
-   * @default A discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups.
-   */
-  sourceMainEntrypointPath?: string
+  layout?: {
+    /**
+     * Should the projectDir and sourceMainModulePath be validated that they exist on disk?
+     *
+     * @default true
+     */
+    validateExists?: boolean
+    /**
+     * Absolute path to the source main entrypoint.
+     *
+     * @default A discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups.
+     */
+    sourceMainModulePath?: string
+    /**
+     * Specify the root of the project.
+     *
+     * @default The current working directory
+     * @remarks This is useful for tests to avoid having to mock process.cwd
+     */
+    projectDir?: string
+    sourceDir?: string
+    packageJson?: PackageJson
+  }
 }
 
 /**
@@ -108,10 +112,7 @@ export function fromProject(options: Options): Doc.DocPackage {
   // Wherever the user's package.json is. We assume for now that this tool is
   // running from project root.
 
-  const layout = scan({
-    projectDir: options.projectDir,
-    sourceMainModulePath: options.sourceMainEntrypointPath,
-  })
+  const layout = scan(options.layout)
 
   const project =
     options.project ??
@@ -194,9 +195,9 @@ export function fromProject(options: Options): Doc.DocPackage {
    */
 
   const managerSettings = {
-    srcDir: layout.sourceDir,
-    prjDir: layout.projectDir,
-    mainModuleFilePathAbs: layout.sourceMainModulePath,
+    sourceDir: layout.sourceDir,
+    projectDir: layout.projectDir,
+    sourceMainModulePath: layout.sourceMainModulePath,
     sourceModuleToPackagePathMappings: options.sourceModuleToPackagePathMappings,
   }
 

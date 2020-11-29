@@ -51,7 +51,7 @@ export class Project extends Command {
         `,
     }),
     sourceMainEntrypointPath: flags.string({
-      description: `Absolute path to the source main entrypoint. By default a discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups.`,
+      description: `Absolute path to the source main entrypoint. By default a discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups. If you give a relative path it is relative to the project directory (--dir).`,
     }),
   }
 
@@ -69,9 +69,11 @@ export class Project extends Command {
     const docs = TyDoc.fromProject({
       entrypoints: argv,
       readSettingsFromJSON: true,
-      projectDir: flags.dir ?? process.cwd(),
       haltOnDiagnostics,
-      sourceMainEntrypointPath: flags.sourceMainEntrypointPath,
+      layout: {
+        projectDir: flags.dir,
+        sourceMainModulePath: flags.sourceMainEntrypointPath,
+      },
     })
 
     if (flags.json) {

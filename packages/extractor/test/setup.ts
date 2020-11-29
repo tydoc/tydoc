@@ -58,7 +58,7 @@ function createContextt() {
         if (typeof mod === 'object' && mod.isEntrypoint) {
           entrypoints.push(Path.join(modulePathUnderSrc, moduleName))
         }
-        const modulePath = Path.join(`./src`, modulePathUnderSrc, `${moduleName}.ts`)
+        const modulePath = Path.join(`src`, modulePathUnderSrc, `${moduleName}.ts`)
         project.createSourceFile(modulePath, contentPretty, {
           overwrite: true,
         })
@@ -66,9 +66,15 @@ function createContextt() {
       return jsde.fromProject({
         entrypoints: entrypoints,
         project: project,
-        prjDir: '/',
-        readSettingsFromJSON: false,
-        packageMainEntrypoint: project.compilerOptions.get().outDir + '/a.js',
+        layout: {
+          validateExists: false,
+          sourceMainModulePath: 'src/a.ts',
+          projectDir: '/',
+          sourceDir: 'src',
+          packageJson: {
+            main: project.compilerOptions.get().outDir + '/a.js',
+          },
+        },
       })
     },
   }
