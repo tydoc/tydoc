@@ -11,7 +11,8 @@ import * as tempy from 'tempy';
 import * as decompress from 'decompress';
 
 const packages = [
-  "sponsorsme"
+  "sponsorsme",
+  "execa"
 ]
 describe("tests extraction of packages", () => {
   for (const pkg of packages) {
@@ -22,17 +23,15 @@ describe("tests extraction of packages", () => {
       const projectDir = path.join(outputDir, 'package')
       console.log({projectDir});
       try {
-        const docs = TyDoc.fromProject({
-          readSettingsFromJSON: false,
+        const docs = TyDoc.fromPublished({
           prjDir: projectDir,
           project: tsProject,
           haltOnDiagnostics: false,
         })
         expect(docs).toMatchSnapshot()
-      } finally {
-
+      } catch(err){
+        throw err
       }
-      
     })
   }
 })
