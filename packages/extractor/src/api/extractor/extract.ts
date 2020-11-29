@@ -292,17 +292,18 @@ export function fromProject(options: Options): Doc.DocPackage {
 
   return manager.data
 }
-
+let done:string[] = []
 /**
  * Recursively extract docs starting from exports of the given module.
  * Everything that is reachable will be considered.
  */
-export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.DocPackage {
+export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.Manager {
   const mod = Doc.modFromSourceFile(manager, sourceFile)
-
-  for (const [exportName, exportedDeclarations] of sourceFile.getExportedDeclarations()) {
-    const n = exportedDeclarations[0]
-
+  const exportedDeclarations = sourceFile.getExportedDeclarations()
+  debugExport(`filepath: ${sourceFile.getFilePath()}`)
+  debugExport({exportedDeclarations,mod })
+  for (const [exportName, expDeclarations] of exportedDeclarations) {
+    let n = expDeclarations[0]
     if (!n) {
       console.warn(
         dedent`
@@ -313,8 +314,19 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
       )
       continue
     }
+    debugExport('-> export declaration %s', exportName)
+    debugExport(n)
 
-    const t = n.getType()
+    debugExport('-> export declaration %s', n.getKindName())
+    if(tsm.Node.isSourceFile(n)){
+      if(!done.includes(n.getFilePath())){
+        done.push(n.getFilePath())
+        manager = fromModule(manager, n)
+      } 
+      continue
+    } 
+    const t = n?.getType()
+    if(!t) continue
     debugExport('start')
     debugExport('-> node kind is %s', n.getKindName())
     debugExport('-> type text is %j', n.getType().getText())
@@ -327,15 +339,16 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
       debugExport('type alias pointing to type that cannot back reference to the type alias %s', n.getText())
       doc = manager.indexTypeAliasNode(n, () =>
         Doc.alias({
-          name: n.getName(),
+          // @ts-ignore
+          name: n.getName ? n.getName() : n.getKindName(),
           raw: {
             nodeFullText: n.getFullText(),
             nodeText: n.getText(),
-            typeText: t.getText(),
+            typeText: t!.getText(),
           },
           // todo getTSDocFromNode()
           ...getTSDoc(manager, n.getType()),
-          type: fromType(manager, t),
+          type: fromType(manager, t!),
         })
       )
     } else {
@@ -357,7 +370,7 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
   }
 
   manager.data.modules.push(mod)
-  return manager.data
+  return manager
 }
 
 function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
@@ -532,7 +545,7 @@ function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
  * Extract docs from the type's properties.
  */
 function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
-  return getProperties(t).map((p) => {
+  return getProperties(t).filter(Boolean).map((p) => {
     const propName = p.getName()
     const propType = p.getType()
     // what is this method for then? It was just returning an `any` type

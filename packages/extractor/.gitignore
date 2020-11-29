@@ -1,5 +1,6 @@
 node_modules
 dist
 oclif.manifest.json
-src/example*
+.vscode
+example*
 scratch.ts
