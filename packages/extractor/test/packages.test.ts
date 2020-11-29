@@ -16,15 +16,8 @@ const packages = [
 describe("tests extraction of packages", () => {
   for (const pkg of packages) {
     test(pkg, async () => {
-      const response = await axios.get('https://registry.npmjs.org/'+pkg)
-      const data = response.data
-      const latestVersion = data["dist-tags"]["latest"]
-      const latestData = data["versions"][latestVersion]
-      const tarUrl = latestData["dist"]["tarball"]
-      const tarPath = await downloadTarball(tarUrl)
-      const outputDir = tempy.directory()
-      await extract(tarPath, outputDir)
       expect.assertions(1)
+      const outputDir = await downloadFromNPM(pkg)
       const tsProject = new tsm.Project()
       const projectDir = path.join(outputDir, 'package')
       console.log({projectDir});
@@ -43,8 +36,27 @@ describe("tests extraction of packages", () => {
     })
   }
 })
-
-async function extract(path: string, outputDir: string){
+async function downloadFromNPM(packageName: string): Promise<string>{
+  const tarUrl = await  getTarUrl(packageName)
+  const tarPath = await downloadTarball(tarUrl)
+  const outputDir = await extract(tarPath)
+  return outputDir
+}
+async function getTarUrl(packageName: string){
+  let tarUrl: string;
+  try {
+    const response = await axios.get('https://registry.npmjs.org/'+packageName)
+    const data = response.data
+    const latestVersion = data["dist-tags"]["latest"]
+    const latestData = data["versions"][latestVersion]
+    tarUrl = latestData["dist"]["tarball"]
+  } catch (err) {
+    throw new Error(`Failed to fetch tarball url for ${packageName}`)
+  }
+  return tarUrl
+}
+async function extract(path: string): Promise<string>{
+  const outputDir = tempy.directory()
   return new Promise<string>((resolve, reject) => {
     decompress(path, outputDir).then((files: any) => {
       console.log('done!');
