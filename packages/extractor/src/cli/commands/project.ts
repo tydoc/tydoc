@@ -15,7 +15,7 @@ export class Project extends Command {
       description: 'Entrypoint(s) into the package',
     },
   ]
-  static flags = {
+  static flags: any = {
     markdown: flags.boolean({
       default: true,
       char: 'm',
@@ -57,7 +57,7 @@ export class Project extends Command {
   }
 
   async run() {
-    const { flags, argv } = this.parse(Project)
+    const { flags, argv } = this.parse(Project) as any
 
     /**
      * Map arv and flags to FromProjectParams

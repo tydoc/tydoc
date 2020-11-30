@@ -14,7 +14,7 @@
   "scripts": {
     "build:docs:toc": "doctoc README.md",
     "build:docs:api": "ts-node scripts/build-api-docs",
-    "build:docs": "yarn -s build:docs:api && yarn -s build:docs:toc",
+    "build:docs": "yarn build:docs:api && yarn build:docs:toc",
     "build:oclif": "oclif-dev manifest",
     "build:ts": "tsc",
     "build": "yarn clean && yarn build:oclif && yarn build:ts",
