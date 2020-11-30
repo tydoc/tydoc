@@ -14,5 +14,5 @@
     // For context see https://prisma.slack.com/archives/G01E30CCZGF/p1606708250013200
     "lib": ["ESNext", "DOM"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src"]
 }
