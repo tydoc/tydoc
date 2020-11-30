@@ -14,7 +14,7 @@
   "scripts": {
     "build:docs:toc": "doctoc README.md",
     "build:docs:api": "ts-node scripts/build-api-docs",
-    "build:docs": "yarn -s build:docs:api && yarn -s build:docs:toc",
+    "build:docs": "yarn build:docs:api && yarn build:docs:toc",
     "build:oclif": "oclif-dev manifest",
     "build:ts": "tsc",
     "build": "yarn clean && yarn build:oclif && yarn build:ts",
@@ -64,7 +64,8 @@
     "jest-watch-typeahead": "0.4.2",
     "ts-jest": "25.2.1",
     "ts-node": "8.6.2",
-    "ts-node-dev": "1.0.0-pre.44"
+    "ts-node-dev": "1.0.0-pre.44",
+    "type-fest": "^0.20.2"
   },
   "prettier": "@prisma-labs/prettier-config",
   "jest": {
