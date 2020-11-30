@@ -1,6 +1,7 @@
 import Command, { flags } from '@oclif/command'
 import * as JSON5 from 'json5'
 import * as TyDoc from '../../'
+import { FromProjectParams } from '../../api/extractor/extract'
 import { DiagnosticFilter } from '../../api/lib/ts-helpers'
 import { arrayify } from '../../utils'
 import dedent = require('dedent')
@@ -58,23 +59,35 @@ export class Project extends Command {
   async run() {
     const { flags, argv } = this.parse(Project)
 
-    let haltOnDiagnostics
+    /**
+     * Map arv and flags to FromProjectParams
+     */
+
+    let validateTypeScriptDiagnostics
 
     if (flags['ignore-diagnostics-matching']) {
-      haltOnDiagnostics = arrayify(JSON5.parse(flags['ignore-diagnostics-matching'])) as DiagnosticFilter[]
+      validateTypeScriptDiagnostics = arrayify(
+        JSON5.parse(flags['ignore-diagnostics-matching'])
+      ) as DiagnosticFilter[]
     } else {
-      haltOnDiagnostics = !flags['ignore-diagnostics']
+      validateTypeScriptDiagnostics = !flags['ignore-diagnostics']
     }
 
-    const docs = TyDoc.fromProject({
+    const FromProjectParams: FromProjectParams = {
       entrypoints: argv,
       readSettingsFromJSON: true,
-      haltOnDiagnostics,
       layout: {
+        validateTypeScriptDiagnostics,
         projectDir: flags.dir,
         sourceMainModulePath: flags.sourceMainEntrypointPath,
       },
-    })
+    }
+
+    /**
+     * Get EDD
+     */
+
+    const docs = TyDoc.fromProject(FromProjectParams)
 
     if (flags.json) {
       this.log(JSON.stringify(docs, null, 2))

@@ -5,7 +5,6 @@ import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { PackageJson } from 'type-fest'
 import {
-  applyDiagnosticFilters,
   DiagnosticFilter,
   getDiscriminantPropertiesOfUnionMembers,
   getFirstDeclarationOrThrow,
@@ -22,7 +21,7 @@ const debugExport = Debug('tydoc:extract:export')
 const debugVisible = Debug('tydoc:extract:visible')
 const debugWarn = Debug('tydoc:warn')
 
-interface Options {
+export interface FromProjectParams {
   /**
    * Paths to modules in project, relative to source root or absolute.
    */
@@ -60,25 +59,25 @@ interface Options {
    * ```
    */
   sourceModuleToPackagePathMappings?: Record<string, string>
-  /**
-   * Should Tydoc halt when TypeScript diagnostics are raised?
-   *
-   * Pass true to halt on any diagnostic
-   *
-   * Pass false to ignore all diagnostics
-   *
-   * Pass an array of filters to ignore only certain diagnostics.
-   *
-   * @default true
-   *
-   * @remarks
-   *
-   * Typically your package should be error free before documentation is extracted for it. However there may be cases where you want to bypass this check in general or for specific kinds of type check errors. For example a @ts-expect-error that is erroring because there is no error.
-   *
-   */
-  haltOnDiagnostics?: boolean | DiagnosticFilter[]
-  project?: tsm.Project
   layout?: {
+    /**
+     * Should Tydoc halt when TypeScript diagnostics are raised?
+     *
+     * Pass true to halt on any diagnostic
+     *
+     * Pass false to ignore all diagnostics
+     *
+     * Pass an array of filters to ignore only certain diagnostics.
+     *
+     * @default true
+     *
+     * @remarks
+     *
+     * Typically your package should be error free before documentation is extracted for it. However there may be cases where you want to bypass this check in general or for specific kinds of type check errors. For example a @ts-expect-error that is erroring because there is no error.
+     *
+     */
+    validateTypeScriptDiagnostics?: boolean | DiagnosticFilter[]
+
     /**
      * Should the projectDir and sourceMainModulePath be validated that they exist on disk?
      *
@@ -100,6 +99,7 @@ interface Options {
     projectDir?: string
     sourceDir?: string
     packageJson?: PackageJson
+    tsMorphProject?: tsm.Project
   }
 }
 
@@ -108,38 +108,10 @@ interface Options {
  * the given list of entrypoint modules. Everything that is reachable from the
  * exports will be considered part of the API.
  */
-export function fromProject(options: Options): Doc.DocPackage {
-  // Wherever the user's package.json is. We assume for now that this tool is
-  // running from project root.
-
+export function fromProject(options: FromProjectParams): Doc.DocPackage {
   const layout = scan(options.layout)
 
-  const project =
-    options.project ??
-    new tsm.Project({
-      tsConfigFilePath: layout.tsconfigPath,
-    })
-
-  const haltOnDiagnostics = options.haltOnDiagnostics ?? true
-
-  if (haltOnDiagnostics !== false) {
-    const diagnostics = project.getPreEmitDiagnostics()
-    if (diagnostics.length) {
-      if (haltOnDiagnostics === true || applyDiagnosticFilters(haltOnDiagnostics, diagnostics)) {
-        const message = project.formatDiagnosticsWithColorAndContext(diagnostics)
-        console.log(`
-        Tydoc stopped extracting documentation becuase the package was found to have type errors. You should fix these and then try again. If you do not care about these type errors and want to try extracting documentation anyways then try using one of the following flags:\n  --ignore-diagnostics\n  --ignore-diagnostics-matching
-      `)
-        throw new Error(message)
-      }
-    }
-  }
-
-  /**
-   * Get the entrypoint modules to crawl
-   */
-
-  const sourceFiles = project.getSourceFiles()
+  const sourceFiles = layout.tsMorphPoject.getSourceFiles()
 
   if (isEmpty(sourceFiles)) {
     throw new Error('No source files found in project to document.')
@@ -217,8 +189,7 @@ export function fromProject(options: Options): Doc.DocPackage {
     fromModule(manager, sf)
   })
 
-  // todo rename to edd
-  return manager.data
+  return manager.EDD
 }
 
 /**
@@ -284,8 +255,8 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
     )
   }
 
-  manager.data.modules.push(mod)
-  return manager.data
+  manager.EDD.modules.push(mod)
+  return manager.EDD
 }
 
 function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {

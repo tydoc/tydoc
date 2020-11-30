@@ -6,3 +6,4 @@ dist
 .yarn/install-state.gz
 storybook-static
 tsconfig.tsbuildinfo
+.scratch*

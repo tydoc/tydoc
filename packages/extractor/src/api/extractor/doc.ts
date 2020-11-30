@@ -31,7 +31,7 @@ export class Manager {
     )
   }
 
-  data: DocPackage = {
+  EDD: DocPackage = {
     modules: [],
     typeIndex: {},
   }
@@ -52,11 +52,11 @@ export class Manager {
   }
 
   isIndexed(name: string): boolean {
-    return this.data.typeIndex[name] !== undefined
+    return this.EDD.typeIndex[name] !== undefined
   }
 
   getFromIndex(name: string): Node {
-    const node = this.data.typeIndex[name]
+    const node = this.EDD.typeIndex[name]
     if (!node) throw new Error(`Could not find "${name}" in the EDD Type Index.`)
     return node
   }
@@ -67,9 +67,9 @@ export class Manager {
 
   indexTypeAliasNode(n: tsm.TypeAliasDeclaration, doc: Thunk<Node>): Node {
     const fqtn = getFQTNFromTypeAliasNode(this.settings.sourceDir, n)
-    this.data.typeIndex[fqtn] = {} as any
+    this.EDD.typeIndex[fqtn] = {} as any
     const result = doc() as IndexableNode
-    this.data.typeIndex[fqtn] = result
+    this.EDD.typeIndex[fqtn] = result
     return typeIndexRef(fqtn)
   }
 
@@ -79,10 +79,10 @@ export class Manager {
       if (!this.isIndexed(fqtn)) {
         // register then hydrate, this prevents infinite loops
         debug('provisioning entry in type index: %s', fqtn)
-        this.data.typeIndex[fqtn] = {} as any
+        this.EDD.typeIndex[fqtn] = {} as any
         const result = doc() as IndexableNode
         debug('hydrating entry in type index: %s', fqtn)
-        this.data.typeIndex[fqtn] = result
+        this.EDD.typeIndex[fqtn] = result
       }
       return typeIndexRef(fqtn)
     }

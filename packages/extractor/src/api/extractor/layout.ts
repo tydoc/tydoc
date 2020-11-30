@@ -2,6 +2,7 @@ import createDebug from 'debug'
 import * as dedent from 'dedent'
 import * as kleur from 'kleur'
 import * as path from 'path'
+import * as tsm from 'ts-morph'
 import { PackageJson } from 'type-fest'
 import {
   absolutify,
@@ -9,9 +10,9 @@ import {
   assertFileExists,
   assertPathAbsolute,
   readPackageJson,
-  readTsconfigJson,
   stripExtension,
 } from '../lib/package-helpers'
+import { applyDiagnosticFilters, DiagnosticFilter } from '../lib/ts-helpers'
 
 const debug = createDebug('tydoc:package')
 
@@ -22,10 +23,15 @@ type Givens = {
    * @default true
    */
   validateExists?: boolean
+  /**
+   * On a TypeScript
+   */
+  validateTypeScriptDiagnostics?: boolean | DiagnosticFilter[]
   projectDir?: string
   sourceMainModulePath?: string
   packageJson?: PackageJson
   sourceDir?: string
+  tsMorphProject?: tsm.Project
 }
 
 /**
@@ -81,14 +87,40 @@ export function scan(givens?: Givens) {
   debug('packageMain is %s', packageMain)
 
   /**
-   * Read tsconfig.json
+   * Create a ts-morph project, including reading tsconfig.json
    */
 
-  // todo does not support tsconfig inheritance
-  const tsconfigJson = readTsconfigJson(projectDir)
+  let tsMorphPoject
 
-  if (!tsconfigJson) {
-    throw new Error(`Your project at ${kleur.yellow(projectDir)} is missing a tsconfig.json file.`)
+  if (givens?.tsMorphProject) {
+    tsMorphPoject = givens.tsMorphProject
+  } else {
+    const tsConfigFilePath = path.join(projectDir, 'tsconfig.json')
+
+    if (givens?.validateExists) {
+      assertFileExists(
+        tsConfigFilePath,
+        `You must have a tsconfig.json file in the root of your project (${kleur.yellow(projectDir)}).`
+      )
+    }
+
+    tsMorphPoject = new tsm.Project({ tsConfigFilePath })
+
+    if (givens?.validateTypeScriptDiagnostics) {
+      const diagnostics = tsMorphPoject.getPreEmitDiagnostics()
+      if (diagnostics.length) {
+        if (
+          givens.validateTypeScriptDiagnostics === true ||
+          applyDiagnosticFilters(givens.validateTypeScriptDiagnostics, diagnostics)
+        ) {
+          const message = tsMorphPoject.formatDiagnosticsWithColorAndContext(diagnostics)
+          console.log(`
+        Tydoc stopped extracting documentation becuase the package was found to have type errors. You should fix these and then try again. If you do not care about these type errors and want to try extracting documentation anyways then try using one of the following flags:\n  --ignore-diagnostics\n  --ignore-diagnostics-matching
+      `)
+          throw new Error(message)
+        }
+      }
+    }
   }
 
   /**
@@ -103,7 +135,8 @@ export function scan(givens?: Givens) {
       assertDirExists(givens.sourceDir)
     }
   } else {
-    const tsconfigRootDir = tsconfigJson.compilerOptions?.rootDir
+    // todo what is .rootDirs?
+    const tsconfigRootDir = tsMorphPoject.compilerOptions.get().rootDir
 
     if (tsconfigRootDir) {
       if (path.isAbsolute(tsconfigRootDir)) {
@@ -136,7 +169,7 @@ export function scan(givens?: Givens) {
   } else {
     let outDir: string
 
-    const tsconfigOutDir = tsconfigJson.compilerOptions?.outDir
+    const tsconfigOutDir = tsMorphPoject.compilerOptions.get().outDir
 
     if (tsconfigOutDir === undefined) {
       throw new Error(dedent`
@@ -195,7 +228,7 @@ export function scan(givens?: Givens) {
     tydocSettingsInPackage,
     tsconfigPath: path.join(projectDir, 'tsconfig.json'),
     packageJson,
-    tsconfigJson,
+    tsMorphPoject,
   }
 
   debug(`layout calculated:`, layout)

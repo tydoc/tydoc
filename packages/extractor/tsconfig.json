@@ -12,5 +12,5 @@
     "sourceMap": true,
     "lib": ["ESNext"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/.scratch.ts"]
 }

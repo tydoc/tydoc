@@ -1,7 +1,6 @@
 import * as fs from 'fs-jetpack'
 import * as path from 'path'
-import { PackageJson, TsConfigJson } from 'type-fest'
-import * as ts from 'typescript'
+import { PackageJson } from 'type-fest'
 
 export function readPackageJson(dir: string): null | PackageJson {
   return fs.read(path.join(dir, 'package.json'), 'json') ?? null
@@ -10,12 +9,6 @@ export function readPackageJson(dir: string): null | PackageJson {
 export function stripExtension(somePath: string): string {
   const { dir, name } = path.parse(somePath)
   return path.join(dir, name)
-}
-
-export function readTsconfigJson(dir: string): null | TsConfigJson {
-  return ts.readConfigFile(path.join(dir, 'tsconfig.json'), ts.sys.readFile).config ?? null
-  // return ts.readJsonConfigFile(path.join(dir, 'tsconfig.json'), ts.sys.readFile)
-  // return fs.read(path.join(dir, 'tsconfig.json'), 'json') ?? null
 }
 
 export function absolutify(rootDir: string, somePath: string): string {
