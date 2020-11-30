@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    // Not yet available
+    // todo Not yet available
     // "noUncheckedIndexedAccess": true,
     "module": "CommonJS",
     "moduleResolution": "node",
@@ -10,7 +10,9 @@
     "rootDir": "src",
     "declarationMap": true,
     "sourceMap": true,
-    "lib": ["ESNext"]
+    // todo remove "DOM" once "nmHoistingLimits: dependencies" is working
+    // For context see https://prisma.slack.com/archives/G01E30CCZGF/p1606708250013200
+    "lib": ["ESNext", "DOM"]
   },
-  "include": ["src/**/*.ts", "src/.scratch.ts"]
+  "include": ["src/**/*.ts"]
 }
