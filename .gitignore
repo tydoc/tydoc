@@ -7,3 +7,4 @@ dist
 storybook-static
 tsconfig.tsbuildinfo
 .scratch*
+.yarn/build-state.yml 
