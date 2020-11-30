@@ -1,3 +1,4 @@
+import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { casesHandled, Index, indexBy } from '../../utils'
 
@@ -152,4 +153,12 @@ export function getFirstDeclarationOrThrow(symbol: tsm.Symbol): tsm.Node {
     )
   }
   return dec
+}
+
+/**
+ * Get the module path of the given source file. The difference froma  file path
+ * is that a module path does not have a file extension.
+ */
+export function getSourceFileModulePath(sf: tsm.SourceFile): string {
+  return path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
 }

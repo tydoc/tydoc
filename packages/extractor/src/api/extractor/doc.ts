@@ -3,19 +3,19 @@ import Debug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { Index, Thunk } from '../../utils'
-import { getFirstDeclarationOrThrow } from '../lib/ts-helpers'
+import { getFirstDeclarationOrThrow, getSourceFileModulePath } from '../lib/ts-helpers'
 import { hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
 
 const debug = Debug('tydoc:doc')
 
 export interface Settings {
+  projectDir: string
   /**
    * Absolute path to the source root. This should match the path that rootDir
    * resolves to from the project's tsconfig.json.
    */
-  srcDir: string
-  prjDir: string
-  mainModuleFilePathAbs: string
+  sourceDir: string
+  sourceMainModulePath: string
   sourceModuleToPackagePathMappings?: Record<string, string>
 }
 
@@ -31,7 +31,7 @@ export class Manager {
     )
   }
 
-  data: DocPackage = {
+  EDD: DocPackage = {
     modules: [],
     typeIndex: {},
   }
@@ -52,37 +52,37 @@ export class Manager {
   }
 
   isIndexed(name: string): boolean {
-    return this.data.typeIndex[name] !== undefined
+    return this.EDD.typeIndex[name] !== undefined
   }
 
   getFromIndex(name: string): Node {
-    const node = this.data.typeIndex[name]
+    const node = this.EDD.typeIndex[name]
     if (!node) throw new Error(`Could not find "${name}" in the EDD Type Index.`)
     return node
   }
 
   getFQTN(t: tsm.Type): string {
-    return getFQTNFromType(this.settings.srcDir, t)
+    return getFQTNFromType(this.settings.sourceDir, t)
   }
 
   indexTypeAliasNode(n: tsm.TypeAliasDeclaration, doc: Thunk<Node>): Node {
-    const fqtn = getFQTNFromTypeAliasNode(this.settings.srcDir, n)
-    this.data.typeIndex[fqtn] = {} as any
+    const fqtn = getFQTNFromTypeAliasNode(this.settings.sourceDir, n)
+    this.EDD.typeIndex[fqtn] = {} as any
     const result = doc() as IndexableNode
-    this.data.typeIndex[fqtn] = result
+    this.EDD.typeIndex[fqtn] = result
     return typeIndexRef(fqtn)
   }
 
   indexTypeIfApplicable(t: tsm.Type, doc: Thunk<Node>) {
     if (this.isIndexable(t)) {
-      const fqtn = getFQTNFromType(this.settings.srcDir, t)
+      const fqtn = getFQTNFromType(this.settings.sourceDir, t)
       if (!this.isIndexed(fqtn)) {
         // register then hydrate, this prevents infinite loops
         debug('provisioning entry in type index: %s', fqtn)
-        this.data.typeIndex[fqtn] = {} as any
+        this.EDD.typeIndex[fqtn] = {} as any
         const result = doc() as IndexableNode
         debug('hydrating entry in type index: %s', fqtn)
-        this.data.typeIndex[fqtn] = result
+        this.EDD.typeIndex[fqtn] = result
       }
       return typeIndexRef(fqtn)
     }
@@ -90,7 +90,7 @@ export class Manager {
   }
 
   isMainModule(sf: tsm.SourceFile): boolean {
-    return this.settings.mainModuleFilePathAbs === getModulePath(sf)
+    return this.settings.sourceMainModulePath === getSourceFileModulePath(sf)
   }
 
   getImportFromPath(sf: tsm.SourceFile): string {
@@ -99,10 +99,10 @@ export class Manager {
       return '/'
     }
 
-    const modulePath = getModulePath(sf)
+    const modulePath = getSourceFileModulePath(sf)
 
     // handle mapped non-root module case
-    const srcRelModulePath = path.relative(this.settings.srcDir, modulePath)
+    const srcRelModulePath = path.relative(this.settings.sourceDir, modulePath)
     const packageMapping = this.settings.sourceModuleToPackagePathMappings?.[srcRelModulePath]
     if (packageMapping) {
       debug('getting module path (%s) from settings mappings', packageMapping)
@@ -110,40 +110,8 @@ export class Manager {
     }
 
     // handle non-root module case
-    return path.join('/', path.relative(this.settings.prjDir, modulePath))
+    return path.join('/', path.relative(this.settings.projectDir, modulePath))
   }
-}
-
-/**
- * Get the path to the main TypeScript module in the package.
- *
- * @remarks If relative paths are given then the result will be relative.
- * otherwise if absolute paths are given the result will be absolute. Do not mix
- * relative and absolute paths!
- */
-export function getMainModule({
-  outDir,
-  srcDir,
-  packageMainEntrypoint,
-}: {
-  outDir: string
-  srcDir: string
-  packageMainEntrypoint: string
-}): string {
-  // todo assertion that all paths are relative or absolute––no mixing
-  const jsFilePathRel = path.relative(outDir, packageMainEntrypoint)
-  const mainModuleName = path.basename(jsFilePathRel, '.js')
-  const MainModulePathRel = path.join(path.dirname(jsFilePathRel), mainModuleName)
-  const MainModulePathAbs = path.join(srcDir, MainModulePathRel)
-  return MainModulePathAbs
-}
-
-/**
- * Get the module path of the given source file. The difference froma  file path
- * is that a module path does not have a file extension.
- */
-function getModulePath(sf: tsm.SourceFile): string {
-  return path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
 }
 
 // // todo move to test suite

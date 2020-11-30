@@ -1061,9 +1061,21 @@ export type Bar = {
 }
 ```
 
-## AST Guide
+## EDD Guide
 
 todo
+
+## CLI
+
+### `project`
+
+This command extracts documentation data from a TypeScript package. You must tell it where the package entrypoints are. You must also tell it which of the given entrypoints is the main entrypoint. Often a package only has a main entrypoint, and no others. An example of a package with more than one entrypoint is `lodash` which has `lodash/fp`.
+
+## Glossary
+
+### A package entrypoint
+
+### The main package entrypoint
 
 ## API
 

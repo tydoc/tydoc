@@ -1,6 +1,7 @@
 import Command, { flags } from '@oclif/command'
 import * as JSON5 from 'json5'
 import * as TyDoc from '../../'
+import { FromProjectParams } from '../../api/extractor/extract'
 import { DiagnosticFilter } from '../../api/lib/ts-helpers'
 import { arrayify } from '../../utils'
 import dedent = require('dedent')
@@ -14,7 +15,7 @@ export class Project extends Command {
       description: 'Entrypoint(s) into the package',
     },
   ]
-  static flags = {
+  static flags: any = {
     markdown: flags.boolean({
       default: true,
       char: 'm',
@@ -50,24 +51,43 @@ export class Project extends Command {
           [{ path: '/foo/bar/.*', code '24.*' }]
         `,
     }),
+    sourceMainEntrypointPath: flags.string({
+      description: `Absolute path to the source main entrypoint. By default a discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups. If you give a relative path it is relative to the project directory (--dir).`,
+    }),
   }
-  async run() {
-    const { flags, argv } = this.parse(Project)
 
-    let haltOnDiagnostics
+  async run() {
+    const { flags, argv } = this.parse(Project) as any
+
+    /**
+     * Map arv and flags to FromProjectParams
+     */
+
+    let validateTypeScriptDiagnostics
 
     if (flags['ignore-diagnostics-matching']) {
-      haltOnDiagnostics = arrayify(JSON5.parse(flags['ignore-diagnostics-matching'])) as DiagnosticFilter[]
+      validateTypeScriptDiagnostics = arrayify(
+        JSON5.parse(flags['ignore-diagnostics-matching'])
+      ) as DiagnosticFilter[]
     } else {
-      haltOnDiagnostics = !flags['ignore-diagnostics']
+      validateTypeScriptDiagnostics = !flags['ignore-diagnostics']
     }
 
-    const docs = TyDoc.fromProject({
+    const FromProjectParams: FromProjectParams = {
       entrypoints: argv,
       readSettingsFromJSON: true,
-      prjDir: flags.dir ?? process.cwd(),
-      haltOnDiagnostics,
-    })
+      layout: {
+        validateTypeScriptDiagnostics,
+        projectDir: flags.dir,
+        sourceMainModulePath: flags.sourceMainEntrypointPath,
+      },
+    }
+
+    /**
+     * Get EDD
+     */
+
+    const docs = TyDoc.fromProject(FromProjectParams)
 
     if (flags.json) {
       this.log(JSON.stringify(docs, null, 2))

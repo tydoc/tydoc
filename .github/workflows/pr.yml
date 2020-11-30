@@ -15,11 +15,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        run: yarn --frozen-lockfile
+        working-directory: packages/extractor
+        run: yarn --immutable
       - name: Test
-        run: yarn -s test
-      - name: Upload coverage to Codecov
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '14.x'
-        uses: codecov/codecov-action@v1
-        with:
-          directory: ./coverage
+        working-directory: packages/extractor
+        run: yarn test

@@ -27,7 +27,7 @@ interface ModuleSpec {
 }
 
 function createContextt() {
-  const project = new tsm.Project({
+  const tsMorphProject = new tsm.Project({
     compilerOptions: {
       rootDir: './src',
       outDir: './dist',
@@ -57,17 +57,23 @@ function createContextt() {
         if (typeof mod === 'object' && mod.isEntrypoint) {
           entrypoints.push(Path.join(modulePathUnderSrc, moduleName))
         }
-        const modulePath = Path.join(`./src`, modulePathUnderSrc, `${moduleName}.ts`)
-        project.createSourceFile(modulePath, contentPretty, {
+        const modulePath = Path.join(`src`, modulePathUnderSrc, `${moduleName}.ts`)
+        tsMorphProject.createSourceFile(modulePath, contentPretty, {
           overwrite: true,
         })
       }
       return jsde.fromProject({
         entrypoints: entrypoints,
-        project: project,
-        prjDir: '/',
-        readSettingsFromJSON: false,
-        packageMainEntrypoint: project.compilerOptions.get().outDir + '/a.js',
+        layout: {
+          tsMorphProject,
+          validateExists: false,
+          sourceMainModulePath: 'src/a.ts',
+          projectDir: '/',
+          sourceDir: 'src',
+          packageJson: {
+            main: tsMorphProject.compilerOptions.get().outDir + '/a.js',
+          },
+        },
       })
     },
   }

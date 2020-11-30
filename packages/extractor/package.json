@@ -14,7 +14,7 @@
   "scripts": {
     "build:docs:toc": "doctoc README.md",
     "build:docs:api": "ts-node scripts/build-api-docs",
-    "build:docs": "yarn -s build:docs:api && yarn -s build:docs:toc",
+    "build:docs": "yarn build:docs:api && yarn build:docs:toc",
     "build:oclif": "oclif-dev manifest",
     "build:ts": "tsc",
     "build": "yarn clean && yarn build:oclif && yarn build:ts",
@@ -68,7 +68,8 @@
     "tempy": "^1.0.0",
     "ts-jest": "26.4.4",
     "ts-node": "9.0.0",
-    "ts-node-dev": "1.0.0"
+    "ts-node-dev": "1.0.0",
+    "type-fest": "^0.20.2"
   },
   "prettier": "@prisma-labs/prettier-config",
   "jest": {
@@ -90,7 +91,9 @@
         }
       ]
     ],
-    "snapshotSerializers": ["./test/__helpers__/snapshotSerializer.ts"],
+    "snapshotSerializers": [
+      "./test/__helpers__/snapshotSerializer.ts"
+    ],
     "watchPathIgnorePatterns": [
       "<rootDir>/dist/",
       "<rootDir>/oclif.manifest.json"
