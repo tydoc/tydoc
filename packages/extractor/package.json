@@ -73,6 +73,7 @@
   "prettier": "@prisma-labs/prettier-config",
   "jest": {
     "preset": "ts-jest",
+    "testEnvironment": "node",
     "watchPlugins": [
       "jest-watch-suspend",
       "jest-watch-typeahead/filename",
@@ -90,9 +91,6 @@
         }
       ]
     ],
-    "snapshotSerializers": [
-      "./test/__helpers__/snapshotSerializer.ts"
-    ],
     "watchPathIgnorePatterns": [
       "<rootDir>/dist/",
       "<rootDir>/oclif.manifest.json"
@@ -102,8 +100,7 @@
     ],
     "globals": {
       "ts-jest": {
-        "tsconfig": "test/tsconfig.json",
-        "diagnostics": false
+        "tsconfig": "test/tsconfig.json"
       }
     }
   },
