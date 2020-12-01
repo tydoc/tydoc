@@ -120,10 +120,10 @@ export function fromPublished(options: Options): Doc.DocPackage {
 
   // Setup manager settings
   //
-  const managerSettings = {
-    srcDir: prjDir,
-    prjDir: prjDir,
-    mainModuleFilePathAbs: entryPoint,
+  const managerSettings: Doc.Settings = {
+    projectDir:prjDir,
+    sourceDir: prjDir,
+    sourceMainModulePath: entryPoint
   }
 
   // Create manager extract doc and return final docs AST
@@ -134,7 +134,7 @@ export function fromPublished(options: Options): Doc.DocPackage {
     fromModule(manager, sf)
   })
 
-  return manager.data
+  return manager.EDD
 }
 let done:string[] = []
 
@@ -214,7 +214,7 @@ function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.Manag
     )
   }
 
-  manager.data.modules.push(mod)
+  manager.EDD.modules.push(mod)
   return manager
 }
 

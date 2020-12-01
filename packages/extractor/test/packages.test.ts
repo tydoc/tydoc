@@ -2,12 +2,11 @@
 /**
  * @jest-environment node
  */
-import * as fs from "fs";
+import * as fs from "fs-jetpack";
 import * as path from "path";
 import * as TyDoc from "../src"
 import * as tsm from 'ts-morph'
-import axios from 'axios';
-import * as tempy from 'tempy';
+import got from 'got';
 import * as decompress from 'decompress';
 
 const packages = [
@@ -43,10 +42,11 @@ async function downloadFromNPM(packageName: string): Promise<string>{
 async function getTarUrl(packageName: string){
   let tarUrl: string;
   try {
-    const response = await axios.get('https://registry.npmjs.org/'+packageName)
-    const data = response.data
-    const latestVersion = data["dist-tags"]["latest"]
-    const latestData = data["versions"][latestVersion]
+    const  {body} = await got.get('https://registry.npmjs.org/'+packageName, {responseType: 'json'})
+    // @ts-ignore
+    const latestVersion = body["dist-tags"]["latest"]
+    // @ts-ignore
+    const latestData = body["versions"][latestVersion]
     tarUrl = latestData["dist"]["tarball"]
   } catch (err) {
     throw new Error(`Failed to fetch tarball url for ${packageName}`)
@@ -54,28 +54,25 @@ async function getTarUrl(packageName: string){
   return tarUrl
 }
 async function extract(path: string): Promise<string>{
-  const outputDir = tempy.directory()
+  const tmp = fs.tmpDir();
   return new Promise<string>((resolve, reject) => {
-    decompress(path, outputDir).then((files: any) => {
-      resolve(outputDir)
+    decompress(path, tmp.cwd()).then((files: any) => {
+      resolve(tmp.cwd())
     }).catch(reject)
   })
 }
 
 async function downloadTarball (url: string): Promise<string> {  
-  const path = tempy.file()
-  const writer = fs.createWriteStream(path)
+  const tmp = fs.tmpDir()
+  const filePath = path.join(tmp.cwd(), url)
+  tmp.file(filePath)
+  console.log(filePath);
 
-  const response = await axios({
-    url,
-    method: 'GET',
-    responseType: 'stream'
-  })
-
-  response.data.pipe(writer)
+  const writer = fs.createWriteStream(filePath)
+  got.get(url, {responseType: 'json', isStream: true}).pipe(writer)
 
   return new Promise<string>((resolve, reject) => {
-    writer.on('finish', () => resolve(path))
+    writer.on('finish', () => resolve(filePath))
     writer.on('error', reject)
   })
 }
