@@ -1,4 +1,6 @@
+import decompress = require('decompress')
 import * as fs from 'fs-jetpack'
+import got from 'got'
 import * as path from 'path'
 import { PackageJson } from 'type-fest'
 
@@ -57,4 +59,54 @@ export function assertPathAbsolute(somePath: string, customMessage?: string) {
     const message = customMessage ?? `The given path is not absolute: ${somePath}`
     throw new Error(message)
   }
+}
+
+export function downloadPackageTarball(tarballUrl: string, toFilePath: string): Promise<void> {
+  const writer = fs.createWriteStream(toFilePath)
+  got.get(tarballUrl, { responseType: 'json', isStream: true }).pipe(writer)
+
+  return new Promise<void>((resolve, reject) => {
+    writer.on('finish', () => resolve())
+    writer.on('error', reject)
+  })
+}
+
+export async function getPackageVersionTarballUrl(
+  packageName: string,
+  packageVersion?: string
+): Promise<string> {
+  const { body } = await got.get<any>(`https://registry.npmjs.org/${packageName}`, { responseType: 'json' })
+
+  if (typeof body !== 'object' || body === null) {
+    throw new Error('Returned body was not an object')
+  }
+
+  let tarballUrl: string
+
+  if (packageVersion) {
+    const versionData = body.versions[packageVersion]
+    if (!versionData) {
+      throw new Error(
+        `Package "${packageName}" has not such version "${packageVersion}". Versions it has are: ${body.versions.join(
+          ', '
+        )}`
+      )
+    }
+    const versionTarballUrl = versionData.dist.tarball
+    tarballUrl = versionTarballUrl
+  } else {
+    const latestVersion = body['dist-tags'].latest
+    const latestVersionData = body.versions[latestVersion]
+    const latestVersionTarballUrl = latestVersionData.dist.tarball
+    tarballUrl = latestVersionTarballUrl
+  }
+
+  return tarballUrl
+}
+
+export async function downloadPackage(packageName: string, dir: string): Promise<void> {
+  const tarballDownloadDir = `${dir}-tarball`
+  const tarballUrl = await getPackageVersionTarballUrl(packageName)
+  await downloadPackageTarball(tarballUrl, tarballDownloadDir)
+  await decompress(tarballDownloadDir, dir)
 }

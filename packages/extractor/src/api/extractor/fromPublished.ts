@@ -5,7 +5,6 @@ import * as tsm from 'ts-morph'
 import { applyDiagnosticFilters, DiagnosticFilter } from '../lib/ts-helpers'
 import * as Doc from './doc'
 import { fromModule as fromModule2 } from './extract'
-import dedent = require('dedent')
 
 const debug = Debug('tydoc:extract')
 
