@@ -120,3 +120,12 @@ export async function downloadPackage({
   await decompress(tarballDownloadDir, tarballDecompressDir)
   fs.move(path.join(tarballDecompressDir, 'package'), downloadDir, { overwrite: true })
 }
+
+export function getPackageMain(packageJson: PackageJson) {
+  return packageJson.main ?? './index.js'
+}
+
+export function JsFilePathToTsDeclarationFilePath(jsFilePath: string) {
+  const { dir, name } = path.parse(jsFilePath)
+  return path.join(dir, `${name}.d.ts`)
+}

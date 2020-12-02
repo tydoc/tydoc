@@ -5,7 +5,13 @@ import { isEmpty } from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { PackageJson } from 'type-fest'
-import { assertFileExists, downloadPackage, readPackageJson } from '../lib/package-helpers'
+import {
+  assertFileExists,
+  downloadPackage,
+  getPackageMain,
+  JsFilePathToTsDeclarationFilePath,
+  readPackageJson,
+} from '../lib/package-helpers'
 import {
   DiagnosticFilter,
   getDiscriminantPropertiesOfUnionMembers,
@@ -124,12 +130,8 @@ export async function fromPublished(options: {
       `The downloaded package at ${projectDir} was not valid. It is missing a package.json file.`
     )
   }
-  let packageJsonMain = packageJson.main
-  if (packageJson.main) {
-    packageJsonMain = packageJson.main
-  } else {
-    packageJsonMain = './index.js'
-  }
+
+  const packageJsonMain = getPackageMain(packageJson)
 
   const entrypointPath = JsFilePathToTsDeclarationFilePath(path.join(projectDir, packageJsonMain))
 
@@ -151,11 +153,6 @@ export async function fromPublished(options: {
   })
 
   return manager.EDD
-}
-
-function JsFilePathToTsDeclarationFilePath(jsFilePath: string) {
-  const { dir, name } = path.parse(jsFilePath)
-  return path.join(dir, `${name}.d.ts`)
 }
 
 /**
