@@ -71,39 +71,6 @@
     "type-fest": "^0.20.2"
   },
   "prettier": "@prisma-labs/prettier-config",
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "watchPlugins": [
-      "jest-watch-suspend",
-      "jest-watch-typeahead/filename",
-      "jest-watch-typeahead/testname",
-      [
-        "jest-watch-toggle-config",
-        {
-          "setting": "verbose"
-        }
-      ],
-      [
-        "jest-watch-toggle-config",
-        {
-          "setting": "bail"
-        }
-      ]
-    ],
-    "watchPathIgnorePatterns": [
-      "<rootDir>/dist/",
-      "<rootDir>/oclif.manifest.json"
-    ],
-    "setupFiles": [
-      "./test/setup.ts"
-    ],
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "test/tsconfig.json"
-      }
-    }
-  },
   "oclif": {
     "commands": "./dist/cli/commands",
     "bin": "tydoc",

@@ -30,6 +30,7 @@ async function foo(pkg: string) {
 }
 
 function replaceInObjectValues<T>(obj: T, searchTerm: string, replacementTerm: string): T {
+  // hacky implementation, would replace keys too etc.
   return JSON.parse(replaceAll(JSON.stringify(obj), searchTerm, replacementTerm))
 }
 

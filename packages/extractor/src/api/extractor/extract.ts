@@ -103,6 +103,8 @@ export interface FromProjectParams {
   }
 }
 
+// export function fromPublished(): Doc.DocPackage {}
+
 /**
  * Recursively extract docs from the given project starting from the exports of
  * the given list of entrypoint modules. Everything that is reachable from the
@@ -259,7 +261,7 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
   return manager.EDD
 }
 
-function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
+export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   debugVisible('start')
   debugVisible('-> type text is %j', t.getText())
   const locationKind = getLocationKind(t)
@@ -514,7 +516,7 @@ function getRaw(t: tsm.Type): Doc.RawFrag {
  * If the node associated with the type does not have JSDoc present in the
  * source code then `null` is returned.
  */
-function getTSDoc(manager: Doc.Manager, t: tsm.Type): Doc.TSDocFrag {
+export function getTSDoc(manager: Doc.Manager, t: tsm.Type): Doc.TSDocFrag {
   const n = getNodeFromTypePreferingAlias(t)
   let docFragTSDoc: Doc.TSDocFrag['tsdoc']
 
