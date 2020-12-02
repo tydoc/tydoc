@@ -3,19 +3,20 @@ import { fromPublished } from '../src/api/extractor/extract'
 import { replaceInObjectValues } from './__utils'
 
 test('can get EDD from "sponsorsme" package', async () => {
-  const edd = await foo('sponsorsme')
+  const edd = await doFromPublished('sponsorsme', '1.0.1')
   expect(edd).toMatchSnapshot()
 })
 
 test('can get EDD from "execa" package', async () => {
-  const edd = await foo('execa')
+  const edd = await doFromPublished('execa', '4.1.0')
   expect(edd).toMatchSnapshot()
 })
 
-async function foo(packageName: string) {
+async function doFromPublished(packageName: string, packageVersion: string) {
   const tmp = fs.tmpDir()
   const edd = await fromPublished({
-    packageName: packageName,
+    packageName,
+    packageVersion,
     downloadDir: tmp.cwd(),
   })
   const eddWithStaticPaths = replaceInObjectValues(edd, tmp.cwd(), '/__root__')
