@@ -1,9 +1,11 @@
 import Debug from 'debug'
+import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
 import { isEmpty } from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { PackageJson } from 'type-fest'
+import { assertFileExists, downloadPackage, readPackageJson } from '../lib/package-helpers'
 import {
   DiagnosticFilter,
   getDiscriminantPropertiesOfUnionMembers,
@@ -103,7 +105,58 @@ export interface FromProjectParams {
   }
 }
 
-// export function fromPublished(): Doc.DocPackage {}
+export async function fromPublished(options: {
+  packageName: string
+  packageVersion?: string
+  project?: tsm.Project
+  downloadDir?: string
+}): Promise<Doc.DocPackage> {
+  const tmpDir = await fs.tmpDirAsync()
+  const projectDir = options.downloadDir ?? tmpDir.cwd()
+  await downloadPackage({
+    name: options.packageName,
+    version: options.packageVersion,
+    downloadDir: projectDir,
+  })
+  const packageJson = readPackageJson(projectDir)
+  if (!packageJson) {
+    throw new Error(
+      `The downloaded package at ${projectDir} was not valid. It is missing a package.json file.`
+    )
+  }
+  let packageJsonMain = packageJson.main
+  if (packageJson.main) {
+    packageJsonMain = packageJson.main
+  } else {
+    packageJsonMain = './index.js'
+  }
+
+  const entrypointPath = JsFilePathToTsDeclarationFilePath(path.join(projectDir, packageJsonMain))
+
+  assertFileExists(
+    entrypointPath,
+    `The downloaded package at ${projectDir} is not valid because it did not include TypeScript declaration files (looked for one at ${entrypointPath}).`
+  )
+
+  const project = options.project ?? new tsm.Project()
+  project.addSourceFilesAtPaths(entrypointPath)
+  const manager = new Doc.Manager({
+    projectDir: projectDir,
+    sourceDir: projectDir,
+    sourceMainModulePath: entrypointPath,
+  })
+
+  project.getSourceFiles().forEach((sf) => {
+    fromModule(manager, sf)
+  })
+
+  return manager.EDD
+}
+
+function JsFilePathToTsDeclarationFilePath(jsFilePath: string) {
+  const { dir, name } = path.parse(jsFilePath)
+  return path.join(dir, `${name}.d.ts`)
+}
 
 /**
  * Recursively extract docs from the given project starting from the exports of

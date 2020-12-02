@@ -1,8 +1,5 @@
 import * as fs from 'fs-jetpack'
-import * as path from 'path'
-import * as tsm from 'ts-morph'
-import * as TyDoc from '../src'
-import { downloadPackage } from '../src/api/lib/package-helpers'
+import { fromPublished } from '../src/api/extractor/extract'
 import { replaceInObjectValues } from './__utils'
 
 test('can get EDD from "sponsorsme" package', async () => {
@@ -17,13 +14,9 @@ test('can get EDD from "execa" package', async () => {
 
 async function foo(packageName: string) {
   const tmp = fs.tmpDir()
-  await downloadPackage(packageName, tmp.cwd())
-  const tsProject = new tsm.Project()
-  const projectDir = path.join(tmp.cwd(), 'package')
-  const edd = TyDoc.fromPublished({
-    prjDir: projectDir,
-    project: tsProject,
-    haltOnDiagnostics: false,
+  const edd = await fromPublished({
+    packageName: packageName,
+    downloadDir: tmp.cwd(),
   })
   const eddWithStaticPaths = replaceInObjectValues(edd, tmp.cwd(), '/__root__')
   return eddWithStaticPaths

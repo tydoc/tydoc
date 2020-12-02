@@ -104,9 +104,19 @@ export async function getPackageVersionTarballUrl(
   return tarballUrl
 }
 
-export async function downloadPackage(packageName: string, dir: string): Promise<void> {
-  const tarballDownloadDir = `${dir}-tarball`
-  const tarballUrl = await getPackageVersionTarballUrl(packageName)
+export async function downloadPackage({
+  name,
+  version,
+  downloadDir,
+}: {
+  version?: string
+  name: string
+  downloadDir: string
+}): Promise<void> {
+  const tarballDownloadDir = `${downloadDir}-tarball`
+  const tarballDecompressDir = `${downloadDir}-tarball-decompressed`
+  const tarballUrl = await getPackageVersionTarballUrl(name, version)
   await downloadPackageTarball(tarballUrl, tarballDownloadDir)
-  await decompress(tarballDownloadDir, dir)
+  await decompress(tarballDownloadDir, tarballDecompressDir)
+  fs.move(path.join(tarballDecompressDir, 'package'), downloadDir, { overwrite: true })
 }

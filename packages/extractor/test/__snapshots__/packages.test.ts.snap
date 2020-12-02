@@ -7,7 +7,7 @@ Object {
       "isMain": false,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/__root__/package/index.d.ts",
+        "absoluteFilePath": "/__root__/index.d.ts",
       },
       "mainExport": null,
       "name": "index",
@@ -7404,7 +7404,7 @@ Object {
       "isMain": false,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/__root__/package/dist/index.d.ts",
+        "absoluteFilePath": "/__root__/dist/index.d.ts",
       },
       "mainExport": Object {
         "kind": "object",
