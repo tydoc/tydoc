@@ -199,10 +199,10 @@ export type Node =
   | DocTypeIndexRef
   | DocUnsupported
   | DocTypeIntersection
-  // todo unused?
-  | { kind: 'function'; signatures: DocSig[] }
-  | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & RawFrag
-  | { kind: 'callable_interface'; properties: DocProp[]; signatures: DocSig[] } & RawFrag
+// todo unused?
+// | { kind: 'function'; signatures: DocSig[] }
+// | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & RawFrag
+// | { kind: 'callable_interface'; properties: DocProp[]; signatures: DocSig[] } & RawFrag
 
 // prettier-ignore
 export type IndexableNode =
@@ -260,7 +260,11 @@ export type Expor = {
   type: Node
 }
 
-type ExporInput = { type: Node; name: string; node: tsm.ExportedDeclarations }
+type ExporInput = {
+  name: string
+  node: tsm.ExportedDeclarations
+  type: Node
+}
 
 export function expor(input: ExporInput): Expor {
   const isType = isTypeLevelNode(input.node)
