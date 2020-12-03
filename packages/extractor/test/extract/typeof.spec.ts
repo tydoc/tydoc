@@ -12,7 +12,7 @@ it('inlines the type extracted from the term', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",

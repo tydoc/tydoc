@@ -14,7 +14,7 @@ it('raw is based on type alias declaration node', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -84,7 +84,7 @@ it('exported type alias of number is added to type index', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -138,7 +138,7 @@ it('exported type alias of number via typeof is added to type index', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",

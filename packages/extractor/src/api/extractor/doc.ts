@@ -335,14 +335,9 @@ export type DocModule = TSDocFrag & {
    */
   location: {
     /**
-     *  The absolute location of the source file on disk
-     *  Note this points to the source TypeScript module, not the built JavaScript one.
-     *
-     *  An example value might be:
-     *
-     *  '/Users/jasonkuhrt/projects/prisma-labs/tydoc/src/lib/renderers/markdown.ts'
+     * The file path to the module relative to the project root.
      */
-    absoluteFilePath: string
+    filePath: string
   }
 }
 
@@ -354,8 +349,7 @@ type ModInput = {
   tsdoc: TSDocFrag['tsdoc']
   path: string
   location: {
-    absoluteFilePath: string
-    // projectRelativeFilePath: string // todo
+    filePath: string
   }
 }
 
@@ -375,7 +369,7 @@ export function modFromSourceFile(manager: Manager, sourceFile: tsm.SourceFile):
     path: manager.getImportFromPath(sourceFile),
     isMain: manager.isMainModule(sourceFile),
     location: {
-      absoluteFilePath: sourceFile.getFilePath(),
+      filePath: path.relative(manager.settings.projectDir, sourceFile.getFilePath()),
     },
   })
 }
