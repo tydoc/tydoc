@@ -217,8 +217,7 @@ export const graphQLRequestTypes: Doc.DocPackage = {
       path: '/src/types',
       isMain: false,
       location: {
-        absoluteFilePath:
-          '/tmp/tydoc-source-proxy-prisma-labs-graphql-request-Nk2BSL/src/types.ts',
+        filePath: 'src/types.ts',
       },
     },
   ],

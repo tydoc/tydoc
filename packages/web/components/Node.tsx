@@ -1,6 +1,5 @@
 import React, { FC } from 'react'
 import { Doc } from 'tydoc/types'
-
 import { useTypeIndex } from './TypeIndexContext'
 
 type NodeProps = { node: Doc.Node }
@@ -199,10 +198,6 @@ function getDocumentationOfNode(node: Doc.Node): string | null {
       return node.raw.nodeFullText
     }
 
-    case 'function': {
-      return null
-    }
-
     case 'union': {
       return null
     }
@@ -241,14 +236,6 @@ function getDocumentationOfNode(node: Doc.Node): string | null {
 
     case 'intersection': {
       return null
-    }
-
-    case 'callable_object': {
-      return node.raw.nodeFullText
-    }
-
-    case 'callable_interface': {
-      return node.raw.nodeFullText
     }
   }
 }
