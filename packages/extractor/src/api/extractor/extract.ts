@@ -6,10 +6,12 @@ import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { PackageJson } from 'type-fest'
 import {
+  absolutify,
   assertFileExists,
   downloadPackage,
   getPackageMain,
   JsFilePathToTsDeclarationFilePath,
+  pathToModulePath,
   readPackageJson,
 } from '../lib/package-helpers'
 import {
@@ -17,6 +19,7 @@ import {
   getDiscriminantPropertiesOfUnionMembers,
   getFirstDeclarationOrThrow,
   getProperties,
+  getSourceFileModulePath,
 } from '../lib/ts-helpers'
 import * as Doc from './doc'
 import { scan } from './layout'
@@ -111,6 +114,7 @@ export interface FromProjectParams {
   }
 }
 
+// todo support extracting fromPublished with additional entrypoints
 export async function fromPublished(options: {
   packageName: string
   packageVersion?: string
@@ -170,49 +174,44 @@ export function fromProject(options: FromProjectParams): Doc.DocPackage {
   }
 
   debug(
-    'found project source files ',
+    'found project source files:',
     sourceFiles.map((sf) => sf.getFilePath())
   )
 
-  const sourceFileEntrypoints = []
-  for (const findEntryPoint of options.entrypoints) {
-    let entrypointModulePathAbs: string
-    if (path.isAbsolute(findEntryPoint)) {
-      debug('considering given entrypoint as absolute, disregarding srcDir: %s', findEntryPoint)
-      entrypointModulePathAbs = path.join(
-        path.dirname(findEntryPoint),
-        path.basename(findEntryPoint, path.extname(findEntryPoint))
-      )
-    } else {
-      debug('considering given entrypoint relative to srcDir: %s', findEntryPoint)
-      entrypointModulePathAbs = path.join(
-        layout.sourceDir,
-        path.dirname(findEntryPoint),
-        path.basename(findEntryPoint, path.extname(findEntryPoint))
-      )
+  /**
+   * Find the corresponding source files for the given entrypoints
+   */
+
+  const sourceFileEntrypoints = options.entrypoints.map((givenEntryPoint) => {
+    let givenEntryPointAbs = absolutify(layout.sourceDir, givenEntryPoint)
+
+    /**
+     * If given entrypoint is a folder then infer that to mean looking for
+     * an index within it (just like how node module resolution works).
+     *
+     * In case user is working with in-memory ts-morph project do not care if the directory
+     * does not actually exist.
+     */
+    if (fs.exists(givenEntryPointAbs) === 'dir') {
+      givenEntryPointAbs = path.join(givenEntryPointAbs, 'index.ts')
     }
-    debug('entrypointModulePathAbs is %s', entrypointModulePathAbs)
 
-    // todo if given entrypoint is a folder then infer that to mean looking for
-    // an index within it (just like how node module resolution works)
+    debug('givenEntryPointAbs is %s', givenEntryPointAbs)
 
-    const tried: string[] = []
-    const sf = sourceFiles.find((sf) => {
-      const absoluteModulePath = path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
-      tried.push(absoluteModulePath)
-      return absoluteModulePath === entrypointModulePathAbs
+    const sourceFileEntryPoint = sourceFiles.find((sf) => {
+      return getSourceFileModulePath(sf) === pathToModulePath(givenEntryPointAbs)
     })
 
-    if (!sf) {
+    if (!sourceFileEntryPoint) {
       throw new Error(
-        `Given entrypoint not found in project: ${entrypointModulePathAbs}. Source files were:\n\n${tried.join(
-          ', '
-        )}`
+        `Given entrypoint not found in project: ${givenEntryPointAbs}. Source files were:\n\n${sourceFiles
+          .map(getSourceFileModulePath)
+          .join('\n')}`
       )
     }
 
-    sourceFileEntrypoints.push(sf)
-  }
+    return sourceFileEntryPoint
+  })
 
   /**
    * Setup manager

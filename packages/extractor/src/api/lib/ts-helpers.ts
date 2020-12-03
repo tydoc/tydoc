@@ -156,9 +156,9 @@ export function getFirstDeclarationOrThrow(symbol: tsm.Symbol): tsm.Node {
 }
 
 /**
- * Get the module path of the given source file. The difference froma  file path
- * is that a module path does not have a file extension.
+ * Get the module path of the given source file. The difference from a file path
+ * is that a module path does not have a file extension and is always in posix format.
  */
 export function getSourceFileModulePath(sf: tsm.SourceFile): string {
-  return path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
+  return path.posix.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
 }
