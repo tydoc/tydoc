@@ -5,7 +5,7 @@ const process = require('process')
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  setupFiles: ['./test/setup.ts'],
+  setupFiles: ['./test/__setup__.ts'],
   watchPlugins: [
     'jest-watch-suspend',
     'jest-watch-typeahead/filename',
