@@ -9,7 +9,7 @@ it('passes smoke test', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",

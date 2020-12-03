@@ -22,7 +22,7 @@ it('extracts first comment in an empty file', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -78,7 +78,7 @@ it('extracts first comment above an import node', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -119,7 +119,7 @@ it('extracts first comment above an export node', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -172,7 +172,7 @@ it('extracts leadig comment above any node if node has own comment', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -210,7 +210,7 @@ it('does not extract leadig comment if appears to be for a piece of code', () =>
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -238,7 +238,7 @@ it('does not extract leadig comment if there is none', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",
@@ -260,7 +260,7 @@ it('does not extract leadig comment from totally empty file', () => {
           "isMain": true,
           "kind": "module",
           "location": Object {
-            "absoluteFilePath": "/src/a.ts",
+            "filePath": "src/a.ts",
           },
           "mainExport": null,
           "name": "a",

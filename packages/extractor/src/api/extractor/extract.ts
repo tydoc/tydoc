@@ -1,14 +1,25 @@
 import Debug from 'debug'
+import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
 import { isEmpty } from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { PackageJson } from 'type-fest'
 import {
+  absolutify,
+  assertFileExists,
+  downloadPackage,
+  getPackageMain,
+  JsFilePathToTsDeclarationFilePath,
+  pathToModulePath,
+  readPackageJson,
+} from '../lib/package-helpers'
+import {
   DiagnosticFilter,
   getDiscriminantPropertiesOfUnionMembers,
   getFirstDeclarationOrThrow,
   getProperties,
+  getSourceFileModulePath,
 } from '../lib/ts-helpers'
 import * as Doc from './doc'
 import { scan } from './layout'
@@ -103,6 +114,51 @@ export interface FromProjectParams {
   }
 }
 
+// todo support extracting fromPublished with additional entrypoints
+export async function fromPublished(options: {
+  packageName: string
+  packageVersion?: string
+  project?: tsm.Project
+  downloadDir?: string
+}): Promise<Doc.DocPackage> {
+  const tmpDir = await fs.tmpDirAsync()
+  const projectDir = options.downloadDir ?? tmpDir.cwd()
+  await downloadPackage({
+    name: options.packageName,
+    version: options.packageVersion,
+    downloadDir: projectDir,
+  })
+  const packageJson = readPackageJson(projectDir)
+  if (!packageJson) {
+    throw new Error(
+      `The downloaded package at ${projectDir} was not valid. It is missing a package.json file.`
+    )
+  }
+
+  const packageJsonMain = getPackageMain(packageJson)
+
+  const entrypointPath = JsFilePathToTsDeclarationFilePath(path.join(projectDir, packageJsonMain))
+
+  assertFileExists(
+    entrypointPath,
+    `The downloaded package at ${projectDir} is not valid because it did not include TypeScript declaration files (looked for one at ${entrypointPath}).`
+  )
+
+  const project = options.project ?? new tsm.Project()
+  project.addSourceFilesAtPaths(entrypointPath)
+  const manager = new Doc.Manager({
+    projectDir: projectDir,
+    sourceDir: projectDir,
+    sourceMainModulePath: entrypointPath,
+  })
+
+  project.getSourceFiles().forEach((sf) => {
+    fromModule(manager, sf)
+  })
+
+  return manager.EDD
+}
+
 /**
  * Recursively extract docs from the given project starting from the exports of
  * the given list of entrypoint modules. Everything that is reachable from the
@@ -118,49 +174,44 @@ export function fromProject(options: FromProjectParams): Doc.DocPackage {
   }
 
   debug(
-    'found project source files ',
+    'found project source files:',
     sourceFiles.map((sf) => sf.getFilePath())
   )
 
-  const sourceFileEntrypoints = []
-  for (const findEntryPoint of options.entrypoints) {
-    let entrypointModulePathAbs: string
-    if (path.isAbsolute(findEntryPoint)) {
-      debug('considering given entrypoint as absolute, disregarding srcDir: %s', findEntryPoint)
-      entrypointModulePathAbs = path.join(
-        path.dirname(findEntryPoint),
-        path.basename(findEntryPoint, path.extname(findEntryPoint))
-      )
-    } else {
-      debug('considering given entrypoint relative to srcDir: %s', findEntryPoint)
-      entrypointModulePathAbs = path.join(
-        layout.sourceDir,
-        path.dirname(findEntryPoint),
-        path.basename(findEntryPoint, path.extname(findEntryPoint))
-      )
+  /**
+   * Find the corresponding source files for the given entrypoints
+   */
+
+  const sourceFileEntrypoints = options.entrypoints.map((givenEntryPoint) => {
+    let givenEntryPointAbs = absolutify(layout.sourceDir, givenEntryPoint)
+
+    /**
+     * If given entrypoint is a folder then infer that to mean looking for
+     * an index within it (just like how node module resolution works).
+     *
+     * In case user is working with in-memory ts-morph project do not care if the directory
+     * does not actually exist.
+     */
+    if (fs.exists(givenEntryPointAbs) === 'dir') {
+      givenEntryPointAbs = path.join(givenEntryPointAbs, 'index.ts')
     }
-    debug('entrypointModulePathAbs is %s', entrypointModulePathAbs)
 
-    // todo if given entrypoint is a folder then infer that to mean looking for
-    // an index within it (just like how node module resolution works)
+    debug('givenEntryPointAbs is %s', givenEntryPointAbs)
 
-    const tried: string[] = []
-    const sf = sourceFiles.find((sf) => {
-      const absoluteModulePath = path.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
-      tried.push(absoluteModulePath)
-      return absoluteModulePath === entrypointModulePathAbs
+    const sourceFileEntryPoint = sourceFiles.find((sf) => {
+      return getSourceFileModulePath(sf) === pathToModulePath(givenEntryPointAbs)
     })
 
-    if (!sf) {
+    if (!sourceFileEntryPoint) {
       throw new Error(
-        `Given entrypoint not found in project: ${entrypointModulePathAbs}. Source files were:\n\n${tried.join(
-          ', '
-        )}`
+        `Given entrypoint not found in project: ${givenEntryPointAbs}. Source files were:\n\n${sourceFiles
+          .map(getSourceFileModulePath)
+          .join('\n')}`
       )
     }
 
-    sourceFileEntrypoints.push(sf)
-  }
+    return sourceFileEntryPoint
+  })
 
   /**
    * Setup manager
@@ -259,7 +310,7 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
   return manager.EDD
 }
 
-function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
+export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   debugVisible('start')
   debugVisible('-> type text is %j', t.getText())
   const locationKind = getLocationKind(t)
@@ -514,7 +565,7 @@ function getRaw(t: tsm.Type): Doc.RawFrag {
  * If the node associated with the type does not have JSDoc present in the
  * source code then `null` is returned.
  */
-function getTSDoc(manager: Doc.Manager, t: tsm.Type): Doc.TSDocFrag {
+export function getTSDoc(manager: Doc.Manager, t: tsm.Type): Doc.TSDocFrag {
   const n = getNodeFromTypePreferingAlias(t)
   let docFragTSDoc: Doc.TSDocFrag['tsdoc']
 

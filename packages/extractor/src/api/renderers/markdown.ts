@@ -9,13 +9,13 @@ import {
   span,
   tsCodeBlock,
 } from 'chaindown'
-import * as Debug from 'debug'
+import createDebug from 'debug'
 import * as Prettier from 'prettier'
 import { lookupOrThrow } from '../../utils'
 import * as Doc from '../extractor/doc'
 
-const debug = Debug('tydoc:markdown')
-const debugModule = Debug('tydoc:markdown:module')
+const debug = createDebug('tydoc:markdown')
+const debugModule = createDebug('tydoc:markdown:module')
 
 export interface Options {
   /**

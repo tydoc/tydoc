@@ -9,6 +9,7 @@ import {
   assertDirExists,
   assertFileExists,
   assertPathAbsolute,
+  getPackageMain,
   readPackageJson,
   stripExtension,
 } from '../lib/package-helpers'
@@ -78,11 +79,7 @@ export function scan(givens?: Givens) {
    * Find the real package entrypoint
    */
 
-  if (packageJson.main) {
-    packageMain = absolutify(projectDir, packageJson.main)
-  } else {
-    throw new Error('Your package.json main field is missing or empty. It must be present.')
-  }
+  packageMain = path.join(projectDir, getPackageMain(packageJson))
 
   debug('packageMain is %s', packageMain)
 
