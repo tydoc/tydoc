@@ -1,4 +1,4 @@
-import { Doc } from 'tydoc/types'
+import { Doc } from '@tydoc/extractor/types'
 
 export const graphQLRequestTypes: Doc.DocPackage = {
   modules: [

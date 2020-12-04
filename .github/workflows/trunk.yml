@@ -5,7 +5,24 @@ on:
     branches: [develop]
 
 jobs:
-  test:
+  tydoc-test:
+    strategy:
+      matrix:
+        node-version: [14.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        working-directory: packages/extractor
+        run: yarn --immutable
+      - name: Test
+        working-directory: packages/extractor
+        run: yarn build
+  extractor-test:
     strategy:
       matrix:
         node-version: [14.x]

@@ -1,10 +1,10 @@
 import Command, { flags } from '@oclif/command'
+import * as TyDoc from '@tydoc/extractor'
+import { FromProjectParams } from '@tydoc/extractor/dist/extractor/extract'
+import { DiagnosticFilter } from '@tydoc/extractor/dist/lib/ts-helpers'
+import dedent from 'dedent'
 import * as JSON5 from 'json5'
-import * as TyDoc from '../../'
-import { FromProjectParams } from '../../api/extractor/extract'
-import { DiagnosticFilter } from '../../api/lib/ts-helpers'
 import { arrayify } from '../../utils'
-import dedent = require('dedent')
 
 export class Project extends Command {
   static strict = false

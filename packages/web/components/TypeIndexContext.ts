@@ -1,5 +1,5 @@
+import { Doc } from '@tydoc/extractor/types'
 import React from 'react'
-import { Doc } from 'tydoc/types'
 
 /**
  * TypeIndex provides a list of all types used in package.
