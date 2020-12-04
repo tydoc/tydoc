@@ -1,8 +1,6 @@
+import { Doc } from '@tydoc/extractor/types'
 import React from 'react'
-
-import { Doc } from 'tydoc/types'
 import { CodeBlock } from './CodeBlock'
-
 import { Node } from './Node'
 import { Playground } from './Playground'
 

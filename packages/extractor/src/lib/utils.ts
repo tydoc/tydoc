@@ -1,6 +1,4 @@
-import * as tsm from 'ts-morph'
 import { inspect } from 'util'
-import { dumpNode, dumpType } from './api/extractor/utils'
 
 export type ArrayOrVarg<T> = T[] | [T[]]
 
@@ -18,12 +16,29 @@ export function casesHandled(x: never): never {
   throw new Error(`A case was not handled for value: ${x}`)
 }
 
+type CustomDumper = (...args: any[]) => boolean
+
+declare global {
+  function registerDumper(detector: CustomDumper): void
+}
+
+const registeredCustomDumpers: CustomDumper[] = []
+
+global.registerDumper = (customDumper) => {
+  registeredCustomDumpers.push(customDumper)
+}
+
 /**
  * Quick and dirty logging. Not for production.
  */
 export function dump(...args: any[]) {
-  if (args[0] instanceof tsm.Node) return dumpNode(args[0])
-  if (args[0] instanceof tsm.Type) return dumpType(args[0])
+  const didDump = registeredCustomDumpers.find((customDumper) => {
+    return customDumper(...args)
+  })
+
+  if (didDump) {
+    return
+  }
 
   const argsInspected = args.map((a) => inspect(a, { depth: 20 }))
   console.error(...argsInspected)
@@ -41,6 +56,9 @@ export function indexBy<T extends object>(items: T[], property: keyof T | ((item
   return index
 }
 
+/**
+ * Wrap a value in an array if it is not already an array.
+ */
 export function arrayify<T>(x: T): T extends Array<any> ? T : T[] {
   return Array.isArray(x) ? x : ([x] as any)
 }

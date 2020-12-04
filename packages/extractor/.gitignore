@@ -1,5 +1,3 @@
 node_modules
 dist
-oclif.manifest.json
-src/example*
 scratch.ts

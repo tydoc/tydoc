@@ -1,5 +1,5 @@
+import { Doc } from '@tydoc/extractor/types'
 import React, { FC } from 'react'
-import { Doc } from 'tydoc/types'
 import { useTypeIndex } from './TypeIndexContext'
 
 type NodeProps = { node: Doc.Node }

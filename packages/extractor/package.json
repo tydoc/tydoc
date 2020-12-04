@@ -1,23 +1,20 @@
 {
-  "name": "tydoc",
-  "description": "The TypeScript documenter that meets you where you are",
-  "version": "0.0.0-dripip",
+  "name": "@tydoc/extractor",
+  "description": "TyDoc API for getting extracted documentation data (EDD)",
+  "version": "0.2.1",
   "main": "dist/index.js",
   "license": "MIT",
-  "bin": "dist/cli/main.js",
   "files": [
     "dist",
     "types.d.ts",
-    "types.js",
-    "oclif.manifest.json"
+    "types.js"
   ],
   "scripts": {
     "build:docs:toc": "doctoc README.md",
     "build:docs:api": "ts-node scripts/build-api-docs",
     "build:docs": "yarn build:docs:api && yarn build:docs:toc",
-    "build:oclif": "oclif-dev manifest",
     "build:ts": "tsc",
-    "build": "yarn clean && yarn build:oclif && yarn build:ts",
+    "build": "yarn clean && yarn build:ts",
     "dev": "tsc -w",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "dev:test": "jest --watch",
@@ -30,9 +27,6 @@
   },
   "dependencies": {
     "@microsoft/tsdoc": "^0.12.21",
-    "@oclif/command": "^1.8.0",
-    "@oclif/config": "^1.17.0",
-    "@oclif/plugin-help": "^3.2.0",
     "@types/debug": "^4.1.5",
     "@types/lodash": "^4.14.165",
     "chaindown": "^0.1.0-next.1",
@@ -50,7 +44,6 @@
     "typescript": "^4.1.2"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "1.24.1",
     "@prisma-labs/prettier-config": "0.1.0",
     "@types/decompress": "^4",
     "@types/dedent": "^0.7.0",
@@ -70,12 +63,5 @@
     "ts-node-dev": "1.0.0",
     "type-fest": "^0.20.2"
   },
-  "prettier": "@prisma-labs/prettier-config",
-  "oclif": {
-    "commands": "./dist/cli/commands",
-    "bin": "tydoc",
-    "plugins": [
-      "@oclif/plugin-help"
-    ]
-  }
+  "prettier": "@prisma-labs/prettier-config"
 }

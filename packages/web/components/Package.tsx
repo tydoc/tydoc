@@ -1,9 +1,7 @@
-import React, { FC, useEffect, useState } from 'react'
-import { Doc } from 'tydoc/types'
-
+import { Doc } from '@tydoc/extractor/types'
+import React, { FC } from 'react'
 import { Heading } from './Heading'
 import { Module } from './Module'
-import { Node } from './Node'
 import { Type } from './Type'
 import { TypeIndexContext } from './TypeIndexContext'
 

@@ -2,9 +2,25 @@ import { TSDocParser } from '@microsoft/tsdoc'
 import Debug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
-import { Index, Thunk } from '../../utils'
 import { getFirstDeclarationOrThrow, getSourceFileModulePath } from '../lib/ts-helpers'
-import { hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
+import { Index, Thunk } from '../lib/utils'
+import { dumpNode, dumpType, hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
+
+registerDumper((...args) => {
+  if (args[0] instanceof tsm.Node) {
+    dumpNode(args[0])
+    return true
+  }
+  return false
+})
+
+registerDumper((...args) => {
+  if (args[0] instanceof tsm.Type) {
+    dumpType(args[0])
+    return true
+  }
+  return false
+})
 
 const debug = Debug('tydoc:doc')
 

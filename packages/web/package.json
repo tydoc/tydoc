@@ -28,6 +28,7 @@
     "@tailwindcss/aspect-ratio": "^0.2.0",
     "@tailwindcss/forms": "^0.2.1",
     "@tailwindcss/typography": "^0.3.1",
+    "@tydoc/extractor": "workspace:packages/extractor",
     "@types/node": "^14.14.6",
     "@types/react": "^16.9.55",
     "@types/react-syntax-highlighter": "^13.5.0",
@@ -36,7 +37,6 @@
     "postcss": "^8.1.9",
     "react-is": "^17.0.1",
     "tailwindcss": "^2.0.1",
-    "tydoc": "workspace:packages/extractor",
     "typescript": "^4.1.2"
   }
 }

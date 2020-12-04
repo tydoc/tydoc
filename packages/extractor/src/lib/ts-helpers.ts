@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as tsm from 'ts-morph'
-import { casesHandled, Index, indexBy } from '../../utils'
+import { casesHandled, Index, indexBy } from './utils'
 
 /**
  * Express a filter for diagnostic errors.

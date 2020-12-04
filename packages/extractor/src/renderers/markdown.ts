@@ -11,8 +11,8 @@ import {
 } from 'chaindown'
 import createDebug from 'debug'
 import * as Prettier from 'prettier'
-import { lookupOrThrow } from '../../utils'
 import * as Doc from '../extractor/doc'
+import { lookupOrThrow } from '../lib/utils'
 
 const debug = createDebug('tydoc:markdown')
 const debugModule = createDebug('tydoc:markdown:module')
