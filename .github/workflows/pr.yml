@@ -3,7 +3,7 @@ name: pr
 on: [pull_request]
 
 jobs:
-  tydoc-test:
+  tydoc-build:
     strategy:
       matrix:
         node-version: [14.x]
@@ -17,9 +17,8 @@ jobs:
       - name: Install Dependencies
         working-directory: packages/tydoc
         run: yarn --immutable
-      - name: Test
-        working-directory: packages/tydoc
-        run: yarn build
+      - name: build
+        run: yarn wsrun -p tydoc -c build
   extractor-test:
     strategy:
       matrix:
@@ -35,8 +34,7 @@ jobs:
         working-directory: packages/extractor
         run: yarn --immutable
       - name: Test
-        working-directory: packages/extractor
-        run: yarn test
+        run: yarn wsrun -p '@tydoc/extractor' -- test
   renderer-markdown-test:
     strategy:
       matrix:
@@ -52,5 +50,4 @@ jobs:
         working-directory: packages/renderer-markdown
         run: yarn --immutable
       - name: Test
-        working-directory: packages/renderer-markdown
-        run: yarn test
+        run: yarn wsrun -p '@tydoc/renderer-markdown' -- test

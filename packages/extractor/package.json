@@ -13,7 +13,7 @@
     "build:docs:toc": "doctoc README.md",
     "build:docs:api": "ts-node scripts/build-api-docs",
     "build:docs": "yarn build:docs:api && yarn build:docs:toc",
-    "build": "yarn tsc",
+    "build": "yarn tsc && echo 'done build'",
     "dev": "tsc -w",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "test": "jest",

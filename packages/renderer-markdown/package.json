@@ -9,7 +9,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "yarn clean && yarn tsc",
+    "build": "yarn clean && yarn tsc && echo 'done build'",
     "dev": "tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "test": "jest",

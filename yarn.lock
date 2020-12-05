@@ -17685,38 +17685,6 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"tydoc-web@workspace:packages/web":
-  version: 0.0.0-use.local
-  resolution: "tydoc-web@workspace:packages/web"
-  dependencies:
-    "@babel/cli": ^7.12.1
-    "@babel/core": ^7.12.3
-    "@storybook/addon-actions": ^6.0.28
-    "@storybook/addon-essentials": ^6.0.28
-    "@storybook/addon-links": ^6.0.28
-    "@storybook/react": ^6.0.28
-    "@tailwindcss/aspect-ratio": ^0.2.0
-    "@tailwindcss/forms": ^0.2.1
-    "@tailwindcss/typography": ^0.3.1
-    "@tydoc/extractor": "workspace:packages/extractor"
-    "@types/node": ^14.14.6
-    "@types/react": ^16.9.55
-    "@types/react-syntax-highlighter": ^13.5.0
-    "@typescript/twoslash": ^1.1.2
-    autoprefixer: ^10.0.2
-    babel-loader: ^8.1.0
-    next: 10.0.3
-    postcss: ^8.1.9
-    react: 17.0.1
-    react-dom: 17.0.1
-    react-is: ^17.0.1
-    react-syntax-highlighter: ^15.3.0
-    tailwindcss: ^2.0.1
-    ts-morph: ^8.1.2
-    typescript: ^4.1.2
-  languageName: unknown
-  linkType: soft
-
 "tydoc@workspace:packages/tydoc":
   version: 0.0.0-use.local
   resolution: "tydoc@workspace:packages/tydoc"
@@ -18571,6 +18539,38 @@ typescript@~4.0.2:
   checksum: 0899d2a4a088b15761b6234ff6610f9598112d58f27adad86f7881ad51631317b47033bfa84cdeb62a37c8b6c3ece618f4ff720fd42c99f4907a1d9390c9dae0
   languageName: node
   linkType: hard
+
+"web@workspace:packages/web":
+  version: 0.0.0-use.local
+  resolution: "web@workspace:packages/web"
+  dependencies:
+    "@babel/cli": ^7.12.1
+    "@babel/core": ^7.12.3
+    "@storybook/addon-actions": ^6.0.28
+    "@storybook/addon-essentials": ^6.0.28
+    "@storybook/addon-links": ^6.0.28
+    "@storybook/react": ^6.0.28
+    "@tailwindcss/aspect-ratio": ^0.2.0
+    "@tailwindcss/forms": ^0.2.1
+    "@tailwindcss/typography": ^0.3.1
+    "@tydoc/extractor": "workspace:packages/extractor"
+    "@types/node": ^14.14.6
+    "@types/react": ^16.9.55
+    "@types/react-syntax-highlighter": ^13.5.0
+    "@typescript/twoslash": ^1.1.2
+    autoprefixer: ^10.0.2
+    babel-loader: ^8.1.0
+    next: 10.0.3
+    postcss: ^8.1.9
+    react: 17.0.1
+    react-dom: 17.0.1
+    react-is: ^17.0.1
+    react-syntax-highlighter: ^15.3.0
+    tailwindcss: ^2.0.1
+    ts-morph: ^8.1.2
+    typescript: ^4.1.2
+  languageName: unknown
+  linkType: soft
 
 "webidl-conversions@npm:^4.0.2":
   version: 4.0.2

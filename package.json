@@ -11,7 +11,7 @@
   },
   "scripts": {
     "g:tsc": "tsc",
-    "build": "wsrun -- build",
-    "dev": "wsrun -- dev"
+    "build": "wsrun build",
+    "dev": "wsrun dev"
   }
 }
