@@ -35,11 +35,11 @@ describe('two different type aliases named the same co-exist in the type index v
         export const b:B.Foo = { c: 3 }
       `,
         {
-          modulePathUnderSrc: 'foo/bar/qux',
+          modulePathUnderSource: 'foo/bar/qux',
           content: 'export type Foo = { b: 2 }',
         },
         {
-          modulePathUnderSrc: 'tim/buk/too',
+          modulePathUnderSource: 'tim/buk/too',
           content: 'export type Foo = { c: 3 }',
         }
       )
@@ -62,12 +62,12 @@ describe('two different type aliases named the same co-exist in the type index v
       `,
         {
           isEntrypoint: false,
-          modulePathUnderSrc: 'foo/bar/qux',
+          modulePathUnderSource: 'foo/bar/qux',
           content: 'export type Foo = { b: 2 }',
         },
         {
           isEntrypoint: false,
-          modulePathUnderSrc: 'tim/buk/too',
+          modulePathUnderSource: 'tim/buk/too',
           content: 'export type Foo = { c: 3 }',
         }
       )

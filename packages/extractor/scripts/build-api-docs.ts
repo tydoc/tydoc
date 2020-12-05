@@ -1,7 +1,8 @@
+import * as tydocMarkdownRender from '@tydoc/renderer-markdown'
 import * as fs from 'fs-jetpack'
 import * as path from 'path'
 import { inspect } from 'util'
-import { fromProject, renderMarkdown } from '../src'
+import { fromProject } from '../source'
 
 const docsData = fromProject({
   entrypoints: ['index'],
@@ -13,7 +14,7 @@ if (process.argv[2] === '--json') {
   process.exit(0)
 }
 
-const docsMarkdown = renderMarkdown(docsData, { flatTermsSection: true })
+const docsMarkdown = tydocMarkdownRender.render(docsData, { flatTermsSection: true })
 updateMarkdownBlock(path.join(__dirname, '../README.md'), 'api docs', docsMarkdown)
 
 /**

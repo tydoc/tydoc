@@ -1,7 +1,7 @@
 import * as Path from 'path'
 import * as Prettier from 'prettier'
 import * as tsm from 'ts-morph'
-import * as jsde from '../src'
+import * as jsde from '../source'
 
 interface ModuleSpec {
   /**
@@ -15,10 +15,10 @@ interface ModuleSpec {
    */
   content: string
   /**
-   * The path to place the module under the src directory. By default the module
-   * will be placed directly under the "src" directory.
+   * The path to place the module under the source directory. By default the module
+   * will be placed directly under the source directory.
    */
-  modulePathUnderSrc?: string
+  modulePathUnderSource?: string
   /**
    * The name of the module. By default an alphabet letter increasing for each
    * subsequent module given among the parameters.
@@ -51,7 +51,7 @@ function createContextt() {
         const moduleName =
           typeof mod === 'object' ? (mod.moduleName ? mod.moduleName : letters.shift()!) : letters.shift()!
         const modulePathUnderSrc =
-          typeof mod === 'object' ? (mod.modulePathUnderSrc ? mod.modulePathUnderSrc : '') : ''
+          typeof mod === 'object' ? (mod.modulePathUnderSource ? mod.modulePathUnderSource : '') : ''
         if (typeof mod === 'object' && mod.isEntrypoint) {
           entrypoints.push(Path.join(modulePathUnderSrc, moduleName))
         }
