@@ -7,6 +7,7 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Features](#features)
 - [Features Still TODO](#features-still-todo)
 - [General Features Overview](#general-features-overview)
@@ -22,10 +23,10 @@ Work in progress 👷‍
   - [Named Exports](#named-exports)
   - [Main Export](#main-export)
 - [Type Index Overview](#type-index-overview)
-  - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
-  - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
-  - [Module Level TsDoc](#module-level-tsdoc)
-  - [Qualified Module Paths](#qualified-module-paths)
+    - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
+    - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
+    - [Module Level TsDoc](#module-level-tsdoc)
+    - [Qualified Module Paths](#qualified-module-paths)
   - [Avoids extracting docs for native types (Array, RegExp, etc.)](#avoids-extracting-docs-for-native-types-array-regexp-etc)
 - [TS Types Support Overview](#ts-types-support-overview)
   - [Functions](#functions)
@@ -41,15 +42,21 @@ Work in progress 👷‍
   - [Literal Types](#literal-types)
   - [Inline Object types](#inline-object-types)
   - [`typeof` operator](#typeof-operator)
-- [AST Guide](#ast-guide)
+- [EDD Guide](#edd-guide)
+- [CLI](#cli-1)
+  - [`project`](#project)
+- [Glossary](#glossary)
+  - [A package entrypoint](#a-package-entrypoint)
+  - [The main package entrypoint](#the-main-package-entrypoint)
 - [API](#api)
-  - [`renderMarkdown`](#rendermarkdown)
+  - [`fromPublished`](#frompublished)
   - [`fromProject`](#fromproject)
   - [`fromModule`](#frommodule)
+  - [`fromType`](#fromtype)
+  - [`getTSDoc`](#gettsdoc)
   - [Exported Types](#exported-types)
-    - [`I` `RenderMarkdownOptions`](#i-rendermarkdownoptions)
+    - [`I` `FromProjectParams`](#i-fromprojectparams)
   - [Type Index](#type-index)
-    - [`I` `Options`](#i-options)
     - [`T` `DocPackage`](#t-docpackage)
     - [`&` `DocModule`](#-docmodule)
     - [`T` `TSDocFrag`](#t-tsdocfrag)
@@ -71,7 +78,8 @@ Work in progress 👷‍
     - [`&` `DocUnsupported`](#-docunsupported)
     - [`&` `DocTypeIntersection`](#-doctypeintersection)
     - [`T` `Expor`](#t-expor)
-    - [`I` `Options`](#i-options-1)
+    - [`I` `FromProjectParams`](#i-fromprojectparams-1)
+    - [`|` `DiagnosticFilter`](#-diagnosticfilter)
     - [`I` `Settings`](#i-settings)
     - [`F` `Thunk`](#f-thunk)
 - [Debugging](#debugging)
@@ -1083,18 +1091,18 @@ It is possible to use Tydoc in a programmatic way. The CLI is built using this A
 
 <!-- START API DOCS --->
 
-### `renderMarkdown`
+### `fromPublished`
 
 <!-- prettier-ignore -->
 ```ts
-(docs: DocPackage, opts: Options) => string
+(options: { packageName: string; packageVersion?: string | undefined; project?: Project | undefined; downloadDir?: string | undefined; }) => Promise<DocPackage>
 ```
 
 ### `fromProject`
 
 <!-- prettier-ignore -->
 ```ts
-(opts: Options) => DocPackage
+(options: FromProjectParams) => DocPackage
 ```
 
 ### `fromModule`
@@ -1104,27 +1112,29 @@ It is possible to use Tydoc in a programmatic way. The CLI is built using this A
 (manager: Manager, sourceFile: SourceFile) => DocPackage
 ```
 
+### `fromType`
+
+<!-- prettier-ignore -->
+```ts
+(manager: Manager, t: Type<Type>) => Node
+```
+
+### `getTSDoc`
+
+<!-- prettier-ignore -->
+```ts
+(manager: Manager, t: Type<Type>) => TSDocFrag
+```
+
 ### Exported Types
 
-#### `I` `RenderMarkdownOptions`
+#### `I` `FromProjectParams`
 
 ```ts
 typeIndexRef
 ```
 
 ### Type Index
-
-#### `I` `Options`
-
-```ts
-export interface Options {
-  /**
-   * Whether or not the API terms section should have a title and nest its term
-   * entries under it. If false, term entry titles are de-nested by one level.
-   */
-  flatTermsSection: boolean
-}
-```
 
 #### `T` `DocPackage`
 
@@ -1133,8 +1143,34 @@ export interface Options {
 // Package node
 //
 
+/**
+ * The root of the extracted JSON that Tydoc produces.
+ */
 export type DocPackage = {
+  /**
+   * List of the extracted modules. There may be more than one because a package
+   * may officially support importing from multiple modules.
+   */
   modules: DocModule[]
+  /**
+   * An index of the all the types that have been extracted. This includes three
+   * cases:
+   *
+   * 1. Directly exported types
+   * 2. Types referenced directly or indirectly by exported types.
+   *
+   * If a term is exported but the type it is annotated with is not exported
+   * then the type will not appear in the type index and the term's type info will
+   * inlined.
+   *
+   * If a term is exported and so it its annotated type then the term type info
+   * will be a reference to the type index.
+   *
+   * If a term is exported, but the type it is annotated with (A) is not, but the
+   * type (A) is referenced by another type (B) that _is_ exported, then the
+   * type (A) will appear in the type index referenced by type A, but the term
+   * will inline the type info of type A rather than be a type index reference.
+   */
   typeIndex: TypeIndex
 }
 ```
@@ -1146,16 +1182,25 @@ export type DocPackage = {
 // Module Node
 //
 
+/**
+ * A module (aka. file)
+ */
 export type DocModule = TSDocFrag & {
+  /**
+   * Tells you the kind of data (aka. schema) contained within this object.
+   */
   kind: 'module'
+  /**
+   * The name of the module (aka. file name). File extension or directory path not included.
+   */
   name: string
   /**
-   * The path to this module from package root. If this module is the root
+   * The path to this module from package root. If this module is the main
    * module then the path will be `/`.
    *
    * @remarks
    *
-   * This is what a user would place in their import `from `string _following_ the
+   * This is what a user would place in their import `from` string _following_ the
    * package name. For example:
    *
    * ```ts
@@ -1164,11 +1209,36 @@ export type DocModule = TSDocFrag & {
    * ```
    */
   path: string
+  /**
+   * Is this module the main one of the package?
+   *
+   * @remarks
+   *
+   * The main module of a package is the one that is specified in the
+   * package.json "main" field.
+   */
   isMain: boolean
+  /**
+   * Information about the main export from the module. If none, is null.
+   *
+   * @remarks
+   *
+   * The "main" export is the one exported using the `export default ...` syntax.
+   */
   mainExport: null | Node
+  /**
+   * Information about the named exports from the module. Being empty means the module
+   * does not have any named exports (it may still have a mainExport though).
+   */
   namedExports: Expor[]
+  /**
+   * Detailed location info about the module on disk.
+   */
   location: {
-    absoluteFilePath: string
+    /**
+     * The file path to the module relative to the project root.
+     */
+    filePath: string
   }
 }
 ````
@@ -1181,6 +1251,9 @@ export type DocModule = TSDocFrag & {
 //
 
 export type TSDocFrag = {
+  /**
+   * The extracted tsdoc for this entity (module, type, term). If none, is null.
+   */
   tsdoc: null | TSDoc
 }
 ```
@@ -1189,10 +1262,10 @@ export type TSDocFrag = {
 
 ```ts
 export interface TSDoc {
-  raw: string
   summary: string
   examples: { text: string }[]
   customTags: { name: string; text: string }[]
+  raw: string
 }
 ```
 
@@ -1226,18 +1299,6 @@ export type Node =
   | DocTypeIndexRef
   | DocUnsupported
   | DocTypeIntersection
-  // todo unused?
-  | { kind: 'function'; signatures: DocSig[] }
-  | ({
-      kind: 'callable_object'
-      signatures: DocSig[]
-      properties: DocProp[]
-    } & RawFrag)
-  | ({
-      kind: 'callable_interface'
-      properties: DocProp[]
-      signatures: DocSig[]
-    } & RawFrag)
 ```
 
 #### `T` `DocTypePrimitive`
@@ -1298,7 +1359,15 @@ export type DocProp = { kind: 'prop'; name: string; type: Node }
 export type DocTypeCallable = {
   kind: 'callable'
   isOverloaded: boolean
+  // todo rename to isNamespace
   hasProps: boolean
+  /**
+   * Signatures extracted for this function.
+   *
+   * @remarks
+   *
+   * This is an array because overloaded functions have multiple signatures. Look at property "isOverloaded" to know if this function is overloaded or not. If it is overloaded that means this array is guaranteed to have two or more signatures. Otherwise this array is guaranteed to have exactly one signature.
+   */
   sigs: DocSig[]
   props: DocProp[]
 } & RawFrag
@@ -1387,35 +1456,23 @@ export type Expor = {
 }
 ```
 
-#### `I` `Options`
+#### `I` `FromProjectParams`
 
 ````ts
-interface Options {
+export interface FromProjectParams {
   /**
-   * Paths to modules in project, relative to project root or absolute.
+   * Paths to modules in project, relative to source root or absolute.
    */
   entrypoints: string[]
-  project?: tsm.Project
   /**
-   * Specify the path to the package's entrypoint file.
-   *
-   * @defualt Read from package.json main field
-   * @remarks This is useful for tests to avoid mocks or environment setup
+   * Should Tydoc settings be read from from the package file.
    */
-  packageMainEntrypoint?: string
-  /**
-   * Specify the root of the project.
-   *
-   * @default The current working directory
-   * @remarks This is useful for tests to avoid having to mock process.cwd
-   */
-  prjDir?: string
-  readSettingsFromJSON: boolean
+  readSettingsFromJSON?: boolean
   /**
    * Sometimes a source entrypoint is fronted by a facade module that allows
    * package consumers to do e.g. `import foo from "bar/toto"` _instead of_
    * `import foo from "bar/dist/toto". Use this mapping to force tydoc to view
-   * the given source modules (keys) at the given package path (values).
+   * the given source modules (the keys) at the given package path (the values).
    *
    * @example
    *
@@ -1440,20 +1497,90 @@ interface Options {
    * ```
    */
   sourceModuleToPackagePathMappings?: Record<string, string>
+  layout?: {
+    /**
+     * Should Tydoc halt when TypeScript diagnostics are raised?
+     *
+     * Pass true to halt on any diagnostic
+     *
+     * Pass false to ignore all diagnostics
+     *
+     * Pass an array of filters to ignore only certain diagnostics.
+     *
+     * @default true
+     *
+     * @remarks
+     *
+     * Typically your package should be error free before documentation is extracted for it. However there may be cases where you want to bypass this check in general or for specific kinds of type check errors. For example a @ts-expect-error that is erroring because there is no error.
+     *
+     */
+    validateTypeScriptDiagnostics?: boolean | DiagnosticFilter[]
+
+    /**
+     * Should the projectDir and sourceMainModulePath be validated that they exist on disk?
+     *
+     * @default true
+     */
+    validateExists?: boolean
+    /**
+     * Absolute path to the source main entrypoint.
+     *
+     * @default A discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups.
+     */
+    sourceMainModulePath?: string
+    /**
+     * Specify the root of the project.
+     *
+     * @default The current working directory
+     * @remarks This is useful for tests to avoid having to mock process.cwd
+     */
+    projectDir?: string
+    sourceDir?: string
+    packageJson?: PackageJson
+    tsMorphProject?: tsm.Project
+  }
 }
 ````
+
+#### `|` `DiagnosticFilter`
+
+```ts
+/**
+ * Express a filter for diagnostic errors.
+ *
+ * An array of filters means to ignore only certain errors. It can be one of three things:
+ *
+ * 1. regular expression to match against the error code
+ * 2. the name of an error category
+ * 3. regular expression to match against the file path from which the error arises
+ *
+ * You can also combine a file path with either error code or error category.
+ *
+ * Regular expressions are applied case-insensitive.
+ *
+ * Array items share an OR semantic.
+ *
+ * @example { path: '/foo/bar/.*' }
+ * @example { code: '2\d{2}5' }
+ * @example { category: 'error' }
+ * @example { path: '/foo/bar/.*', code '24.*' }
+ */
+export type DiagnosticFilter =
+  | { path?: string; code?: string }
+  | { path?: string; category?: DiagnosticCategoryString }
+```
 
 #### `I` `Settings`
 
 ```ts
 export interface Settings {
+  projectDir: string
   /**
    * Absolute path to the source root. This should match the path that rootDir
    * resolves to from the project's tsconfig.json.
    */
-  srcDir: string
-  prjDir: string
-  mainModuleFilePathAbs: string
+  sourceDir: string
+  sourceMainModulePath: string
   sourceModuleToPackagePathMappings?: Record<string, string>
 }
 ```
@@ -1464,7 +1591,6 @@ export interface Settings {
 ```ts
 export type Thunk<T> = () => T
 ```
-
 <!-- END API DOCS --->
 
 ## Debugging

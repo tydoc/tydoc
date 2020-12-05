@@ -13,17 +13,12 @@
     "build:docs:toc": "doctoc README.md",
     "build:docs:api": "ts-node scripts/build-api-docs",
     "build:docs": "yarn build:docs:api && yarn build:docs:toc",
-    "build:ts": "tsc",
-    "build": "yarn clean && yarn build:ts",
+    "build": "yarn tsc && echo 'done build'",
     "dev": "tsc -w",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "dev:test": "jest --watch",
     "test": "jest",
-    "test:dev": "yarn -s dev:test",
     "format": "prettier --write .",
-    "prepublishOnly": "yarn build",
-    "release:stable": "dripip stable",
-    "release:preview": "dripip preview"
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "@microsoft/tsdoc": "^0.12.21",

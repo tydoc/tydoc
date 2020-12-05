@@ -135,7 +135,10 @@ async function fetchDocPackage({
   packageName: string
   organization?: string
   entrypoint: string
-}): Promise<{ docPackage: Doc.DocPackage; npmInfo: NPM.Response }> {
+}): Promise<{
+  docPackage: Doc.DocPackage
+  npmInfo: NPM.Response
+}> {
   const fullPackageName = organization
     ? `${organization}/${packageName}`
     : packageName

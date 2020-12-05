@@ -1,7 +1,8 @@
+import * as tydocExtractor from '@tydoc/extractor'
 import * as Path from 'path'
 import * as Prettier from 'prettier'
 import * as tsm from 'ts-morph'
-import * as jsde from '../source'
+import * as tydocMarkdownRenderer from '../source'
 
 interface ModuleSpec {
   /**
@@ -15,10 +16,10 @@ interface ModuleSpec {
    */
   content: string
   /**
-   * The path to place the module under the source directory. By default the module
-   * will be placed directly under the source directory.
+   * The path to place the module under the src directory. By default the module
+   * will be placed directly under the "src" directory.
    */
-  modulePathUnderSource?: string
+  modulePathUnderSrc?: string
   /**
    * The name of the module. By default an alphabet letter increasing for each
    * subsequent module given among the parameters.
@@ -37,6 +38,9 @@ function createContextt() {
   })
 
   const api = {
+    markdown(opts: tydocMarkdownRenderer.Options, ...sources: (string | ModuleSpec)[]) {
+      return tydocMarkdownRenderer.render(api.extract(...sources), opts)
+    },
     /**
      * Pass a set of synthetic source files. The first source is considered the
      * entrypoint. Files are named by alphabet letters, starting from "a",
@@ -51,7 +55,7 @@ function createContextt() {
         const moduleName =
           typeof mod === 'object' ? (mod.moduleName ? mod.moduleName : letters.shift()!) : letters.shift()!
         const modulePathUnderSrc =
-          typeof mod === 'object' ? (mod.modulePathUnderSource ? mod.modulePathUnderSource : '') : ''
+          typeof mod === 'object' ? (mod.modulePathUnderSrc ? mod.modulePathUnderSrc : '') : ''
         if (typeof mod === 'object' && mod.isEntrypoint) {
           entrypoints.push(Path.join(modulePathUnderSrc, moduleName))
         }
@@ -60,7 +64,7 @@ function createContextt() {
           overwrite: true,
         })
       }
-      return jsde.fromProject({
+      return tydocExtractor.fromProject({
         entrypoints: entrypoints,
         layout: {
           tsMorphProject,

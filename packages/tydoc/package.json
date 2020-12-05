@@ -12,14 +12,10 @@
     "oclif.manifest.json"
   ],
   "scripts": {
-    "build:oclif": "oclif-dev manifest",
-    "build:ts": "tsc",
-    "build": "yarn clean && yarn build:oclif && yarn build:ts",
+    "build": "yarn clean && oclif-dev manifest && yarn tsc && echo 'done build'",
     "dev": "tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "dev:test": "jest --watch",
     "test": "jest",
-    "test:dev": "yarn -s dev:test",
     "format": "prettier --write .",
     "prepublishOnly": "yarn build"
   },
@@ -28,6 +24,7 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.0",
     "@tydoc/extractor": "workspace:packages/extractor",
+    "@tydoc/renderer-markdown": "workspace:packages/renderer-markdown",
     "@types/debug": "^4.1.5",
     "@types/lodash": "^4.14.165",
     "debug": "^4.3.1",
