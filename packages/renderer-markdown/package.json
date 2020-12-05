@@ -1,0 +1,38 @@
+{
+  "name": "@tydoc/renderer-markdown",
+  "description": "TyDoc renderer for markdown",
+  "private": true,
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "yarn clean && yarn tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "test": "jest",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@tydoc/extractor": "workspace:packages/extractor",
+    "chaindown": "^0.1.0-next.1",
+    "debug": "^4.3.1"
+  },
+  "devDependencies": {
+    "@prisma-labs/prettier-config": "0.1.0",
+    "@types/debug": "^4.1.5",
+    "@types/jest": "26.0.15",
+    "@types/node": "14.14.10",
+    "jest": "26.6.3",
+    "jest-validate": "26.6.2",
+    "jest-watch-suspend": "1.1.2",
+    "jest-watch-toggle-config": "2.0.1",
+    "jest-watch-typeahead": "0.6.1",
+    "prettier": "^2.2.1",
+    "ts-jest": "26.4.4",
+    "typescript": "^4.1.2"
+  },
+  "prettier": "@prisma-labs/prettier-config"
+}

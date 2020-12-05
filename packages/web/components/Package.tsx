@@ -1,4 +1,4 @@
-import { Doc } from '@tydoc/extractor/types'
+import { tydocMarkdownRenderer } from '@tydoc/extractor/types'
 import React, { FC } from 'react'
 import { Heading } from './Heading'
 import { Module } from './Module'
@@ -6,7 +6,7 @@ import { Type } from './Type'
 import { TypeIndexContext } from './TypeIndexContext'
 
 export interface PackageProps {
-  docPackage: Doc.DocPackage
+  docPackage: tydocMarkdownRenderer.DocPackage
 }
 
 /**

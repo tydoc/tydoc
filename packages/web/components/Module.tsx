@@ -1,11 +1,11 @@
-import { Doc } from '@tydoc/extractor/types'
+import { tydocMarkdownRenderer } from '@tydoc/extractor/types'
 import React from 'react'
 import { CodeBlock } from './CodeBlock'
 import { Node } from './Node'
 import { Playground } from './Playground'
 
 type ModuleProps = {
-  module: Doc.DocModule
+  module: tydocMarkdownRenderer.DocModule
 }
 
 export function Module({ module }: ModuleProps) {
@@ -34,7 +34,7 @@ export function Module({ module }: ModuleProps) {
 
 type NamedExportProps = {
   name: string
-  type: Doc.Node
+  type: tydocMarkdownRenderer.Node
 }
 
 function NamedExport(props: NamedExportProps) {

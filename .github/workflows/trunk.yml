@@ -17,10 +17,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        working-directory: packages/extractor
+        working-directory: packages/tydoc
         run: yarn --immutable
       - name: Test
-        working-directory: packages/extractor
+        working-directory: packages/tydoc
         run: yarn build
   extractor-test:
     strategy:
@@ -38,4 +38,21 @@ jobs:
         run: cd packages/extractor && yarn --immutable
       - name: Test
         working-directory: packages/extractor
+        run: yarn test
+  renderer-markdown-test:
+    strategy:
+      matrix:
+        node-version: [14.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        working-directory: packages/renderer-markdown
+        run: yarn --immutable
+      - name: Test
+        working-directory: packages/renderer-markdown
         run: yarn test

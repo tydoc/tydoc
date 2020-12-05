@@ -1,6 +1,6 @@
-import { Doc } from '@tydoc/extractor/types'
+import { tydocMarkdownRenderer } from '@tydoc/extractor/types'
 
-export const graphQLRequestTypes: Doc.DocPackage = {
+export const graphQLRequestTypes: tydocMarkdownRenderer.DocPackage = {
   modules: [
     {
       kind: 'module',

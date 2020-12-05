@@ -1,7 +1,8 @@
+import * as tydocExtractor from '@tydoc/extractor'
 import * as Path from 'path'
 import * as Prettier from 'prettier'
 import * as tsm from 'ts-morph'
-import * as jsde from '../src'
+import * as tydocMarkdownRenderer from '../source'
 
 interface ModuleSpec {
   /**
@@ -37,6 +38,9 @@ function createContextt() {
   })
 
   const api = {
+    markdown(opts: tydocMarkdownRenderer.Options, ...sources: (string | ModuleSpec)[]) {
+      return tydocMarkdownRenderer.render(api.extract(...sources), opts)
+    },
     /**
      * Pass a set of synthetic source files. The first source is considered the
      * entrypoint. Files are named by alphabet letters, starting from "a",
@@ -60,7 +64,7 @@ function createContextt() {
           overwrite: true,
         })
       }
-      return jsde.fromProject({
+      return tydocExtractor.fromProject({
         entrypoints: entrypoints,
         layout: {
           tsMorphProject,

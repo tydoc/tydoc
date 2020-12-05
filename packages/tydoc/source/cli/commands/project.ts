@@ -2,6 +2,7 @@ import Command, { flags } from '@oclif/command'
 import * as TyDoc from '@tydoc/extractor'
 import { FromProjectParams } from '@tydoc/extractor/dist/extractor/extract'
 import { DiagnosticFilter } from '@tydoc/extractor/dist/lib/ts-helpers'
+import * as TyDocMarkdownRenderer from '@tydoc/renderer-markdown'
 import dedent from 'dedent'
 import * as JSON5 from 'json5'
 import { arrayify } from '../../utils'
@@ -98,7 +99,7 @@ export class Project extends Command {
       const options = {
         flatTermsSection: flags['flat-terms-section'],
       }
-      this.log(TyDoc.renderMarkdown(docs, options))
+      this.log(TyDocMarkdownRenderer.render(docs, options))
       return
     }
   }

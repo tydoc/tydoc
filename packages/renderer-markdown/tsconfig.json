@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    // todo Not yet available
+    // "noUncheckedIndexedAccess": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2019",
+    "outDir": "dist",
+    "rootDir": "source",
+    "declarationMap": true,
+    "sourceMap": true,
+    // todo remove "DOM" once "nmHoistingLimits: dependencies" is working
+    // For context see https://prisma.slack.com/archives/G01E30CCZGF/p1606708250013200
+    "lib": ["ESNext", "DOM"]
+  },
+  "include": ["source"]
+}

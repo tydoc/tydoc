@@ -17,13 +17,9 @@
     "build": "yarn clean && yarn build:ts",
     "dev": "tsc -w",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "dev:test": "jest --watch",
     "test": "jest",
-    "test:dev": "yarn -s dev:test",
     "format": "prettier --write .",
-    "prepublishOnly": "yarn build",
-    "release:stable": "dripip stable",
-    "release:preview": "dripip preview"
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "@microsoft/tsdoc": "^0.12.21",
