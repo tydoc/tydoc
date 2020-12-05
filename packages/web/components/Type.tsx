@@ -1,10 +1,10 @@
-import { tydocMarkdownRenderer } from '@tydoc/extractor/types'
+import { Doc } from '@tydoc/extractor/types'
 import React, { FC } from 'react'
 import { CodeBlock } from './CodeBlock'
 import { Node } from './Node'
 
 interface TypeProps {
-  type: tydocMarkdownRenderer.IndexableNode
+  type: Doc.IndexableNode
 }
 
 export const Type: FC<TypeProps> = ({ type }) => {

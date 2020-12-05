@@ -1,5 +1,5 @@
 import { Layout } from '.../../../components/Layout'
-import { tydocMarkdownRenderer } from '@tydoc/extractor/types'
+import { Doc } from '@tydoc/extractor/types'
 import { GetStaticPaths, InferGetStaticPropsType } from 'next'
 import React, { FC } from 'react'
 import { Package } from '../../../components/Package'
@@ -136,7 +136,7 @@ async function fetchDocPackage({
   organization?: string
   entrypoint: string
 }): Promise<{
-  docPackage: tydocMarkdownRenderer.DocPackage
+  docPackage: Doc.DocPackage
   npmInfo: NPM.Response
 }> {
   const fullPackageName = organization
@@ -151,7 +151,7 @@ async function fetchDocPackage({
   )!
 
   const github = `https://github.com/${ghOwner}/${ghName}`
-  const docPackage = await getJson<tydocMarkdownRenderer.DocPackage>(
+  const docPackage = await getJson<Doc.DocPackage>(
     `https://tydoc-source-proxy.vercel.app/api?github=${github}&entrypoint=${entrypoint}`,
   )
 

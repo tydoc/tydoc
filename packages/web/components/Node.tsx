@@ -1,8 +1,8 @@
-import { tydocMarkdownRenderer } from '@tydoc/extractor/types'
+import { Doc } from '@tydoc/extractor/types'
 import React, { FC } from 'react'
 import { useTypeIndex } from './TypeIndexContext'
 
-type NodeProps = { node: tydocMarkdownRenderer.Node }
+type NodeProps = { node: Doc.Node }
 
 /**
  * Type recursively creates a representation of the provided type.
@@ -174,7 +174,7 @@ export const Node: FC<NodeProps> = ({ node }) => {
 }
 
 interface DocumentationProps {
-  node: tydocMarkdownRenderer.Node
+  node: Doc.Node
 }
 
 const Documentation: FC<DocumentationProps> = ({ node }) => {
@@ -192,9 +192,7 @@ const Documentation: FC<DocumentationProps> = ({ node }) => {
 /**
  * Gets documentation from the given node by checking raw data.
  */
-function getDocumentationOfNode(
-  node: tydocMarkdownRenderer.Node,
-): string | null {
+function getDocumentationOfNode(node: Doc.Node): string | null {
   switch (node.kind) {
     case 'object': {
       return node.raw.nodeFullText
