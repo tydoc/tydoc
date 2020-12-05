@@ -24,7 +24,7 @@ declare global {
 
 const registeredCustomDumpers: CustomDumper[] = []
 
-global.registerDumper = (customDumper) => {
+global.registerDumper = (customDumper: CustomDumper) => {
   registeredCustomDumpers.push(customDumper)
 }
 
