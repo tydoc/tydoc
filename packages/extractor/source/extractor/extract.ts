@@ -114,21 +114,26 @@ export interface FromProjectParams {
   }
 }
 
-// todo support extracting fromPublished with additional entrypoints
-export async function fromPublished(options: {
+type FromPublishedParams = {
   packageName: string
   packageVersion?: string
   project?: tsm.Project
   downloadDir?: string
-}): Promise<Doc.DocPackage> {
+}
+
+// todo support extracting fromPublished with additional entrypoints
+export async function fromPublished(options: FromPublishedParams): Promise<Doc.DocPackage> {
   const tmpDir = await fs.tmpDirAsync()
   const projectDir = options.downloadDir ?? tmpDir.cwd()
+
   await downloadPackage({
     name: options.packageName,
     version: options.packageVersion,
     downloadDir: projectDir,
   })
+
   const packageJson = readPackageJson(projectDir)
+
   if (!packageJson) {
     throw new Error(
       `The downloaded package at ${projectDir} was not valid. It is missing a package.json file.`
@@ -145,7 +150,9 @@ export async function fromPublished(options: {
   )
 
   const project = options.project ?? new tsm.Project()
+
   project.addSourceFilesAtPaths(entrypointPath)
+
   const manager = new Doc.Manager({
     projectDir: projectDir,
     sourceDir: projectDir,
