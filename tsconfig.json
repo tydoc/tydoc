@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "incremental": true,
     "composite": true,
     "declaration": true,
-    "baseUrl": "./packages/",
     "paths": {
-      "tydoc": ["./extractor/src"]
+      "@tydoc/extractor": ["./packages/extractor/source/"]
     }
   },
   "plugins": [

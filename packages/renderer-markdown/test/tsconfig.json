@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "strict": true,
-    "moduleResolution": "node",
-    "target": "ES2019",
-    "rootDir": "..",
-    "lib": ["ESNext"]
-  }
-}

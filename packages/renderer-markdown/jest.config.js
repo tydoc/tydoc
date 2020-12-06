@@ -6,28 +6,17 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   setupFiles: ['./test/__setup__.ts'],
-  watchPlugins: [
-    'jest-watch-suspend',
-    'jest-watch-typeahead/filename',
-    'jest-watch-typeahead/testname',
-    [
-      'jest-watch-toggle-config',
-      {
-        setting: 'verbose',
-      },
-    ],
-    [
-      'jest-watch-toggle-config',
-      {
-        setting: 'bail',
-      },
-    ],
-  ],
+  watchPlugins: ['jest-watch-suspend', 'jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
   globals: {
     'ts-jest': {
-      tsconfig: 'test/tsconfig.json',
+      tsconfig: 'tsconfig.test.json',
       diagnostics: Boolean(process.env.CI),
     },
   },
-  watchPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/oclif.manifest.json'],
+  // NOTE we're not using path mapping here
+  // moduleNameMapper: {
+  // '^@tydoc/(.*)$': '<rootDir>/source/$1',
+  // '^@tydoc/extractor': '<rootDir>/../extractor/source',
+  // },
+  watchPathIgnorePatterns: ['<rootDir>/dist/'],
 }
