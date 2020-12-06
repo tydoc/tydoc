@@ -34,7 +34,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
         working-directory: packages/extractor
-        run: cd packages/extractor && yarn --immutable
+        run: yarn --immutable
       - name: Test
         run: yarn wsrun -p '@tydoc/extractor' -- test
   renderer-markdown-test:
