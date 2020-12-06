@@ -4,7 +4,13 @@
     "noUncheckedIndexedAccess": true,
     "incremental": true,
     "composite": true,
+    "sourceMap": true,
+    "declarationMap": true,
     "declaration": true,
+    "target": "ES2019",
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "lib": ["DOM", "ESNext"],
     "paths": {
       "@tydoc/extractor": ["./packages/extractor/source/"]
     }

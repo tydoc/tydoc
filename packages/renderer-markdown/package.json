@@ -9,8 +9,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "yarn clean && yarn tsc && echo 'done build'",
-    "dev": "tsc --watch",
+    "build": "yarn clean && yarn g:tsc --build && echo 'done build'",
+    "dev": "g:tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "test": "jest",
     "format": "prettier --write ."

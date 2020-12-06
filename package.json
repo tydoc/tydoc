@@ -9,6 +9,6 @@
     "typescript-snapshots-plugin": "^1.7.0"
   },
   "scripts": {
-    "g:tsc": "tsc"
+    "g:tsc": "cd $INIT_CWD && tsc"
   }
 }
