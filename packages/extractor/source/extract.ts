@@ -492,7 +492,7 @@ function sigDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocSig[] {
  * Extract docs from the type's properties.
  */
 function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
-  return getProperties(t).map((p) => {
+  return getProperties(t).filter(Boolean).map((p) => {
     const propName = p.getName()
     const propType = p.getType()
     // what is this method for then? It was just returning an `any` type
