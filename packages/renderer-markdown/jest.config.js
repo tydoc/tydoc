@@ -13,10 +13,5 @@ module.exports = {
       diagnostics: Boolean(process.env.CI),
     },
   },
-  // NOTE we're not using path mapping here
-  // moduleNameMapper: {
-  // '^@tydoc/(.*)$': '<rootDir>/source/$1',
-  // '^@tydoc/extractor': '<rootDir>/../extractor/source',
-  // },
   watchPathIgnorePatterns: ['<rootDir>/dist/'],
 }
