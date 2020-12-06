@@ -1,6 +1,8 @@
-name: pr
+name: ci
 
-on: [pull_request]
+on:
+  push:
+    branches: [*]
 
 jobs:
   tydoc-build:
@@ -16,8 +18,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
         working-directory: packages/tydoc
-        run: yarn
-      - name: build
+        run: yarn --immutable
+      - name: Build
         working-directory: packages/tydoc
         run: yarn build
   extractor-test:
@@ -33,7 +35,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
         working-directory: packages/extractor
-        run: yarn
+        run: yarn --immutable
       - name: Test
         working-directory: packages/extractor
         run: yarn test
@@ -50,7 +52,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
         working-directory: packages/renderer-markdown
-        run: yarn
+        run: yarn --immutable
+      - name: Build (incl. dependencies)
+        working-directory: packages/renderer-markdown
+        run: yarn build
       - name: Test
         working-directory: packages/renderer-markdown
         run: yarn test

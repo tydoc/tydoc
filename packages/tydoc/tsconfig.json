@@ -4,5 +4,6 @@
     "outDir": "dist",
     "rootDir": "source"
   },
+  "references": [{ "path": "../extractor" }, { "path": "../renderer-markdown" }],
   "include": ["source"]
 }
