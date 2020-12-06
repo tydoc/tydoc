@@ -15,7 +15,7 @@ async function fetcher<T>(
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   let data: undefined | SearchResponseData
-  const packageName = ctx.req.url?.replace('/search/', '').split('?')[0]
+  const packageName = getPackageNameFromUrl(ctx.req.url)
   const version = ctx.query['v']
   if (packageName) {
     data = await fetchDocPackage({
@@ -27,20 +27,18 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     props: { data: data ?? null }, // will be passed to the page component as props
   }
 }
-function getPackageNameFromUrl(url: string){
-  const packageName = url.replace('/search/', '').split('?')[0]
+function getPackageNameFromUrl(url?: string){
+  const packageName = url?.replace('/search/', '').split('?')[0]
   return packageName
 }
 const Page: FC<{ data?: SearchResponseData }> = ({ data }) => {
-  const [version, setVersion] = React.useState()
   const router = useRouter()
   if (!data || !data.docPackage || !data.npmInfo) {
     return <div>Loading ...</div>
   }
   function handleVersionChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    console.log(event.target.value)
     router.push({
-      query: { search: getPackageNameFromUrl(router.asPath), v: event.target.value },
+      query: { search: router.query.search, v: event.target.value },
     })
   }
   const inverseDistTags = Object.entries(data.npmInfo['dist-tags']).reduce(
