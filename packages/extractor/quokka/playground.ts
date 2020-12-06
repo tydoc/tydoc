@@ -1,7 +1,7 @@
 import * as tsm from 'ts-morph'
 
 const project = new tsm.Project({
-  addFilesFromTsConfig: false,
+  skipAddingFilesFromTsConfig: true,
   useInMemoryFileSystem: true,
   skipLoadingLibFiles: true,
 })
