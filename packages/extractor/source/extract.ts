@@ -11,7 +11,9 @@ import {
   absolutify,
   assertFileExists,
   downloadPackage,
+  getEntryPoint,
   getPackageMain,
+  getPackageTypesEntry,
   JsFilePathToTsDeclarationFilePath,
   pathToModulePath,
   readPackageJson,
@@ -130,7 +132,6 @@ export async function fromPublished(options: FromPublishedParams): Promise<Doc.D
     version: options.packageVersion,
     downloadDir: projectDir,
   })
-
   const packageJson = readPackageJson(projectDir)
 
   if (!packageJson) {
@@ -142,7 +143,8 @@ export async function fromPublished(options: FromPublishedParams): Promise<Doc.D
   const packageJsonMain = getPackageMain(packageJson)
   debug('found packageJsonMain %s', packageJsonMain)
 
-  const entrypointPath = JsFilePathToTsDeclarationFilePath(path.join(projectDir, packageJsonMain))
+  const packageJsonTypes = getPackageTypesEntry(packageJson)
+  const entrypointPath = getEntryPoint(projectDir, packageJsonMain, packageJsonTypes)
   debug('found entrypointPath %s', entrypointPath)
 
   assertFileExists(

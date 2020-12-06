@@ -118,13 +118,27 @@ export async function downloadPackage({
   const tarballUrl = await getPackageVersionTarballUrl(name, version)
   await downloadPackageTarball(tarballUrl, tarballDownloadDir)
   await decompress(tarballDownloadDir, tarballDecompressDir)
-  fs.move(path.join(tarballDecompressDir, 'package'), downloadDir, { overwrite: true })
+  console.log({tarballDecompressDir});
+  const folders = fs.inspectTree(tarballDecompressDir)?.children.reduce((acc,item) => {
+    if(item.type === 'dir') acc.push(item.name)
+    return acc
+  }, [] as string [])
+  console.log({folders});
+  folders && fs.move(path.join(tarballDecompressDir, folders[0]), downloadDir, { overwrite: true })
 }
 
 export function getPackageMain(packageJson: PackageJson) {
-  return packageJson.main ?? './index.js'
+  return packageJson.main ? JsFilePathToTsDeclarationFilePath(packageJson.main) : './index.d.ts'
+}
+export function getPackageTypesEntry(packageJson: PackageJson) {
+  return packageJson.types ? packageJson.types : packageJson.typings ? packageJson.typings : './index.d.ts' 
 }
 
+export function getEntryPoint(projectDir: string, mainEntry: string, typesEntry: string){
+  if(mainEntry && fs.exists(path.join(projectDir, mainEntry))) return path.join(projectDir, mainEntry)
+  if(typesEntry && fs.exists(path.join(projectDir, typesEntry))) return path.join(projectDir, typesEntry)
+  throw new Error('No Entry Point Found')
+}
 export function JsFilePathToTsDeclarationFilePath(jsFilePath: string) {
   const { dir, name, ext } = path.parse(jsFilePath)
 
