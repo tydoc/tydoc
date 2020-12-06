@@ -84,13 +84,19 @@ export async function getPackageVersionTarballUrl(
   let tarballUrl: string
 
   if (packageVersion) {
+    console.log({packageVersion});
+    if(!body.versions){
+      throw new Error(
+        `Package \`${packageName}\` has no versions`
+      )
+    }
     const versionData = body.versions[packageVersion]
     if (!versionData) {
       throw new Error(
-        `Package "${packageName}" has not such version "${packageVersion}". Versions it has are: ${body.versions.join(
-          ', '
-        )}`
-      )
+`Package "${packageName}" has not such version "${packageVersion}". 
+Available Versions: 
+  ${Object.keys(body?.versions)?.join('\n  ')}
+`)
     }
     const versionTarballUrl = versionData.dist.tarball
     tarballUrl = versionTarballUrl

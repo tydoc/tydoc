@@ -11,7 +11,9 @@ export type SearchResponseData = {
 
 export async function fetchDocPackage({
   packageName,
+  version
 }: {
+  version?: string,
   packageName: string
 }): Promise<SearchResponseData> {
   const npmInfo = await getJson<NPM.Response>(
@@ -25,6 +27,7 @@ export async function fetchDocPackage({
   const github = `https://github.com/${ghOwner}/${ghName}`
   const docPackage = await fromPublished({
     packageName: packageName,
+    packageVersion: version
   })
 
   return { docPackage, npmInfo }

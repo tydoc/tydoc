@@ -1,33 +1,48 @@
 import { Layout } from '.../../../components/Layout'
 import { GetServerSidePropsContext } from 'next'
+import { useRouter } from 'next/router'
 import React, { FC } from 'react'
 import { fetchDocPackage, SearchResponseData } from 'web/utils/docs'
 import { Package } from '../../components/Package'
 
-async function fetcher<T>(input: RequestInfo, init?: RequestInit | undefined): Promise<T> {
+async function fetcher<T>(
+  input: RequestInfo,
+  init?: RequestInit | undefined,
+): Promise<T> {
   const res = await fetch(input, init)
   return res.json()
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   let data: undefined | SearchResponseData
-  const packageName = ctx.req.url?.replace('/search/', '')
-  if(packageName){
-    data = await fetchDocPackage({packageName})
-    
+  const packageName = ctx.req.url?.replace('/search/', '').split('?')[0]
+  const version = ctx.query['v']
+  if (packageName) {
+    data = await fetchDocPackage({
+      packageName,
+      version: typeof version === 'string' ? version : undefined,
+    })
   }
   return {
     props: { data: data ?? null }, // will be passed to the page component as props
   }
 }
-
-const Page: FC<{data?: SearchResponseData}> = ({data}) => {
-  
+function getPackageNameFromUrl(url: string){
+  const packageName = url.replace('/search/', '').split('?')[0]
+  return packageName
+}
+const Page: FC<{ data?: SearchResponseData }> = ({ data }) => {
+  const [version, setVersion] = React.useState()
+  const router = useRouter()
   if (!data || !data.docPackage || !data.npmInfo) {
     return <div>Loading ...</div>
   }
-
-  console.log({ data: data.docPackage })
+  function handleVersionChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    console.log(event.target.value)
+    router.push({
+      query: { search: getPackageNameFromUrl(router.asPath), v: event.target.value },
+    })
+  }
   const inverseDistTags = Object.entries(data.npmInfo['dist-tags']).reduce(
     (acc, [tag, version]) => {
       acc[version] ??= []
@@ -50,9 +65,10 @@ const Page: FC<{data?: SearchResponseData}> = ({data}) => {
 
           {/* Version */}
           <select
+            onChange={handleVersionChange}
             id="location"
             className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 rounded-md form-select focus:outline-none focus:ring focus:ring-blue-300"
-            defaultValue={data.npmInfo['dist-tags'].latest}
+            defaultValue={router.query.v || data.npmInfo['dist-tags'].latest}
           >
             {Object.entries(data.npmInfo.versions).map(([version]) => (
               <option key={version} value={version}>
