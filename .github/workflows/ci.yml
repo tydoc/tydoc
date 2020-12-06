@@ -38,7 +38,7 @@ jobs:
         run: yarn --immutable
       - name: Test
         working-directory: packages/extractor
-        run: yarn test:all
+        run: yarn test
   renderer-markdown-test:
     strategy:
       matrix:

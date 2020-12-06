@@ -1,4 +1,4 @@
-import { fromPublished } from '../../source/extractor/extract'
+import { fromPublished } from '../../source'
 
 test('can get EDD from "sponsorsme" package', async () => {
   const edd = await fromPublished({

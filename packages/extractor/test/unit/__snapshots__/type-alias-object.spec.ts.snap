@@ -4,9 +4,10 @@ exports[`can be a return type ref 1`] = `
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "filePath": "src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -36,7 +37,7 @@ Object {
                 "params": Array [],
                 "return": Object {
                   "kind": "typeIndexRef",
-                  "link": "(\\"/a\\").A",
+                  "link": "(a).A",
                 },
               },
             ],
@@ -49,14 +50,16 @@ Object {
           "name": "B",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").B",
+            "link": "(a).B",
           },
         },
       ],
+      "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {
@@ -64,6 +67,7 @@ Object {
         "nodeText": "type A = { b: B };",
         "typeText": "A",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
@@ -72,7 +76,7 @@ Object {
             "name": "b",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(\\"/a\\").B",
+              "link": "(a).B",
             },
           },
         ],
@@ -83,7 +87,7 @@ Object {
         },
       },
     },
-    "(\\"/a\\").B": Object {
+    "(a).B": Object {
       "kind": "alias",
       "name": "B",
       "raw": Object {
@@ -91,6 +95,7 @@ Object {
         "nodeText": "export type B = { a: string };",
         "typeText": "B",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
@@ -118,9 +123,10 @@ exports[`can be recursive within inline objects 1`] = `
 Object {
   "modules": Array [
     Object {
+      "isMain": true,
       "kind": "module",
       "location": Object {
-        "absoluteFilePath": "/a.ts",
+        "filePath": "src/a.ts",
       },
       "mainExport": null,
       "name": "a",
@@ -132,7 +138,7 @@ Object {
           "name": "A",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").A",
+            "link": "(a).A",
           },
         },
         Object {
@@ -142,14 +148,16 @@ Object {
           "name": "B",
           "type": Object {
             "kind": "typeIndexRef",
-            "link": "(\\"/a\\").B",
+            "link": "(a).B",
           },
         },
       ],
+      "path": "/",
+      "tsdoc": null,
     },
   ],
   "typeIndex": Object {
-    "(\\"/a\\").A": Object {
+    "(a).A": Object {
       "kind": "alias",
       "name": "A",
       "raw": Object {
@@ -157,6 +165,7 @@ Object {
         "nodeText": "export type A = { a: { aa: B } };",
         "typeText": "A",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
@@ -171,7 +180,7 @@ Object {
                   "name": "aa",
                   "type": Object {
                     "kind": "typeIndexRef",
-                    "link": "(\\"/a\\").B",
+                    "link": "(a).B",
                   },
                 },
               ],
@@ -190,7 +199,7 @@ Object {
         },
       },
     },
-    "(\\"/a\\").B": Object {
+    "(a).B": Object {
       "kind": "alias",
       "name": "B",
       "raw": Object {
@@ -198,6 +207,7 @@ Object {
         "nodeText": "export type B = { b: { bb: A } };",
         "typeText": "B",
       },
+      "tsdoc": null,
       "type": Object {
         "kind": "object",
         "props": Array [
@@ -212,7 +222,7 @@ Object {
                   "name": "bb",
                   "type": Object {
                     "kind": "typeIndexRef",
-                    "link": "(\\"/a\\").A",
+                    "link": "(a).A",
                   },
                 },
               ],

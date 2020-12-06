@@ -16,8 +16,7 @@
     "build": "yarn g:tsc --build && echo 'done build'",
     "dev": "yarn g:tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "test": "jest --modulePathIgnorePatterns 'system'",
-    "test:all": "jest",
+    "test": "jest",
     "format": "prettier --write .",
     "prepublishOnly": "yarn build"
   },

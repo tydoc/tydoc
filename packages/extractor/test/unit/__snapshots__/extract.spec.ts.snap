@@ -1,5 +1,93 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`passes interface smoke test 1`] = `
+Object {
+  "modules": Array [
+    Object {
+      "isMain": true,
+      "kind": "module",
+      "location": Object {
+        "filePath": "src/a.ts",
+      },
+      "mainExport": null,
+      "name": "a",
+      "namedExports": Array [
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "A",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).A",
+          },
+        },
+        Object {
+          "isTerm": false,
+          "isType": true,
+          "kind": "export",
+          "name": "B1",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).B1",
+          },
+        },
+      ],
+      "path": "/",
+      "tsdoc": null,
+    },
+  ],
+  "typeIndex": Object {
+    "(a).A": Object {
+      "kind": "interface",
+      "name": "A",
+      "props": Array [],
+      "raw": Object {
+        "nodeFullText": "export interface A {}",
+        "nodeText": "export interface A {}",
+        "typeText": "A",
+      },
+      "tsdoc": null,
+    },
+    "(a).B1": Object {
+      "kind": "interface",
+      "name": "B1",
+      "props": Array [
+        Object {
+          "kind": "prop",
+          "name": "b2",
+          "type": Object {
+            "kind": "typeIndexRef",
+            "link": "(a).B2",
+          },
+        },
+      ],
+      "raw": Object {
+        "nodeFullText": "export interface B1 {
+  b2: B2;
+}",
+        "nodeText": "export interface B1 {
+  b2: B2;
+}",
+        "typeText": "B1",
+      },
+      "tsdoc": null,
+    },
+    "(a).B2": Object {
+      "kind": "interface",
+      "name": "B2",
+      "props": Array [],
+      "raw": Object {
+        "nodeFullText": "interface B2 {}",
+        "nodeText": "interface B2 {}",
+        "typeText": "B2",
+      },
+      "tsdoc": null,
+    },
+  },
+}
+`;
+
 exports[`when there is an invalid type reference an error is thrown 1`] = `
 "[96ma.ts[0m:[93m2[0m:[93m6[0m - [91merror[0m[90m TS2304: [0mCannot find name 'B'.
 

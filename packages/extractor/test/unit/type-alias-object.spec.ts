@@ -1,6 +1,6 @@
 let docs: any
 
-it.only('can be self recursive', () => {
+it('can be self recursive', () => {
   const docs = ctx.extract(`
     export type A = { a: A }
   `)
@@ -27,14 +27,14 @@ describe('can be a named export', () => {
   })
   it('its type is added to the type index', () => {
     expect(docs).toMatchObject({
-      typeIndex: { '("/a").A': { kind: 'alias' } },
+      typeIndex: { '(a).A': { kind: 'alias' } },
     })
   })
   it('refs the type index entry', () => {
     expect(docs).toMatchObject({
       modules: [
         {
-          namedExports: [{ type: { kind: 'typeIndexRef', link: '("/a").A' } }],
+          namedExports: [{ type: { kind: 'typeIndexRef', link: '(a).A' } }],
         },
       ],
     })
