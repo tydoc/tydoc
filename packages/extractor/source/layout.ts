@@ -12,8 +12,8 @@ import {
   getPackageMain,
   readPackageJson,
   stripExtension,
-} from '../lib/package-helpers'
-import { applyDiagnosticFilters, DiagnosticFilter } from '../lib/ts-helpers'
+} from './lib/package-helpers'
+import { applyDiagnosticFilters, DiagnosticFilter } from './lib/ts-helpers'
 
 const debug = createDebug('tydoc:package')
 

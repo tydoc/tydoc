@@ -1,1 +1,1 @@
-export * from './extractor/extract'
+export * from './extract'

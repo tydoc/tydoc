@@ -2,8 +2,8 @@ import { TSDocParser } from '@microsoft/tsdoc'
 import Debug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
-import { getFirstDeclarationOrThrow, getSourceFileModulePath } from '../lib/ts-helpers'
-import { Index, Thunk } from '../lib/utils'
+import { getFirstDeclarationOrThrow, getSourceFileModulePath } from './lib/ts-helpers'
+import { Index, Thunk } from './lib/utils'
 import { dumpNode, dumpType, hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
 
 registerDumper((...args) => {

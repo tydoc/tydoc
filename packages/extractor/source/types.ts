@@ -1,1 +1,1 @@
-export * as Doc from './extractor/doc'
+export * as Doc from './doc'

@@ -5,6 +5,8 @@ import { isEmpty } from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { PackageJson } from 'type-fest'
+import * as Doc from './doc'
+import { scan } from './layout'
 import {
   absolutify,
   assertFileExists,
@@ -13,16 +15,14 @@ import {
   JsFilePathToTsDeclarationFilePath,
   pathToModulePath,
   readPackageJson,
-} from '../lib/package-helpers'
+} from './lib/package-helpers'
 import {
   DiagnosticFilter,
   getDiscriminantPropertiesOfUnionMembers,
   getFirstDeclarationOrThrow,
   getProperties,
   getSourceFileModulePath,
-} from '../lib/ts-helpers'
-import * as Doc from './doc'
-import { scan } from './layout'
+} from './lib/ts-helpers'
 import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 import dedent = require('dedent')
 import Kleur = require('kleur')
