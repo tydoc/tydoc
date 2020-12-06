@@ -89,7 +89,11 @@ Object {
 `;
 
 exports[`when there is an invalid type reference an error is thrown 1`] = `
-"[96ma.ts[0m:[93m2[0m:[93m6[0m - [91merror[0m[90m TS2304: [0mCannot find name 'B'.
+"Tydoc stopped extracting documentation becuase the package was found to have type errors. You should fix these and then try again. If you do not care about these type errors and want to try extracting documentation anyways then try using one of the following flags:
+  --ignore-diagnostics
+  --ignore-diagnostics-matching
+
+[96msrc/a.ts[0m:[93m2[0m:[93m6[0m - [91merror[0m[90m TS2304: [0mCannot find name 'B'.
 
 [7m2[0m   b: B;
 [7m [0m [91m     ~[0m

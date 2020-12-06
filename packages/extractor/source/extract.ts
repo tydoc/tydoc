@@ -25,7 +25,6 @@ import {
 } from './lib/ts-helpers'
 import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 import dedent = require('dedent')
-import Kleur = require('kleur')
 
 const debug = Debug('tydoc:extract')
 const debugExport = Debug('tydoc:extract:export')
@@ -494,7 +493,6 @@ function propertyDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.DocProp[] {
     const propType = p.getType()
     // what is this method for then? It was just returning an `any` type
     // const propType = p.getDeclaredType()
-    // prettier-ignore
     debugVisible('handle property: %s %s %s', p.getKindName(), propName, propType.getText())
     // Do not try to index type here. Must come after index lookup.
     return Doc.prop({

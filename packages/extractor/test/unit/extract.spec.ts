@@ -3,9 +3,7 @@ it.todo('documents callable interfaces')
 it.todo('documents type aliases')
 it.todo('does not try to document types from the typescript standard library')
 
-// todo fixme
-it.skip('when there is an invalid type reference an error is thrown', () => {
-  console.log(ctx.extract('export interface A { b: B }'))
+it('when there is an invalid type reference an error is thrown', () => {
   expect(() => {
     ctx.extract('export interface A { b: B }')
   }).toThrowErrorMatchingSnapshot()

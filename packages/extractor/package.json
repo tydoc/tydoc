@@ -17,6 +17,7 @@
     "dev": "yarn g:tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "test": "jest",
+    "test:debug": "DEBUG='*' DEBUG_COLORS=true jest --watch",
     "format": "prettier --write .",
     "prepublishOnly": "yarn build"
   },

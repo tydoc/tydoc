@@ -102,21 +102,26 @@ export function scan(givens?: Givens) {
     }
 
     tsMorphPoject = new tsm.Project({ tsConfigFilePath })
+  }
 
-    if (givens?.validateTypeScriptDiagnostics) {
-      const diagnostics = tsMorphPoject.getPreEmitDiagnostics()
-      if (diagnostics.length) {
-        if (
-          givens.validateTypeScriptDiagnostics === true ||
-          applyDiagnosticFilters(givens.validateTypeScriptDiagnostics, diagnostics)
-        ) {
-          const message = tsMorphPoject.formatDiagnosticsWithColorAndContext(diagnostics)
-          console.log(`
+  // todo
+  // tsMorphPoject.getConfigFileParsingDiagnostics()
+
+  const validateTypeScriptDiagnostics: boolean | DiagnosticFilter[] =
+    givens?.validateTypeScriptDiagnostics ?? true
+
+  if (validateTypeScriptDiagnostics) {
+    const diagnostics = tsMorphPoject.getPreEmitDiagnostics()
+    const diagnosticsShouldBeValidated =
+      validateTypeScriptDiagnostics === true ||
+      applyDiagnosticFilters(validateTypeScriptDiagnostics, diagnostics)
+
+    if (diagnostics.length && diagnosticsShouldBeValidated) {
+      const messagePrefix = dedent`
         Tydoc stopped extracting documentation becuase the package was found to have type errors. You should fix these and then try again. If you do not care about these type errors and want to try extracting documentation anyways then try using one of the following flags:\n  --ignore-diagnostics\n  --ignore-diagnostics-matching
-      `)
-          throw new Error(message)
-        }
-      }
+      `
+      const message = messagePrefix + '\n\n' + tsMorphPoject.formatDiagnosticsWithColorAndContext(diagnostics)
+      throw new Error(message)
     }
   }
 
