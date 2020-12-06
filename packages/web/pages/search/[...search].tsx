@@ -38,7 +38,7 @@ const Page: FC<{ data?: SearchResponseData }> = ({ data }) => {
   }
   function handleVersionChange(event: React.ChangeEvent<HTMLSelectElement>) {
     router.push({
-      query: { search: router.query.search, v: event.target.value },
+      query: { search: typeof router.query.search === 'string' ? [router.query.search] :  router.query.search, v: event.target.value },
     })
   }
   const inverseDistTags = Object.entries(data.npmInfo['dist-tags']).reduce(

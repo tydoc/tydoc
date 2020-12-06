@@ -17,74 +17,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        run: yarn
-      - name: build
+        run: yarn install
+      - name: Build All
         run: yarn build
-  test: 
-    needs: build
-    strategy:
-      matrix:
-        node-version: [14.x]
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: test
-        run: yarn test
-  tydoc-build:
-    strategy:
-      matrix:
-        node-version: [14.x]
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install Dependencies
-        working-directory: packages/tydoc
-        run: yarn --immutable
-      - name: Build
-        working-directory: packages/tydoc
-        run: yarn build
-  extractor-test:
-    strategy:
-      matrix:
-        node-version: [14.x]
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install Dependencies
-        working-directory: packages/extractor
-        run: yarn --immutable
-      - name: Test
-        working-directory: packages/extractor
-        run: yarn test
-  renderer-markdown-test:
-    strategy:
-      matrix:
-        node-version: [14.x]
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install Dependencies
-        working-directory: packages/renderer-markdown
-        run: yarn --immutable
-      - name: Build (incl. dependencies)
-        working-directory: packages/renderer-markdown
-        run: yarn build
-      - name: Test
-        working-directory: packages/renderer-markdown
+      - name: Test All
         run: yarn test

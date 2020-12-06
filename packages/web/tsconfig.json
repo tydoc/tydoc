@@ -17,7 +17,6 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "references": [{ "path": "../extractor" }],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }
