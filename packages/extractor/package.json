@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build:docs:toc": "doctoc README.md",
-    "build:docs:api": "ts-node scripts/build-api-docs",
+    "build:docs:api": "yarn g:ts-node scripts/build-api-docs",
     "build:docs": "yarn build:docs:api && yarn build:docs:toc",
     "build": "yarn g:tsc --build && echo 'done build'",
     "dev": "yarn g:tsc --watch",
@@ -54,7 +54,6 @@
     "jest-watch-toggle-config": "2.0.1",
     "jest-watch-typeahead": "0.6.1",
     "ts-jest": "26.4.4",
-    "ts-node": "9.0.0",
     "type-fest": "^0.20.2"
   },
   "prettier": "@prisma-labs/prettier-config"

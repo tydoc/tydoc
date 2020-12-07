@@ -57,6 +57,7 @@ Work in progress 👷‍
   - [Exported Types](#exported-types)
     - [`I` `FromProjectParams`](#i-fromprojectparams)
   - [Type Index](#type-index)
+    - [`T` `FromPublishedParams`](#t-frompublishedparams)
     - [`T` `DocPackage`](#t-docpackage)
     - [`&` `DocModule`](#-docmodule)
     - [`T` `TSDocFrag`](#t-tsdocfrag)
@@ -1095,7 +1096,7 @@ It is possible to use Tydoc in a programmatic way. The CLI is built using this A
 
 <!-- prettier-ignore -->
 ```ts
-(options: { packageName: string; packageVersion?: string | undefined; project?: Project | undefined; downloadDir?: string | undefined; }) => Promise<DocPackage>
+(options: FromPublishedParams) => Promise<DocPackage>
 ```
 
 ### `fromProject`
@@ -1135,6 +1136,17 @@ typeIndexRef
 ```
 
 ### Type Index
+
+#### `T` `FromPublishedParams`
+
+```ts
+type FromPublishedParams = {
+  packageName: string
+  packageVersion?: string
+  project?: tsm.Project
+  downloadDir?: string
+}
+```
 
 #### `T` `DocPackage`
 
