@@ -17,14 +17,17 @@ export class Project extends Command {
     },
   ]
   static flags: any = {
-    markdown: flags.boolean({
-      default: true,
-      char: 'm',
-      exclusive: ['json'],
+    sourceMainEntrypointPath: flags.string({
+      description: `Absolute path to the source main entrypoint. By default a discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups. If you give a relative path it is relative to the project directory (--dir).`,
     }),
     dir: flags.string({
       char: 'd',
       helpValue: './projects/my-awesome-project',
+    }),
+    markdown: flags.boolean({
+      default: true,
+      char: 'm',
+      exclusive: ['json'],
     }),
     json: flags.boolean({
       default: false,
@@ -51,9 +54,6 @@ export class Project extends Command {
           { category: 'error' }
           [{ path: '/foo/bar/.*', code '24.*' }]
         `,
-    }),
-    sourceMainEntrypointPath: flags.string({
-      description: `Absolute path to the source main entrypoint. By default a discovery attempt is made by running heuristics against a combination of package.json and tsconfig.json however it only covers common patterns, not all possible setups. If you give a relative path it is relative to the project directory (--dir).`,
     }),
   }
 
