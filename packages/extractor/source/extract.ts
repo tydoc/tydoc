@@ -140,8 +140,10 @@ export async function fromPublished(options: FromPublishedParams): Promise<Doc.D
   }
 
   const packageJsonMain = getPackageMain(packageJson)
+  debug('found packageJsonMain %s', packageJsonMain)
 
   const entrypointPath = JsFilePathToTsDeclarationFilePath(path.join(projectDir, packageJsonMain))
+  debug('found entrypointPath %s', entrypointPath)
 
   assertFileExists(
     entrypointPath,

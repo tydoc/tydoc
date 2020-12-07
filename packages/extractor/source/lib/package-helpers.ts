@@ -126,8 +126,18 @@ export function getPackageMain(packageJson: PackageJson) {
 }
 
 export function JsFilePathToTsDeclarationFilePath(jsFilePath: string) {
-  const { dir, name } = path.parse(jsFilePath)
-  return path.join(dir, `${name}.d.ts`)
+  const { dir, name, ext } = path.parse(jsFilePath)
+
+  if (ext) {
+    return path.join(dir, `${name}.d.ts`)
+  }
+
+  /**
+   * jsfilePath appears to be pointing at a directory
+   * with in node means to look for an index.js file within.
+   */
+
+  return path.join(jsFilePath, `index.d.ts`)
 }
 
 /**
