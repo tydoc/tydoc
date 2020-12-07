@@ -2353,7 +2353,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@prisma-labs/prettier-config@npm:0.1.0":
+"@prisma-labs/prettier-config@npm:0.1.0, @prisma-labs/prettier-config@npm:^0.1.0":
   version: 0.1.0
   resolution: "@prisma-labs/prettier-config@npm:0.1.0"
   checksum: e03394211076c6274dfacf744ba73f4573d6603d18c42b0581e231624a309580a7ed8fc49c8cecba312b9344b66423672406ba69ad977df6ee3a1a72adbd0ede
@@ -3348,7 +3348,6 @@ __metadata:
   resolution: "@tydoc/extractor@workspace:packages/extractor"
   dependencies:
     "@microsoft/tsdoc": ^0.12.21
-    "@prisma-labs/prettier-config": 0.1.0
     "@types/debug": ^4.1.5
     "@types/decompress": ^4
     "@types/dedent": ^0.7.0
@@ -15166,6 +15165,7 @@ fsevents@^1.2.7:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
+    "@prisma-labs/prettier-config": ^0.1.0
     prettier: ^2.2.0
     ts-node: ^9.1.0
     typescript: ^4.1.2

@@ -18,7 +18,7 @@
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "test": "jest",
     "test:debug": "DEBUG='*' DEBUG_COLORS=true jest --watch",
-    "format": "prettier --write .",
+    "format": "yarn g:prettier --write .",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
@@ -40,7 +40,6 @@
     "typescript": "^4.1.2"
   },
   "devDependencies": {
-    "@prisma-labs/prettier-config": "0.1.0",
     "@types/decompress": "^4",
     "@types/dedent": "^0.7.0",
     "@types/jest": "26.0.15",

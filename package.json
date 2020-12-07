@@ -4,6 +4,7 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@prisma-labs/prettier-config": "^0.1.0",
     "prettier": "^2.2.0",
     "ts-node": "^9.1.0",
     "typescript": "^4.1.2",
@@ -11,6 +12,7 @@
   },
   "scripts": {
     "g:tsc": "cd $INIT_CWD && tsc",
+    "g:prettier": "cd $INIT_CWD && prettier",
     "g:ts-node": "cd $INIT_CWD && ts-node"
   }
 }
