@@ -12,6 +12,7 @@
     "oclif.manifest.json"
   ],
   "scripts": {
+    "tydoc": "node dist/cli/main",
     "build": "yarn clean && yarn g:tsc --build && oclif-dev manifest && echo 'done build'",
     "dev": "yarn g:tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
