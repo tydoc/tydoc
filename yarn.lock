@@ -2232,9 +2232,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@oclif/dev-cli@npm:1.24.1":
-  version: 1.24.1
-  resolution: "@oclif/dev-cli@npm:1.24.1"
+"@oclif/dev-cli@npm:1.25.1":
+  version: 1.25.1
+  resolution: "@oclif/dev-cli@npm:1.25.1"
   dependencies:
     "@oclif/command": ^1.8.0
     "@oclif/config": ^1.17.0
@@ -2242,15 +2242,16 @@ __metadata:
     "@oclif/plugin-help": ^3.2.0
     cli-ux: ^5.2.1
     debug: ^4.1.1
+    find-yarn-workspace-root: ^2.0.0
     fs-extra: ^8.1
     github-slugger: ^1.2.1
     lodash: ^4.17.11
     normalize-package-data: ^3.0.0
     qqjs: ^0.3.10
-    tslib: ^1.9.3
+    tslib: ^2.0.3
   bin:
     oclif-dev: ./bin/run
-  checksum: 61c6fc19ffd60500bbc03f222027ef410552b503f3e02baa343bf52c73daa6cd0f5e20ecf955675a61adff370dc3b199c5ddf82b0a66260a11173cd3678347ae
+  checksum: d59d416611718748b33777cba2c7f22493a11ddcbd2cd99b4725acb01dba5ca1b98f51c2b0f760ace479b6a6a86d1b1bf9c8aacbbd531bb928c58c8664d65a24
   languageName: node
   linkType: hard
 
@@ -8657,6 +8658,15 @@ __metadata:
   dependencies:
     locate-path: ^3.0.0
   checksum: c5422fc7231820421cff6f6e3a5d00a11a79fd16625f2af779c6aedfbaad66764fd149c1b84017aa44e85f86395eb25c31188ad273fc468a981b529eaa59a424
+  languageName: node
+  linkType: hard
+
+"find-yarn-workspace-root@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "find-yarn-workspace-root@npm:2.0.0"
+  dependencies:
+    micromatch: ^4.0.2
+  checksum: 21c2b76621c58ecb0aadfeb128ece1ece979a9c43aac6f91bb422b20ca5744e63300d175692bc1a9e7b9f2f949f865e0f3ec05efeeabb81447146e6b4ccf003a
   languageName: node
   linkType: hard
 
@@ -16909,7 +16919,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.0, tslib@npm:^2.0.1":
+"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3":
   version: 2.0.3
   resolution: "tslib@npm:2.0.3"
   checksum: 447bfca5deaa157806c3f77eaba74d05dd0b38b014e47ce79d98b5c77ce7d91b00a687ba13ca1b5a74d35ca1098ac7a072c0a97fad06f0266612f2a03a6c8e8f
@@ -16945,7 +16955,7 @@ fsevents@^1.2.7:
   dependencies:
     "@oclif/command": ^1.8.0
     "@oclif/config": ^1.17.0
-    "@oclif/dev-cli": 1.24.1
+    "@oclif/dev-cli": 1.25.1
     "@oclif/plugin-help": ^3.2.0
     "@tydoc/extractor": "workspace:packages/extractor"
     "@tydoc/renderer-markdown": "workspace:packages/renderer-markdown"
