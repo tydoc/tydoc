@@ -13,10 +13,9 @@
   ],
   "scripts": {
     "build": "yarn clean && yarn g:tsc --build && oclif-dev manifest && echo 'done build'",
-    "dev": "g:tsc --watch",
+    "dev": "yarn g:tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "test": "jest",
-    "format": "prettier --write .",
+    "format": "yarn g:prettier --write .",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
@@ -25,26 +24,16 @@
     "@oclif/plugin-help": "^3.2.0",
     "@tydoc/extractor": "workspace:packages/extractor",
     "@tydoc/renderer-markdown": "workspace:packages/renderer-markdown",
-    "@types/debug": "^4.1.5",
-    "@types/lodash": "^4.14.165",
     "debug": "^4.3.1",
     "dedent": "^0.7.0",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
     "@oclif/dev-cli": "1.24.1",
-    "@prisma-labs/prettier-config": "0.1.0",
+    "@types/debug": "^4.1.5",
     "@types/dedent": "^0.7.0",
-    "@types/jest": "26.0.15",
-    "@types/node": "14.14.10",
-    "@types/prettier": "2.1.5",
-    "jest": "26.6.3",
-    "jest-validate": "26.6.2",
-    "jest-watch-suspend": "1.1.2",
-    "jest-watch-toggle-config": "2.0.1",
-    "jest-watch-typeahead": "0.6.1",
-    "ts-jest": "26.4.4",
-    "ts-node": "9.0.0"
+    "@types/lodash": "^4.14.165",
+    "@types/node": "14.14.10"
   },
   "prettier": "@prisma-labs/prettier-config",
   "oclif": {
