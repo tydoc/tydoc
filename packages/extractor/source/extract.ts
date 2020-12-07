@@ -113,7 +113,7 @@ export interface FromProjectParams {
   }
 }
 
-type FromPublishedParams = {
+export type FromPublishedParams = {
   packageName: string
   packageVersion?: string
   project?: tsm.Project
