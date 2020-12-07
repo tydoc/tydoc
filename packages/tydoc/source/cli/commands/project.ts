@@ -3,6 +3,7 @@ import * as TyDoc from '@tydoc/extractor'
 import { FromProjectParams } from '@tydoc/extractor/dist/extract'
 import { DiagnosticFilter } from '@tydoc/extractor/dist/lib/ts-helpers'
 import * as TyDocMarkdownRenderer from '@tydoc/renderer-markdown'
+import debug from 'debug'
 import * as dedent from 'dedent'
 import * as JSON5 from 'json5'
 import { arrayify } from '../../utils'
@@ -23,6 +24,10 @@ export class Project extends Command {
     dir: flags.string({
       char: 'd',
       helpValue: './projects/my-awesome-project',
+    }),
+    debug: flags.boolean({
+      default: false,
+      description: 'Enable deug logs. Convenience for setting DEBUG=tydoc* envar.',
     }),
     markdown: flags.boolean({
       default: true,
@@ -59,6 +64,10 @@ export class Project extends Command {
 
   async run() {
     const { flags, argv } = this.parse(Project) as any
+
+    if (flags.debug) {
+      debug.enable('tydoc*')
+    }
 
     /**
      * Map arv and flags to FromProjectParams

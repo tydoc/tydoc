@@ -1,6 +1,7 @@
 import Command, { flags } from '@oclif/command'
 import * as TyDoc from '@tydoc/extractor'
 import * as TyDocMarkdownRenderer from '@tydoc/renderer-markdown'
+import debug from 'debug'
 
 export class FromPublished extends Command {
   static args = [
@@ -13,8 +14,9 @@ export class FromPublished extends Command {
 
   // todo DRY with proejct sub-command flag
   static flags = {
-    version: flags.string({
-      description: 'Version of the package to get EDD for.',
+    debug: flags.boolean({
+      default: false,
+      description: 'Enable deug logs. Convenience for setting DEBUG=tydoc* envar.',
     }),
     'flat-terms-section': flags.boolean({
       default: false,
@@ -31,10 +33,17 @@ export class FromPublished extends Command {
       char: 'm',
       exclusive: ['json'],
     }),
+    version: flags.string({
+      description: 'Version of the package to get EDD for.',
+    }),
   }
 
   async run() {
     const { flags, argv } = this.parse(FromPublished)
+
+    if (flags.debug) {
+      debug.enable('tydoc*')
+    }
 
     /**
      * Map arv and flags to FromProjectParams
