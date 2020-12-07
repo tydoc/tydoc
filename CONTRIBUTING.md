@@ -1,6 +1,10 @@
 # Contributing
 
-## Architecture
+## General Workflow Tips
+
+- Use `yarn tydoc` to work with the TyDoc CLI locally. Note that before using you must have run `yarn build` in `packages/tydoc`.
+
+## Extractor Architecture
 
 Tydoc has three decoupled layers internally. These layers are:
 
