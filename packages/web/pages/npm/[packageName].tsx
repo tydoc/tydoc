@@ -1,32 +1,27 @@
 import { Layout } from '.../../../components/Layout'
-import { Doc } from '@tydoc/extractor/types'
+import * as Tydoc from '@tydoc/extractor'
 import { GetStaticPaths, InferGetStaticPropsType } from 'next'
 import React, { FC } from 'react'
-import { Package } from '../../../components/Package'
-import { defineStaticProps } from '../../../utils/next'
-import { NPM } from '../../../utils/types'
-import { getJson } from '../../../utils/utils'
+import { Package } from '../../components/Package'
+import { defineStaticProps } from '../../utils/next'
 
 export const getStaticProps = defineStaticProps(async (context) => {
-  // TODO remove once implemented in extractor
-  const entrypoint = (context.params!.entrypoint as string).replace('_', '/')
-  const { packageName, organization } = (() => {
-    const pkg = context.params!.pkg! as string[]
-    if (pkg.length === 2) {
-      return { organization: pkg[0], packageName: pkg[1] }
-    } else {
-      return { packageName: pkg[0] }
-    }
-  })()
-
-  const { docPackage, npmInfo } = await fetchDocPackage({
+  const packageName = context.params!.packageName as string
+  const edd = await Tydoc.fromPublished({
     packageName,
-    organization,
-    entrypoint,
   })
 
   return {
-    props: { docPackage, npmInfo },
+    props: {
+      docPackage: edd,
+      npmInfo: {
+        name: packageName,
+        'dist-tags': {
+          latest: '0.0.0-todo.1',
+        },
+        versions: '0.0.0-todo.1',
+      },
+    },
     revalidate: 60 * 5, // every 5min
   }
 })
@@ -50,7 +45,7 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
   const inverseDistTags = Object.entries(npmInfo['dist-tags']).reduce(
     (acc, [tag, version]) => {
       acc[version] ??= []
-      acc[version].push(tag)
+      acc[version]!.push(tag)
       return acc
     },
     {} as { [version: string]: string[] },
@@ -77,7 +72,7 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
               <option key={version} value={version}>
                 {version}
                 {inverseDistTags[version]
-                  ? ` (${inverseDistTags[version].join(', ')})`
+                  ? ` (${inverseDistTags[version]!.join(', ')})`
                   : ''}
               </option>
             ))}
@@ -126,34 +121,3 @@ const SideNavItem: FC<{ name: string; url: string; active?: boolean }> = ({
     {name}
   </a>
 )
-
-async function fetchDocPackage({
-  packageName,
-  organization,
-  entrypoint,
-}: {
-  packageName: string
-  organization?: string
-  entrypoint: string
-}): Promise<{
-  docPackage: Doc.DocPackage
-  npmInfo: NPM.Response
-}> {
-  const fullPackageName = organization
-    ? `${organization}/${packageName}`
-    : packageName
-  const npmInfo = await getJson<NPM.Response>(
-    `https://registry.npmjs.org/${fullPackageName}`,
-  )
-
-  const [, ghOwner, ghName] = npmInfo.repository.url.match(
-    /github\.com\/(.+)\/(.+)\.git$/,
-  )!
-
-  const github = `https://github.com/${ghOwner}/${ghName}`
-  const docPackage = await getJson<Doc.DocPackage>(
-    `https://tydoc-source-proxy.vercel.app/api?github=${github}&entrypoint=${entrypoint}`,
-  )
-
-  return { docPackage, npmInfo }
-}
