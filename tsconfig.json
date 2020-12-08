@@ -7,7 +7,13 @@
     "sourceMap": true,
     "declarationMap": true,
     "declaration": true,
-    "baseUrl": "./packages/"
+    "target": "ES2019",
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "lib": ["DOM", "ESNext"],
+    "paths": {
+      "@tydoc/extractor": ["./packages/extractor/source/"]
+    }
   },
   "plugins": [
     {

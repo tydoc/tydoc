@@ -15,10 +15,3 @@ test('can get EDD from "execa" package', async () => {
   })
   expect(edd).toMatchSnapshot()
 })
-
-test('can get EDD from "@types/react" package', async () => {
-  const edd = await fromPublished({
-    packageName: "@types/react",
-  })
-  expect(edd).toMatchSnapshot()
-})

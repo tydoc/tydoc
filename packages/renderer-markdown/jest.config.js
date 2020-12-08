@@ -9,7 +9,7 @@ module.exports = {
   watchPlugins: ['jest-watch-suspend', 'jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
   globals: {
     'ts-jest': {
-      tsconfig: './tsconfig.json',
+      tsconfig: 'tsconfig.test.json',
       diagnostics: Boolean(process.env.CI),
     },
   },

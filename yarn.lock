@@ -2243,139 +2243,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/auth-token@npm:^2.4.4":
-  version: 2.4.4
-  resolution: "@octokit/auth-token@npm:2.4.4"
-  dependencies:
-    "@octokit/types": ^6.0.0
-  checksum: a2911a58bdcee7c996dc02ac152c3d6318401c41c3899ad4286b379da273700680c97561ed9cf87ee792abf2cf2b439f63d43b33778ca991dfc751994e4d5544
-  languageName: node
-  linkType: hard
-
-"@octokit/core@npm:^3.2.3":
-  version: 3.2.4
-  resolution: "@octokit/core@npm:3.2.4"
-  dependencies:
-    "@octokit/auth-token": ^2.4.4
-    "@octokit/graphql": ^4.5.8
-    "@octokit/request": ^5.4.12
-    "@octokit/types": ^6.0.3
-    before-after-hook: ^2.1.0
-    universal-user-agent: ^6.0.0
-  checksum: fb76c14bfdd934daa00f2d015a2d7af41ead2c50fe7359fa8283a140f833a28a6a23d2b3c541dc92d06aa69aea34d4c3d3aeea2eb8628bdaf899b19693f235c9
-  languageName: node
-  linkType: hard
-
-"@octokit/endpoint@npm:^6.0.1":
-  version: 6.0.10
-  resolution: "@octokit/endpoint@npm:6.0.10"
-  dependencies:
-    "@octokit/types": ^6.0.0
-    is-plain-object: ^5.0.0
-    universal-user-agent: ^6.0.0
-  checksum: e73ddbed6b02344924b101c47f2b7589e2ec0812623cc80be748d31a3308c2fcb2736d7696de64095b4f49da454160146bbb92322d1d62d66b064ce8ce213d99
-  languageName: node
-  linkType: hard
-
-"@octokit/graphql@npm:^4.5.8":
-  version: 4.5.8
-  resolution: "@octokit/graphql@npm:4.5.8"
-  dependencies:
-    "@octokit/request": ^5.3.0
-    "@octokit/types": ^6.0.0
-    universal-user-agent: ^6.0.0
-  checksum: d29ec8a5ec51238b2f149ede5c760106e549def000fd0a42fadc23297c5b762732153957507a63a84cdbaaffd481951e530ffca384bc5a5c0fea01d2fa735171
-  languageName: node
-  linkType: hard
-
-"@octokit/openapi-types@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@octokit/openapi-types@npm:2.0.0"
-  checksum: 5dba467708d45cd43979da80c9229d9b102368ef2cd68d546811bc61f3fc84bf412fb8b619ab776fc60db33b5e4997047128e7b0676c5a86f22c6d0db4220859
-  languageName: node
-  linkType: hard
-
-"@octokit/plugin-paginate-rest@npm:^2.6.2":
-  version: 2.6.2
-  resolution: "@octokit/plugin-paginate-rest@npm:2.6.2"
-  dependencies:
-    "@octokit/types": ^6.0.1
-  peerDependencies:
-    "@octokit/core": ">=2"
-  checksum: 9ea8462bf71da084af23385ca07f7c22f639680d3a7ed77b47ab5a349641cbfe542c3755b56e0491d46704725321ff4316ab6bfde7685bfad2243950c674822b
-  languageName: node
-  linkType: hard
-
-"@octokit/plugin-request-log@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "@octokit/plugin-request-log@npm:1.0.2"
-  peerDependencies:
-    "@octokit/core": ">=3"
-  checksum: c587973f425491fb6b9bf74dd9e3f4bbcf6d814d7a4833d262eed554c0764db1461d7b6719159eb3176edd60e9fc54bf31d5e4fad9c0af6f81fb742e59c1d394
-  languageName: node
-  linkType: hard
-
-"@octokit/plugin-rest-endpoint-methods@npm:4.4.1":
-  version: 4.4.1
-  resolution: "@octokit/plugin-rest-endpoint-methods@npm:4.4.1"
-  dependencies:
-    "@octokit/types": ^6.1.0
-    deprecation: ^2.3.1
-  peerDependencies:
-    "@octokit/core": ">=3"
-  checksum: a19bca83c674aa217cd57063b9b39f140dcc0c55698bf7bae33618098909d32a6ea7cb20729436467e8d0b6b80cc5a98930f984366bd9b05ac1c0eb53b2e13a8
-  languageName: node
-  linkType: hard
-
-"@octokit/request-error@npm:^2.0.0":
-  version: 2.0.4
-  resolution: "@octokit/request-error@npm:2.0.4"
-  dependencies:
-    "@octokit/types": ^6.0.0
-    deprecation: ^2.0.0
-    once: ^1.4.0
-  checksum: 5761659a66aba76a238f97d8e1a995e0745fe3aa7cf86daa42c07d339cc6353e3818c74e5a58c923f72a77f490d137cb20398532c263919d922b02477dd3ee03
-  languageName: node
-  linkType: hard
-
-"@octokit/request@npm:^5.3.0, @octokit/request@npm:^5.4.12":
-  version: 5.4.12
-  resolution: "@octokit/request@npm:5.4.12"
-  dependencies:
-    "@octokit/endpoint": ^6.0.1
-    "@octokit/request-error": ^2.0.0
-    "@octokit/types": ^6.0.3
-    deprecation: ^2.0.0
-    is-plain-object: ^5.0.0
-    node-fetch: ^2.6.1
-    once: ^1.4.0
-    universal-user-agent: ^6.0.0
-  checksum: 7a98c8c7f91671f25f9211e071e881d31e8a4e7f1078954b71374b1b5923001eb979f4c511bc25dde1632143c09586c85de67ba1ab1268ee663db5dfa4d48ef5
-  languageName: node
-  linkType: hard
-
-"@octokit/rest@npm:^18.0.3":
-  version: 18.0.12
-  resolution: "@octokit/rest@npm:18.0.12"
-  dependencies:
-    "@octokit/core": ^3.2.3
-    "@octokit/plugin-paginate-rest": ^2.6.2
-    "@octokit/plugin-request-log": ^1.0.2
-    "@octokit/plugin-rest-endpoint-methods": 4.4.1
-  checksum: 79219bff3e21a216cab5c883ed843e99d9ff1d5b12992e11feb6650a13763c6b1651580e05ce40d1ab52f4c5ae91895081688f39ec7d67979077aeaad401f546
-  languageName: node
-  linkType: hard
-
-"@octokit/types@npm:^6.0.0, @octokit/types@npm:^6.0.1, @octokit/types@npm:^6.0.3, @octokit/types@npm:^6.1.0":
-  version: 6.1.1
-  resolution: "@octokit/types@npm:6.1.1"
-  dependencies:
-    "@octokit/openapi-types": ^2.0.0
-    "@types/node": ">= 8"
-  checksum: ae2a161040f32f8d2032cd4b6a2ba3d1c1ae12c4383b2e519083e0e6ba65c26b645d563c8ec40371756f35bffe05822a3c6376c4266938ffe5815f1a2bf9c852
-  languageName: node
-  linkType: hard
-
 "@pmmmwh/react-refresh-webpack-plugin@npm:^0.4.2":
   version: 0.4.3
   resolution: "@pmmmwh/react-refresh-webpack-plugin@npm:0.4.3"
@@ -3253,7 +3120,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tydoc/extractor@workspace:*, @tydoc/extractor@workspace:packages/extractor":
+"@tydoc/extractor@workspace:packages/extractor":
   version: 0.0.0-use.local
   resolution: "@tydoc/extractor@workspace:packages/extractor"
   dependencies:
@@ -3290,12 +3157,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tydoc/renderer-markdown@workspace:*, @tydoc/renderer-markdown@workspace:packages/renderer-markdown":
+"@tydoc/renderer-markdown@workspace:packages/renderer-markdown":
   version: 0.0.0-use.local
   resolution: "@tydoc/renderer-markdown@workspace:packages/renderer-markdown"
   dependencies:
     "@prisma-labs/prettier-config": 0.1.0
-    "@tydoc/extractor": "workspace:*"
+    "@tydoc/extractor": "workspace:packages/extractor"
     "@types/debug": ^4.1.5
     "@types/jest": 26.0.15
     "@types/node": 14.14.10
@@ -3573,7 +3440,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:14.14.10, @types/node@npm:>= 8, @types/node@npm:^14.14.6":
+"@types/node@npm:*, @types/node@npm:14.14.10, @types/node@npm:^14.14.6":
   version: 14.14.10
   resolution: "@types/node@npm:14.14.10"
   checksum: b793aa15e8c08df50d0f77dc0fe7a93bc2e09bfa5a424841d4dba045d6ae8503b7ffe89b773ffe197c9b637c898bb22e78442e21ff4b33414d35160d9c3f8a9b
@@ -5739,13 +5606,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"camelcase@npm:^2.0.0":
-  version: 2.1.1
-  resolution: "camelcase@npm:2.1.1"
-  checksum: 311182686b3b87ac07851d6bc8c1327d55ef5fe95403bce97e21696dfe666dec70cf2b008593c00ae69a2b84e0074e4c130157a41db1d237f6fe5686cbf870b3
-  languageName: node
-  linkType: hard
-
 "camelcase@npm:^6.0.0":
   version: 6.2.0
   resolution: "camelcase@npm:6.2.0"
@@ -6159,7 +6019,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"code-block-writer@npm:^10.1.0, code-block-writer@npm:^10.1.1":
+"code-block-writer@npm:^10.1.1":
   version: 10.1.1
   resolution: "code-block-writer@npm:10.1.1"
   checksum: 3e04b80dce76927072f96ad8215936a550ba39db5e13f17f455652534e7cd120dceb52b8521a81981edfbc7fbe5410511d6253fd718f0f0e33ea33eceb66dab2
@@ -6829,15 +6689,6 @@ __metadata:
   version: 3.0.5
   resolution: "csstype@npm:3.0.5"
   checksum: d15967edea15457961ab1e3f1c4080c83792a595055551a087923b2fb67fffaddaa2eedafe10f665d12dc3f493af03c08322c9410fcd58e3dcf48104de15043c
-  languageName: node
-  linkType: hard
-
-"currently-unhandled@npm:^0.4.1":
-  version: 0.4.1
-  resolution: "currently-unhandled@npm:0.4.1"
-  dependencies:
-    array-find-index: ^1.0.1
-  checksum: 1968b4b57677da838b8b3f0db806e1eb4f59cc95addb6e0fd3098703fe31a3e7e5e437f253aa74408a80699e7cc59947881a7e678d0ced887619077dcccdf70f
   languageName: node
   linkType: hard
 
@@ -11481,16 +11332,6 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"loud-rejection@npm:^1.0.0":
-  version: 1.6.0
-  resolution: "loud-rejection@npm:1.6.0"
-  dependencies:
-    currently-unhandled: ^0.4.1
-    signal-exit: ^3.0.0
-  checksum: 9d57f7bc81da9a167dca46f9cc986dd18b0ae822811c69c2374f4945418234bb1ee102ca3a34bacf74e3bee122b27eed15604e57d5e1974f6fef8984861ed9ca
-  languageName: node
-  linkType: hard
-
 "lower-case@npm:^2.0.2":
   version: 2.0.2
   resolution: "lower-case@npm:2.0.2"
@@ -13165,7 +13006,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"pify@npm:^2.0.0, pify@npm:^2.3.0":
+"pify@npm:^2.3.0":
   version: 2.3.0
   resolution: "pify@npm:2.3.0"
   checksum: d5758aa570bbd5969c62b5f745065006827ef4859b32af302e3df2bb5978e6c1e50c2360d7ffefa102e451084f4530115c84570c185ba5153ee9871c977fe278
@@ -15276,17 +15117,6 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"simple-git@npm:^2.17.0":
-  version: 2.24.0
-  resolution: "simple-git@npm:2.24.0"
-  dependencies:
-    "@kwsites/file-exists": ^1.1.1
-    "@kwsites/promise-deferred": ^1.1.1
-    debug: ^4.3.1
-  checksum: 549d42cf70b93930835ab58e0e4bab5c92bf632734d74e88bb13e5028b60bb42a0e8104f8de9107350dbaf07215bad37d6d4ddf06eba05f887a85e1b2778227a
-  languageName: node
-  linkType: hard
-
 "simple-swizzle@npm:^0.2.2":
   version: 0.2.2
   resolution: "simple-swizzle@npm:0.2.2"
@@ -16507,18 +16337,6 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"tsconfig@npm:^7.0.0":
-  version: 7.0.0
-  resolution: "tsconfig@npm:7.0.0"
-  dependencies:
-    "@types/strip-bom": ^3.0.0
-    "@types/strip-json-comments": 0.0.30
-    strip-bom: ^3.0.0
-    strip-json-comments: ^2.0.0
-  checksum: c2d07c1030896f6341a819d403679cf0ff9ede086d0860f909f293c4a2e456001f173e2efb8073738b5d20ed7e4218254bc1163ef7fc3fefd97426b38cb89234
-  languageName: node
-  linkType: hard
-
 "tslib@npm:^1.9.0, tslib@npm:^1.9.3":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
@@ -16564,9 +16382,8 @@ fsevents@^1.2.7:
     "@oclif/config": ^1.17.0
     "@oclif/dev-cli": 1.25.1
     "@oclif/plugin-help": ^3.2.0
-    "@prisma-labs/prettier-config": 0.1.0
-    "@tydoc/extractor": "workspace:*"
-    "@tydoc/renderer-markdown": "workspace:*"
+    "@tydoc/extractor": "workspace:packages/extractor"
+    "@tydoc/renderer-markdown": "workspace:packages/renderer-markdown"
     "@types/debug": ^4.1.5
     "@types/dedent": ^0.7.0
     "@types/lodash": ^4.14.165
@@ -17378,7 +17195,7 @@ fsevents@^1.2.7:
     "@tailwindcss/aspect-ratio": ^0.2.0
     "@tailwindcss/forms": ^0.2.1
     "@tailwindcss/typography": ^0.3.1
-    "@tydoc/extractor": "workspace:*"
+    "@tydoc/extractor": "workspace:packages/extractor"
     "@types/node": ^14.14.6
     "@types/react": ^16.9.55
     "@types/react-syntax-highlighter": ^13.5.0

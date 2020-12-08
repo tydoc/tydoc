@@ -5,14 +5,6 @@ import React, { FC } from 'react'
 import { fetchDocPackage, SearchResponseData } from 'web/utils/docs'
 import { Package } from '../../components/Package'
 
-async function fetcher<T>(
-  input: RequestInfo,
-  init?: RequestInit | undefined,
-): Promise<T> {
-  const res = await fetch(input, init)
-  return res.json()
-}
-
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   let data: undefined | SearchResponseData
   const packageName = getPackageNameFromUrl(ctx.req.url)

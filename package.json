@@ -11,9 +11,12 @@
     "typescript-snapshots-plugin": "^1.7.0"
   },
   "scripts": {
-    "g:tsc": "tsc",
+    "g:tsc": "cd $INIT_CWD && tsc",
     "build": "yarn workspaces foreach -pt run build",
     "test": "yarn workspaces foreach -p -i -v --exclude tydoc run test",
-    "dev": "yarn workspaces foreach -p -i -v run dev"
+    "dev": "yarn workspaces foreach -p -i -v run dev",
+    "tydoc": "node packages/tydoc/dist/cli/main",
+    "g:prettier": "cd $INIT_CWD && prettier",
+    "g:ts-node": "cd $INIT_CWD && ts-node"
   }
 }
