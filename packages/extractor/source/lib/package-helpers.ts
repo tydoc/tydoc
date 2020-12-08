@@ -130,7 +130,11 @@ export async function downloadPackage({
     return acc
   }, [] as string [])
   console.log({folders});
-  folders && fs.move(path.join(tarballDecompressDir, folders[0]), downloadDir, { overwrite: true })
+  if(folders && typeof folders[0] === 'string') {
+    fs.move(path.join(tarballDecompressDir, folders[0]), downloadDir, { overwrite: true })
+  } else {
+    throw new Error(`Unable to find folder in decompressed package`)
+  }
 }
 
 export function getPackageMain(packageJson: PackageJson) {
