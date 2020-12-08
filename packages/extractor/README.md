@@ -7,7 +7,6 @@ Work in progress 👷‍
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Features](#features)
 - [Features Still TODO](#features-still-todo)
 - [General Features Overview](#general-features-overview)
@@ -23,10 +22,10 @@ Work in progress 👷‍
   - [Named Exports](#named-exports)
   - [Main Export](#main-export)
 - [Type Index Overview](#type-index-overview)
-    - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
-    - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
-    - [Module Level TsDoc](#module-level-tsdoc)
-    - [Qualified Module Paths](#qualified-module-paths)
+  - [Exported Types of exported terms reference the type index](#exported-types-of-exported-terms-reference-the-type-index)
+  - [Non-exported types of exported terms show up in the Type Index](#non-exported-types-of-exported-terms-show-up-in-the-type-index)
+  - [Module Level TsDoc](#module-level-tsdoc)
+  - [Qualified Module Paths](#qualified-module-paths)
   - [Avoids extracting docs for native types (Array, RegExp, etc.)](#avoids-extracting-docs-for-native-types-array-regexp-etc)
 - [TS Types Support Overview](#ts-types-support-overview)
   - [Functions](#functions)
@@ -1603,12 +1602,5 @@ export interface Settings {
 ```ts
 export type Thunk<T> = () => T
 ```
+
 <!-- END API DOCS --->
-
-## Debugging
-
-Tydoc uses [debug](https://github.com/visionmedia/debug). When enabled via `*` it also causes Oclif to render stack traces for unexpected thrown errors.
-
-```
-DEBUG=* tydoc ...
-```
