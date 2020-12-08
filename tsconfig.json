@@ -8,8 +8,10 @@
     "declarationMap": true,
     "declaration": true,
     "target": "ES2019",
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "module": "CommonJS",
+    "downlevelIteration": true,
     "lib": ["DOM", "ESNext"],
     "paths": {
       "@tydoc/extractor": ["./packages/extractor/source/"]

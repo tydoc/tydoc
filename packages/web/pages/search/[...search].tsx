@@ -36,7 +36,7 @@ const Page: FC<{ data?: SearchResponseData }> = ({ data }) => {
   const inverseDistTags = Object.entries(data.npmInfo['dist-tags']).reduce(
     (acc, [tag, version]) => {
       acc[version] ??= []
-      acc[version].push(tag)
+      acc[version]?.push(tag)
       return acc
     },
     {} as { [version: string]: string[] },
@@ -64,7 +64,7 @@ const Page: FC<{ data?: SearchResponseData }> = ({ data }) => {
               <option key={version} value={version}>
                 {version}
                 {inverseDistTags[version]
-                  ? ` (${inverseDistTags[version].join(', ')})`
+                  ? ` (${inverseDistTags[version]?.join(', ')})`
                   : ''}
               </option>
             ))}

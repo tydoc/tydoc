@@ -26,7 +26,7 @@ import {
   getSourceFileModulePath,
 } from './lib/ts-helpers'
 import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
-import dedent = require('dedent')
+import dedent from 'dedent'
 
 const debug = Debug('tydoc:extract')
 const debugExport = Debug('tydoc:extract:export')
