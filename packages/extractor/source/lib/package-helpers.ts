@@ -142,10 +142,23 @@ export function JsFilePathToTsDeclarationFilePath(jsFilePath: string) {
 
 /**
  * Turn the file path into a module path. The difference from a file path
- * is that a module path does not have a file extension and is always in posix format.
+ * is that:
+ *
+ * - Does not have a file extension
+ * - Is always in posix format
+ * - If file is an index.* then dropped in favour of Node inference
  *
  * If the file path is already actually a module path then this is effectively a no-op.
  */
 export function pathToModulePath(filePath: string) {
-  return path.posix.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)))
+  const parsed = path.posix.parse(filePath)
+
+  /**
+   * If an index.* module then drop it as Node will infer it
+   */
+  if (parsed.name === 'index') {
+    return parsed.dir
+  }
+
+  return path.posix.join(parsed.dir, parsed.name)
 }
