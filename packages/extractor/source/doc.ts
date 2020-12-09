@@ -47,7 +47,7 @@ export class Manager {
     )
   }
 
-  EDD: DocPackage = {
+  EDD: Package = {
     modules: [],
     typeIndex: {},
   }
@@ -300,7 +300,7 @@ export function expor(input: ExporInput): Expor {
 /**
  * A module (aka. file)
  */
-export type DocModule = TSDocFrag & {
+export type Module = TSDocFrag & {
   /**
    * Tells you the kind of data (aka. schema) contained within this object.
    */
@@ -369,7 +369,7 @@ type ModInput = {
   }
 }
 
-export function mod(input: ModInput): DocModule {
+export function mod(input: ModInput): Module {
   return {
     kind: 'module',
     mainExport: null,
@@ -378,7 +378,7 @@ export function mod(input: ModInput): DocModule {
   }
 }
 
-export function modFromSourceFile(manager: Manager, sourceFile: tsm.SourceFile): DocModule {
+export function modFromSourceFile(manager: Manager, sourceFile: tsm.SourceFile): Module {
   return mod({
     name: sourceFile.getBaseNameWithoutExtension(),
     tsdoc: extractModuleLevelTSDoc(manager, sourceFile),
@@ -462,12 +462,12 @@ export function tsDocFromText(manager: Manager, raw: string) {
 /**
  * The root of the extracted JSON that Tydoc produces.
  */
-export type DocPackage = {
+export type Package = {
   /**
    * List of the extracted modules. There may be more than one because a package
    * may officially support importing from multiple modules.
    */
-  modules: DocModule[]
+  modules: Module[]
   /**
    * An index of the all the types that have been extracted. This includes three
    * cases:

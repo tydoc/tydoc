@@ -1,6 +1,6 @@
 import { Doc } from '@tydoc/extractor/types'
 
-export const graphQLRequestTypes: Doc.DocPackage = {
+export const graphQLRequestTypes: Doc.Package = {
   modules: [
     {
       kind: 'module',

@@ -1,17 +1,17 @@
 import { fromPublished } from '../../source'
 
 test('can get EDD from "sponsorsme" package', async () => {
-  const edd = await fromPublished({
+  const epd = await fromPublished({
     packageName: 'sponsorsme',
     packageVersion: '1.0.1',
   })
-  expect(edd).toMatchSnapshot()
+  expect(epd.docs).toMatchSnapshot()
 })
 
 test('can get EDD from "execa" package', async () => {
-  const edd = await fromPublished({
+  const epd = await fromPublished({
     packageName: 'execa',
     packageVersion: '4.1.0',
   })
-  expect(edd).toMatchSnapshot()
+  expect(epd.docs).toMatchSnapshot()
 })

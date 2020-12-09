@@ -5,7 +5,7 @@ import { Node } from './Node'
 import { Playground } from './Playground'
 
 type ModuleProps = {
-  module: Doc.DocModule
+  module: Doc.Module
 }
 
 export function Module({ module }: ModuleProps) {

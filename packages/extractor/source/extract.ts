@@ -7,6 +7,7 @@ import * as tsm from 'ts-morph'
 import { PackageJson } from 'type-fest'
 import * as Doc from './doc'
 import { scan } from './layout'
+import * as Package from './lib/package'
 import {
   absolutify,
   assertFileExists,
@@ -120,8 +121,13 @@ export type FromPublishedParams = {
   downloadDir?: string
 }
 
+type ExtractedPackageData = {
+  docs: Doc.Package
+  metadata: Package.Metadata
+}
+
 // todo support extracting fromPublished with additional entrypoints
-export async function fromPublished(options: FromPublishedParams): Promise<Doc.DocPackage> {
+export async function fromPublished(options: FromPublishedParams): Promise<ExtractedPackageData> {
   const tmpDir = await fs.tmpDirAsync()
   const projectDir = options.downloadDir ?? tmpDir.cwd()
 
@@ -164,7 +170,12 @@ export async function fromPublished(options: FromPublishedParams): Promise<Doc.D
     fromModule(manager, sf)
   })
 
-  return manager.EDD
+  const metadata = await Package.getMetadata(options.packageName)
+
+  return {
+    docs: manager.EDD,
+    metadata,
+  }
 }
 
 /**
@@ -172,7 +183,7 @@ export async function fromPublished(options: FromPublishedParams): Promise<Doc.D
  * the given list of entrypoint modules. Everything that is reachable from the
  * exports will be considered part of the API.
  */
-export function fromProject(options: FromProjectParams): Doc.DocPackage {
+export function fromProject(options: FromProjectParams): Doc.Package {
   const layout = scan(options.layout)
 
   const sourceFiles = layout.tsMorphPoject.getSourceFiles()
@@ -255,7 +266,7 @@ export function fromProject(options: FromProjectParams): Doc.DocPackage {
  * Recursively extract docs starting from exports of the given module.
  * Everything that is reachable will be considered.
  */
-export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.DocPackage {
+export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Doc.Package {
   const mod = Doc.modFromSourceFile(manager, sourceFile)
 
   for (const [exportName, exportedDeclarations] of sourceFile.getExportedDeclarations()) {

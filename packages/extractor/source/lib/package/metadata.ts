@@ -1,28 +1,53 @@
-export type Response = {
+/**
+ * https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#package-endpoints
+ */
+
+import got from 'got'
+
+/**
+ * https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md
+ */
+export async function getMetadata(name: string): Promise<Metadata> {
+  const baseUrl = 'https://registry.npmjs.org'
+  const url = `${baseUrl}/${name}`
+  const res = await got.get(url)
+  const data = JSON.parse(res.body)
+  return data
+}
+
+type Semver = string
+
+type ISOTimestamp = string
+
+type SemverRange = string
+
+export type Metadata = {
   _id: ID
   _rev: string
   name: ID
   description: string
   'dist-tags': DistTags
-  versions: Versions
+  versions: Record<Semver, Version>
   maintainers: Contributor[]
   repository: Repository
-  time: string
-  users: { [key: string]: boolean }
+  time: {
+    created: ISOTimestamp
+    modified: ISOTimestamp
+    [semver: string]: ISOTimestamp
+  }
+  users: Record<string, boolean>
   readme: string
   readmeFilename: string
   keywords: ID[]
   contributors: Contributor[]
   homepage: string
   bugs: Bugs
-  license: string
+  license: License
 }
 
-export enum ID {
-  GUID = 'guid',
-  Rfc4122 = 'rfc4122',
-  UUID = 'uuid',
-}
+export type License = 'MIT'
+
+export type ID = 'guid' | 'rfc4122' | 'uuid'
 
 export type Bugs = {
   url: string
@@ -43,24 +68,18 @@ export type Repository = {
   url: string
 }
 
-export enum Type {
-  Git = 'git',
-  Hg = 'hg',
-}
-
-export type Versions = {
-  [version: string]: Version
-}
+export type Type = 'git' | 'hg'
 
 export type Version = {
   name: ID
+  license: License
   description: string
-  version: string
+  version: Semver
   author: Author
   repository: Repository
   engine: any
-  scripts: { [key: string]: string }
-  main: string
+  scripts: Record<string, string>
+  main?: string
   types?: string
   typings?: string
   _id: string
@@ -70,8 +89,8 @@ export type Version = {
   _nodeVersion: string
   dist: Dist
   directories: any
-  dependencies?: { [key: string]: string }
-  devDependencies?: { [key: string]: string }
+  dependencies?: Record<string, SemverRange>
+  devDependencies?: Record<string, SemverRange>
 }
 
 export type Author = {

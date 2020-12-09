@@ -7,20 +7,13 @@ import { defineStaticProps } from '../../utils/next'
 
 export const getStaticProps = defineStaticProps(async (context) => {
   const packageName = context.params!.packageName as string
-  const edd = await Tydoc.fromPublished({
+  const epd = await Tydoc.fromPublished({
     packageName,
   })
 
   return {
     props: {
-      docPackage: edd,
-      npmInfo: {
-        name: packageName,
-        'dist-tags': {
-          latest: '0.0.0-todo.1',
-        },
-        versions: '0.0.0-todo.1',
-      },
+      epd,
     },
     revalidate: 60 * 5, // every 5min
   }
@@ -34,15 +27,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 }
 
-const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
-  docPackage,
-  npmInfo,
-}) => {
-  if (docPackage === undefined || npmInfo === undefined) {
+const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({ epd }) => {
+  if (!epd) {
     return <div>Loading ...</div>
   }
 
-  const inverseDistTags = Object.entries(npmInfo['dist-tags']).reduce(
+  const inverseDistTags = Object.entries(epd.metadata['dist-tags']).reduce(
     (acc, [tag, version]) => {
       acc[version] ??= []
       acc[version]!.push(tag)
@@ -50,6 +40,20 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
     },
     {} as { [version: string]: string[] },
   )
+
+  const versionMetadata = epd.metadata.versions[
+    epd.metadata['dist-tags'].latest
+  ]!
+
+  const versionPublishedDate = new Date(
+    epd.metadata.time[epd.metadata['dist-tags'].latest]!,
+  )
+
+  const versionTags = Object.entries(epd.metadata['dist-tags'])
+    .filter(([tag, semver]) => {
+      return semver === versionMetadata.version
+    })
+    .map(([tag, _]) => tag)
 
   return (
     <Layout>
@@ -59,16 +63,16 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
         <div className="flex items-center">
           {/* Name */}
           <div className="h-full px-3 py-2 font-mono font-bold leading-6 text-gray-700 bg-gray-200 border border-gray-200 rounded-md">
-            {npmInfo.name}
+            {epd.metadata.name}
           </div>
 
           {/* Version */}
           <select
             id="location"
             className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 rounded-md form-select focus:outline-none focus:ring focus:ring-blue-300"
-            defaultValue={npmInfo['dist-tags'].latest}
+            defaultValue={epd.metadata['dist-tags'].latest}
           >
-            {Object.entries(npmInfo.versions).map(([version]) => (
+            {Object.entries(epd.metadata.versions).map(([version]) => (
               <option key={version} value={version}>
                 {version}
                 {inverseDistTags[version]
@@ -79,24 +83,30 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
           </select>
 
           {/* Tags */}
-          <div className="inline-flex ml-2 items-center px-2.5 py-1 rounded-md text-sm font-medium leading-5 bg-blue-500 text-white">
-            latest
-          </div>
+          {versionTags.map((tag) => (
+            <div
+              key={tag}
+              className="inline-flex ml-2 items-center px-2.5 py-1 rounded-md text-sm font-medium leading-5 bg-blue-500 text-white"
+            >
+              {tag}
+            </div>
+          ))}
         </div>
 
         {/* Meta */}
         <div className="flex my-3 text-sm divide-gray-700">
-          <div>
-            Published: <strong>Jul 31, 2020</strong>
+          <div title={versionPublishedDate.toString()}>
+            Published:{' '}
+            <strong>{versionPublishedDate.toLocaleDateString()}</strong>
           </div>
           <div className="mx-2">|</div>
-          <div>License: MIT</div>
+          <div>License: {versionMetadata.license}</div>
         </div>
 
         {/* Content */}
         <div className="flex">
           <SideNav />
-          <Package docPackage={docPackage} />
+          <Package docs={epd.docs} />
         </div>
       </div>
     </Layout>

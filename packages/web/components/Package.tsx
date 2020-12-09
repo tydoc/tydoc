@@ -5,28 +5,28 @@ import { Module } from './Module'
 import { Type } from './Type'
 import { TypeIndexContext } from './TypeIndexContext'
 
-export interface PackageProps {
-  docPackage: Doc.DocPackage
+export interface Props {
+  docs: Doc.Package
 }
 
 /**
  * Displays package.
  */
-export const Package: FC<PackageProps> = ({ docPackage }) => {
+export const Package: FC<Props> = ({ docs }) => {
   /* Data */
 
-  const types = Object.values(docPackage.typeIndex)
+  const types = Object.values(docs.typeIndex)
 
   /* View */
 
   return (
-    <TypeIndexContext.Provider value={docPackage.typeIndex}>
+    <TypeIndexContext.Provider value={docs.typeIndex}>
       <div className="">
         {/* Modules */}
         <div>
           <Heading>Modules</Heading>
 
-          {docPackage.modules.map((module) => (
+          {docs.modules.map((module) => (
             <Module key={`modules-${module.name}`} module={module} />
           ))}
         </div>

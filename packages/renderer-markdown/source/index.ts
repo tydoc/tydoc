@@ -28,7 +28,7 @@ export interface Options {
 /**
  * Render docs as Markdown.
  */
-export function render(docs: Doc.DocPackage, opts: Options): string {
+export function render(docs: Doc.Package, opts: Options): string {
   debug('start')
 
   const markdownDocs = renderPackage()
@@ -103,7 +103,7 @@ export function render(docs: Doc.DocPackage, opts: Options): string {
   /**
    * Render one module of the package.
    */
-  function renderModule(opts: Options, mod: Doc.DocModule, ti: Doc.TypeIndex) {
+  function renderModule(opts: Options, mod: Doc.Module, ti: Doc.TypeIndex) {
     debugModule('start')
 
     const exportedTypes = mod.namedExports.filter((ex) => ex.isType)
