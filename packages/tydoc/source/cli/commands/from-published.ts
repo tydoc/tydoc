@@ -55,13 +55,13 @@ export class FromPublished extends Command {
     }
 
     /**
-     * Get EDD
+     * Get EPD
      */
 
-    const docs = await TyDoc.fromPublished(FromPublishedParams)
+    const epd = await TyDoc.fromPublished(FromPublishedParams)
 
     if (flags.json) {
-      this.log(JSON.stringify(docs, null, 2))
+      this.log(JSON.stringify(epd, null, 2))
       return
     }
 
@@ -69,7 +69,7 @@ export class FromPublished extends Command {
       const options = {
         flatTermsSection: flags['flat-terms-section'],
       }
-      this.log(TyDocMarkdownRenderer.render(docs, options))
+      this.log(TyDocMarkdownRenderer.render(epd.docs, options))
       return
     }
   }
