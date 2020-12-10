@@ -1,4 +1,4 @@
-import decompress = require('decompress')
+import decompress from 'decompress'
 import * as fs from 'fs-jetpack'
 import got from 'got'
 import * as path from 'path'

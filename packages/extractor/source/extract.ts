@@ -1,4 +1,5 @@
-import Debug from 'debug'
+import makeDebug from 'debug'
+import dedent from 'dedent'
 import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
 import { isEmpty } from 'lodash'
@@ -25,12 +26,11 @@ import {
   getSourceFileModulePath,
 } from './lib/ts-helpers'
 import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
-import dedent = require('dedent')
 
-const debug = Debug('tydoc:extract')
-const debugExport = Debug('tydoc:extract:export')
-const debugVisible = Debug('tydoc:extract:visible')
-const debugWarn = Debug('tydoc:warn')
+const debug = makeDebug('tydoc:extract')
+const debugExport = makeDebug('tydoc:extract:export')
+const debugVisible = makeDebug('tydoc:extract:visible')
+const debugWarn = makeDebug('tydoc:warn')
 
 export interface FromProjectParams {
   /**

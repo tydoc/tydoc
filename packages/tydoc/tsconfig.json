@@ -1,6 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    // oclif-dev cli tool does not inherit this from parent
+    // tsconfig.json for some reason... :(
+    "esModuleInterop": true,
     "outDir": "dist",
     "rootDir": "source"
   },

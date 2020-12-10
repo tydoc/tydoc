@@ -2,6 +2,8 @@
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    // for dedent, decompress
+    "esModuleInterop": true,
     "incremental": true,
     "composite": true,
     "sourceMap": true,

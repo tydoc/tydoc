@@ -1,5 +1,5 @@
 import createDebug from 'debug'
-import * as dedent from 'dedent'
+import dedent from 'dedent'
 import * as kleur from 'kleur'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
