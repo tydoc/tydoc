@@ -1,1 +1,2 @@
-export { getMetadata, Metadata } from './metadata'
+export { getMetadata } from './metadata'
+export type { Metadata } from './metadata'

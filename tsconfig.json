@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    // for dedent
+    // for dedent, decompress
     "esModuleInterop": true,
     "incremental": true,
     "composite": true,
