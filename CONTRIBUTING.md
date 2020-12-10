@@ -4,6 +4,8 @@
 
 - Use `yarn tydoc` to work with the TyDoc CLI locally. Note that before using you must have run `yarn build` in `packages/tydoc`.
 
+- Until TS 4.1 is shipped with VSCode make sure to use the TS version of the workspace with is TS 4.1. This is already setup in the committed `.vscode/settings.json` file. Note that if you open VSCode on a package of the monorepo then VSCode will not see that `.vscode` directory and thus not allow you to set the workspace version to 4.1. You can however add the same kind of `.vscode/settings.json` config at in the package directory and then you can select TS 4.1. See [#75](https://github.com/tydoc/tydoc/issues/75) for more detail.
+
 ## Extractor Architecture
 
 Tydoc has three decoupled layers internally. These layers are:
