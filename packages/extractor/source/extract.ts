@@ -1,5 +1,5 @@
 import makeDebug from 'debug'
-import * as dedent from 'dedent'
+import dedent from 'dedent'
 import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
 import { isEmpty } from 'lodash'
