@@ -4,44 +4,36 @@
   "version": "0.3.0",
   "main": "dist/index.js",
   "license": "MIT",
-  "bin": "dist/cli/main.js",
+  "bin": {
+    "tydoc": "dist/cli/tydoc.js"
+  },
   "files": [
     "dist",
     "types.d.ts",
-    "types.js",
-    "oclif.manifest.json"
+    "types.js"
   ],
   "scripts": {
-    "tydoc": "node dist/cli/main",
-    "build": "yarn clean && yarn g:tsc --build && oclif-dev manifest && echo 'done build'",
+    "tydoc": "node dist/cli/tydoc",
+    "build": "yarn clean && yarn g:tsc --build && echo 'done build'",
     "dev": "yarn clean && yarn g:tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "format": "yarn g:prettier --write .",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@oclif/command": "^1.8.0",
-    "@oclif/config": "^1.17.0",
-    "@oclif/plugin-help": "^3.2.0",
     "@tydoc/extractor": "workspace:packages/extractor",
     "@tydoc/renderer-markdown": "workspace:packages/renderer-markdown",
     "debug": "^4.3.1",
     "dedent": "^0.7.0",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "1.25.1",
     "@types/debug": "^4.1.5",
     "@types/dedent": "^0.7.0",
     "@types/lodash": "^4.14.165",
-    "@types/node": "14.14.10"
+    "@types/node": "14.14.10",
+    "@types/yargs": "^15.0.11"
   },
-  "prettier": "@prisma-labs/prettier-config",
-  "oclif": {
-    "commands": "./dist/cli/commands",
-    "bin": "tydoc",
-    "plugins": [
-      "@oclif/plugin-help"
-    ]
-  }
+  "prettier": "@prisma-labs/prettier-config"
 }
