@@ -157,7 +157,7 @@ const argv = yargs(process.argv.slice(2))
 
       let validateTypeScriptDiagnostics
 
-      if (input['ignore-diagnostics-matching']) {
+      if (input.ignoreDiagnosticsMatching) {
         validateTypeScriptDiagnostics = arrayify(
           JSON5.parse(input.ignoreDiagnosticsMatching)
         ) as DiagnosticFilter[]
