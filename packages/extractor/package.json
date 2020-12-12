@@ -14,7 +14,7 @@
     "build:docs:api": "yarn g:ts-node scripts/build-api-docs",
     "build:docs": "yarn build:docs:api && yarn build:docs:toc",
     "build": "yarn g:tsc --build && echo 'done build'",
-    "dev": "yarn g:tsc --watch",
+    "dev": " yarn clean && yarn g:tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "test": "jest",
     "test:debug": "DEBUG='*' DEBUG_COLORS=true jest --watch",
