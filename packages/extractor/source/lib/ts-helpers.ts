@@ -1,3 +1,4 @@
+import createDebug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { casesHandled, Index, indexBy } from './utils'
@@ -92,7 +93,19 @@ function stringLiteralToDiagnosticCategory(dc: DiagnosticCategoryString): tsm.Di
 export function getDiscriminantPropertiesOfUnionMembers(
   members: tsm.Type[]
 ): (tsm.PropertySignature | tsm.MethodSignature)[] {
-  const membersLiteralProperties = members.map((m) => getProperties(m).filter((p) => p.getType().isLiteral()))
+  const membersLiteralProperties = members.map((m) => {
+    return getProperties(m).filter((p) => {
+      return p.getType().isLiteral()
+    })
+  })
+
+  // if any member has no properties than cannot be a discriminant union
+  const firstPropertylessMember = membersLiteralProperties.find((member) => member.length === 0)
+
+  if (firstPropertylessMember) {
+    return []
+  }
+
   const membersLiteralPropertiesByName = membersLiteralProperties.map((m) => indexBy(m, (p) => p.getName()))
 
   const commonLiteralDistinctPropertiesByName: Index<tsm.PropertySignature | tsm.MethodSignature> = {}
@@ -131,11 +144,30 @@ function isSameLiteralTypes(t1: tsm.Type, t2: tsm.Type): boolean {
  * Overloadeds are discarding, taking only the first declaration found.
  */
 export function getProperties(t: tsm.Type): (tsm.PropertySignature | tsm.MethodSignature)[] {
-  return t.getProperties().map((p) => {
-    const node = p.getDeclarations()[0] as tsm.PropertySignature | tsm.MethodSignature
-    return node
-  })
+  if (t.isTuple()) {
+    // Tuple's are considered objects but their properties like "0" have no declarations
+    return []
+  }
+
+  return t
+    .getProperties()
+    .map((p) => {
+      const node = p.getDeclarations()[0] as tsm.PropertySignature | tsm.MethodSignature | undefined
+
+      if (!node) {
+        debug(
+          `Failed to get all properties for type "${t.getText()}". No declarations present for property "${p.getName()}" `
+        )
+      }
+
+      return node
+    })
+    .filter((maybeProperty): maybeProperty is tsm.PropertySignature | tsm.MethodSignature => {
+      return maybeProperty !== undefined
+    })
 }
+
+const debug = createDebug('ts-helpers')
 
 /**
  * Return the first declaration of the symbol, ignoring all others and throwing if no declaration can be found.

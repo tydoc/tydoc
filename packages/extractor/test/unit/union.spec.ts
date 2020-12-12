@@ -6,6 +6,14 @@ it('union types are extracted', () => {
   ).toMatchSnapshot()
 })
 
+describe('bugs', () => {
+  it('string | [string, string] does not trigger error', () => {
+    ctx.extract(/*ts*/ `
+      export type A = string | [string, string]
+    `)
+  })
+})
+
 it('if union members share property but they are not all literal then not considered discriminant', () => {
   expect(
     ctx.extract(/*ts*/ `

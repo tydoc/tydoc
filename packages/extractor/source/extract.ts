@@ -337,20 +337,20 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
 
   if (locationKind === 'dep') {
     debugVisible('-> location is a dependency, stopping here')
-    return Doc.unsupported(getRaw(t))
+    return Doc.unsupported(getRaw(t), 'We do not support extracting from dependencies.')
   }
   if (locationKind === 'typeScriptStandardLibrary') {
     // we handle arrays specially below
     if (!t.isArray()) {
       debugVisible('-> location is standard lib and not array, stopping here')
-      return Doc.unsupported(getRaw(t))
+      return Doc.unsupported(getRaw(t), 'We do not support extracting from the standard library.')
     }
   }
   if (locationKind === 'unknown') {
     debugWarn(
       '-> location is unknown, stopping here to be safe (code needs to be updated to handle this case)'
     )
-    return Doc.unsupported(getRaw(t))
+    return Doc.unsupported(getRaw(t), 'We do not support extracting from types whose loation is unknown.')
   }
   if (manager.isIndexable(t)) {
     debugVisible('-> type is indexable')
@@ -381,6 +381,10 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     return manager.indexTypeIfApplicable(t, () =>
       extractAliasIfOne(manager, t, Doc.array(fromType(manager, innerType)))
     )
+  }
+  if (t.isTuple()) {
+    debugVisible('-> type is tuple')
+    return Doc.unsupported(getRaw(t), 'Tuples not yet implemented')
   }
   // Place before object becuase objects are superset.
   // Place before interface becuase interfaces can be callable
@@ -462,7 +466,7 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     )
   }
   debugWarn('unsupported kind of type %s', t.getText())
-  return Doc.unsupported(getRaw(t))
+  return Doc.unsupported(getRaw(t), `This kind of type is not supported: "${t.getText()}"`)
 }
 
 /**

@@ -596,10 +596,10 @@ export function sigParam(input: { name: string; type: Node }): DocSigParam {
   return { kind: 'sigParam', ...input }
 }
 // prettier-ignore
-export type DocUnsupported = { kind:'unsupported' } & RawFrag
+export type DocUnsupported = { kind:'unsupported', reason: string, } & RawFrag
 // prettier-ignorp
-export function unsupported(raw: RawFrag): DocUnsupported {
-  return { kind: 'unsupported', ...raw }
+export function unsupported(raw: RawFrag, reason: string): DocUnsupported {
+  return { kind: 'unsupported', reason, ...raw }
 }
 
 //

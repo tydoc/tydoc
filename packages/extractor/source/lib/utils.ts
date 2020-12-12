@@ -57,6 +57,18 @@ export function indexBy<T extends object>(items: T[], property: keyof T | ((item
 }
 
 /**
+ * Do all members of the array satisfy predict?
+ */
+export function all<T>(xs: T[], predicate: (x: T) => boolean): boolean {
+  for (const x of xs) {
+    if (!predicate(x)) {
+      return false
+    }
+  }
+  return true
+}
+
+/**
  * Wrap a value in an array if it is not already an array.
  */
 export function arrayify<T>(x: T): T extends Array<any> ? T : T[] {
