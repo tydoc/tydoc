@@ -16536,7 +16536,7 @@ fsevents@^1.2.7:
     lodash: ^4.17.20
     yargs: ^16.2.0
   bin:
-    tydoc: dist/cli/main.js
+    tydoc: dist/cli/tydoc.js
   languageName: unknown
   linkType: soft
 

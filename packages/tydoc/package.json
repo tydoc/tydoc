@@ -4,9 +4,7 @@
   "version": "0.3.0",
   "main": "dist/index.js",
   "license": "MIT",
-  "bin": {
-    "tydoc": "dist/cli/tydoc.js"
-  },
+  "bin": "dist/cli/tydoc.js",
   "files": [
     "dist",
     "types.d.ts",
