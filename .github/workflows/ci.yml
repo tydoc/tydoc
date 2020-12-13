@@ -59,7 +59,7 @@ jobs:
       - name: Test
         working-directory: packages/renderer-markdown
         run: yarn test
-  tydoc-build:
+  web-test:
     strategy:
       matrix:
         node-version: [14.x]
