@@ -192,5 +192,11 @@ export function getFirstDeclarationOrThrow(symbol: tsm.Symbol): tsm.Node {
  * is that a module path does not have a file extension and is always in posix format.
  */
 export function getSourceFileModulePath(sf: tsm.SourceFile): string {
-  return path.posix.join(path.dirname(sf.getFilePath()), sf.getBaseNameWithoutExtension())
+  const moduleName = sf.getBaseNameWithoutExtension()
+  /**
+   * If an index.* module then drop it as Node will infer it
+   */
+  const moduleNameForPath = moduleName === 'index' ? '' : moduleName
+
+  return path.posix.join(path.dirname(sf.getFilePath()), moduleNameForPath)
 }

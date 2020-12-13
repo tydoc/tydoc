@@ -223,7 +223,7 @@ export function fromProject(options: FromProjectParams): Doc.Package {
 
     if (!sourceFileEntryPoint) {
       throw new Error(
-        `Given entrypoint not found in project: ${givenEntryPointAbs}. Source files were:\n\n${sourceFiles
+        `Given entrypoint not found in project: "${givenEntryPointAbs}". Source files were:\n\n${sourceFiles
           .map(getSourceFileModulePath)
           .join('\n')}`
       )
