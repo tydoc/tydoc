@@ -7,7 +7,7 @@ describe('url-parser', () => {
     expect(result.value).toEqual<ParsedPath>({
       source: 'npm',
       org: null,
-      package: 'setset',
+      pkg: 'setset',
       version: null,
       tag: null,
       module: null,
@@ -20,7 +20,7 @@ describe('url-parser', () => {
     expect(result.value).toEqual<ParsedPath>({
       source: 'npm',
       org: null,
-      package: 'setset',
+      pkg: 'setset',
       version: '1.0.0',
       tag: null,
       module: null,
@@ -33,7 +33,7 @@ describe('url-parser', () => {
     expect(result.value).toEqual<ParsedPath>({
       source: 'npm',
       org: null,
-      package: 'setset',
+      pkg: 'setset',
       version: null,
       tag: 'dev',
       module: null,
@@ -46,7 +46,7 @@ describe('url-parser', () => {
     expect(result.value).toEqual<ParsedPath>({
       source: 'npm',
       org: '@prisma',
-      package: 'client',
+      pkg: 'client',
       version: null,
       tag: null,
       module: null,
@@ -59,7 +59,7 @@ describe('url-parser', () => {
     expect(result.value).toEqual<ParsedPath>({
       source: 'npm',
       org: '@prisma',
-      package: 'client',
+      pkg: 'client',
       version: '1.0.0',
       tag: null,
       module: null,
@@ -72,7 +72,7 @@ describe('url-parser', () => {
     expect(result.value).toEqual<ParsedPath>({
       source: 'npm',
       org: '@prisma',
-      package: 'client',
+      pkg: 'client',
       version: null,
       tag: 'dev',
       module: null,
@@ -85,7 +85,7 @@ describe('url-parser', () => {
     expect(result.value).toEqual<ParsedPath>({
       source: 'npm',
       org: '@effect-ts',
-      package: 'core',
+      pkg: 'core',
       version: null,
       tag: 'dev',
       module: 'Classic/Either',

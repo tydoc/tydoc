@@ -1,19 +1,30 @@
 import { Layout } from '.../../../components/Layout'
 import * as Tydoc from '@tydoc/extractor'
 import { GetStaticPaths, InferGetStaticPropsType } from 'next'
+import { useRouter } from 'next/router'
 import React, { FC } from 'react'
 import { Package } from '../../components/Package'
 import { defineStaticProps } from '../../utils/next'
+import { parsedUrlToString, parseUrl } from '../../utils/url-parser'
 
 export const getStaticProps = defineStaticProps(async (context) => {
-  const packageName = context.params!.packageName as string
+  const url = `/npm/${(context.params!.path! as string[]).join('/')}`
+  const parsedUrl = parseUrl(url)
+  if (parsedUrl.error) {
+    throw parsedUrl.error
+  }
+  const { pkg, org, tag, version, module } = parsedUrl.value
+
+  const packageName = org ? `${org}/${pkg}` : pkg
   const epd = await Tydoc.fromPublished({
     packageName,
+    packageVersion: version ?? undefined,
   })
 
   return {
     props: {
       epd,
+      parsedUrl: parsedUrl.value,
     },
     revalidate: 60 * 5, // every 5min
   }
@@ -27,7 +38,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 }
 
-const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({ epd }) => {
+const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
+  epd,
+  parsedUrl,
+}) => {
   if (!epd) {
     return <div>Loading ...</div>
   }
@@ -55,6 +69,8 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({ epd }) => {
     })
     .map(([tag, _]) => tag)
 
+  const router = useRouter()
+
   return (
     <Layout>
       {/* Package */}
@@ -71,6 +87,14 @@ const Page: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({ epd }) => {
             id="location"
             className="block py-2 pl-3 pr-10 ml-4 text-base leading-6 border-gray-300 rounded-md form-select focus:outline-none focus:ring focus:ring-blue-300"
             defaultValue={epd.metadata['dist-tags'].latest}
+            onChange={(e) =>
+              router.push(
+                parsedUrlToString({
+                  ...parsedUrl,
+                  version: e.target.value as any,
+                }),
+              )
+            }
           >
             {Object.entries(epd.metadata.versions).map(([version]) => (
               <option key={version} value={version}>
