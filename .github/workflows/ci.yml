@@ -59,3 +59,20 @@ jobs:
       - name: Test
         working-directory: packages/renderer-markdown
         run: yarn test
+  tydoc-build:
+    strategy:
+      matrix:
+        node-version: [14.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        working-directory: packages/web
+        run: yarn --immutable
+      - name: Test
+        working-directory: packages/web
+        run: yarn test

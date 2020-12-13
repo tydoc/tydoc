@@ -16,8 +16,8 @@
     "build": "yarn g:tsc --build && echo 'done build'",
     "dev": " yarn clean && yarn g:tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "test": "jest",
-    "test:debug": "DEBUG='*' DEBUG_COLORS=true jest --watch",
+    "test": "yarn g:jest",
+    "test:debug": "DEBUG='*' DEBUG_COLORS=true yarn g:jest --watch",
     "format": "yarn g:prettier --write .",
     "prepublishOnly": "yarn build"
   },
@@ -43,16 +43,13 @@
   "devDependencies": {
     "@types/decompress": "^4",
     "@types/dedent": "^0.7.0",
-    "@types/jest": "26.0.15",
     "@types/json5": "^0.0.30",
     "@types/node": "14.14.10",
     "@types/prettier": "2.1.5",
-    "jest": "26.6.3",
     "jest-validate": "26.6.2",
     "jest-watch-suspend": "1.1.2",
     "jest-watch-toggle-config": "2.0.1",
     "jest-watch-typeahead": "0.6.1",
-    "ts-jest": "26.4.4",
     "type-fest": "^0.20.2"
   },
   "prettier": "@prisma-labs/prettier-config"
