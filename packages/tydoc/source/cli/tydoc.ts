@@ -6,7 +6,7 @@ import dedent from 'dedent'
 import * as JSON5 from 'json5'
 import yargs from 'yargs'
 import * as TyDoc from '..'
-import { arrayify } from '../utils'
+import { absolutify, arrayify } from '../utils'
 
 const argv = yargs(process.argv.slice(2))
   .help()
@@ -166,11 +166,11 @@ const argv = yargs(process.argv.slice(2))
       }
 
       const FromProjectParams: FromProjectParams = {
-        entrypoints: input.filePath as string[],
+        entrypoints: arrayify(input.filePath as string | string[]),
         readSettingsFromJSON: true,
         layout: {
           validateTypeScriptDiagnostics,
-          projectDir: input.dir,
+          projectDir: input.dir === undefined ? undefined : absolutify(process.cwd(), input.dir),
           sourceMainModulePath: input.sourceMainEntrypointPath,
         },
       }
