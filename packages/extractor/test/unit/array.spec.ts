@@ -46,6 +46,7 @@ it('passes smoke test', () => {
             },
             "kind": "array",
           },
+          "typeParameters": Array [],
         },
       },
     }

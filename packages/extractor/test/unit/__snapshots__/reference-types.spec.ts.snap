@@ -1,0 +1,255 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`first type parameter on an alias the alias object type default is added to the type index and refererenced 1`] = `
+Array [
+  Object {
+    "default": Object {
+      "kind": "typeIndexRef",
+      "link": "(a).Bar",
+    },
+    "name": "T",
+    "raw": Object {
+      "nodeFullText": "T = Bar",
+      "nodeText": "T = Bar",
+      "typeText": "T",
+    },
+  },
+]
+`;
+
+exports[`first type parameter on an alias the alias object type default is added to the type index and refererenced 2`] = `
+Object {
+  "kind": "alias",
+  "name": "Bar",
+  "raw": Object {
+    "nodeFullText": "export type Bar = { a: 1 };",
+    "nodeText": "export type Bar = { a: 1 };",
+    "typeText": "Bar",
+  },
+  "tsdoc": null,
+  "type": Object {
+    "kind": "object",
+    "props": Array [
+      Object {
+        "kind": "prop",
+        "name": "a",
+        "type": Object {
+          "base": "number",
+          "kind": "literal",
+          "name": "1",
+        },
+      },
+    ],
+    "raw": Object {
+      "nodeFullText": "export type Bar = { a: 1 };",
+      "nodeText": "export type Bar = { a: 1 };",
+      "typeText": "Bar",
+    },
+  },
+  "typeParameters": Array [],
+}
+`;
+
+exports[`first type parameter on an alias the interface object type default is added to the type index and refererenced 1`] = `
+Array [
+  Object {
+    "default": Object {
+      "kind": "typeIndexRef",
+      "link": "(a).Bar",
+    },
+    "name": "T",
+    "raw": Object {
+      "nodeFullText": "T = Bar",
+      "nodeText": "T = Bar",
+      "typeText": "T",
+    },
+  },
+]
+`;
+
+exports[`first type parameter on an alias the interface object type default is added to the type index and refererenced 2`] = `
+Object {
+  "kind": "interface",
+  "name": "Bar",
+  "props": Array [
+    Object {
+      "kind": "prop",
+      "name": "a",
+      "type": Object {
+        "base": "number",
+        "kind": "literal",
+        "name": "1",
+      },
+    },
+  ],
+  "raw": Object {
+    "nodeFullText": "export interface Bar {
+  a: 1;
+}",
+    "nodeText": "export interface Bar {
+  a: 1;
+}",
+    "typeText": "Bar",
+  },
+  "tsdoc": null,
+  "typeParameters": Array [],
+}
+`;
+
+exports[`first type parameter on an alias the name 1`] = `
+Array [
+  Object {
+    "default": null,
+    "name": "T",
+    "raw": Object {
+      "nodeFullText": "T",
+      "nodeText": "T",
+      "typeText": "T",
+    },
+  },
+]
+`;
+
+exports[`first type parameter on an alias the primitive type default 1`] = `
+Array [
+  Object {
+    "default": Object {
+      "kind": "primitive",
+      "type": "string",
+    },
+    "name": "T",
+    "raw": Object {
+      "nodeFullText": "T = string",
+      "nodeText": "T = string",
+      "typeText": "T",
+    },
+  },
+]
+`;
+
+exports[`first type parameter on an interface the alias object type default is added to the type index and refererenced 1`] = `
+Array [
+  Object {
+    "default": Object {
+      "kind": "typeIndexRef",
+      "link": "(a).Bar",
+    },
+    "name": "T",
+    "raw": Object {
+      "nodeFullText": "T = Bar",
+      "nodeText": "T = Bar",
+      "typeText": "T",
+    },
+  },
+]
+`;
+
+exports[`first type parameter on an interface the alias object type default is added to the type index and refererenced 2`] = `
+Object {
+  "kind": "alias",
+  "name": "Bar",
+  "raw": Object {
+    "nodeFullText": "export type Bar = { a: 1 };",
+    "nodeText": "export type Bar = { a: 1 };",
+    "typeText": "Bar",
+  },
+  "tsdoc": null,
+  "type": Object {
+    "kind": "object",
+    "props": Array [
+      Object {
+        "kind": "prop",
+        "name": "a",
+        "type": Object {
+          "base": "number",
+          "kind": "literal",
+          "name": "1",
+        },
+      },
+    ],
+    "raw": Object {
+      "nodeFullText": "export type Bar = { a: 1 };",
+      "nodeText": "export type Bar = { a: 1 };",
+      "typeText": "Bar",
+    },
+  },
+  "typeParameters": Array [],
+}
+`;
+
+exports[`first type parameter on an interface the interface object type default is added to the type index and refererenced 1`] = `
+Array [
+  Object {
+    "default": Object {
+      "kind": "typeIndexRef",
+      "link": "(a).Bar",
+    },
+    "name": "T",
+    "raw": Object {
+      "nodeFullText": "T = Bar",
+      "nodeText": "T = Bar",
+      "typeText": "T",
+    },
+  },
+]
+`;
+
+exports[`first type parameter on an interface the interface object type default is added to the type index and refererenced 2`] = `
+Object {
+  "kind": "interface",
+  "name": "Bar",
+  "props": Array [
+    Object {
+      "kind": "prop",
+      "name": "a",
+      "type": Object {
+        "base": "number",
+        "kind": "literal",
+        "name": "1",
+      },
+    },
+  ],
+  "raw": Object {
+    "nodeFullText": "export interface Bar {
+  a: 1;
+}",
+    "nodeText": "export interface Bar {
+  a: 1;
+}",
+    "typeText": "Bar",
+  },
+  "tsdoc": null,
+  "typeParameters": Array [],
+}
+`;
+
+exports[`first type parameter on an interface the name 1`] = `
+Array [
+  Object {
+    "default": null,
+    "name": "T",
+    "raw": Object {
+      "nodeFullText": "T",
+      "nodeText": "T",
+      "typeText": "T",
+    },
+  },
+]
+`;
+
+exports[`first type parameter on an interface the primitive type default 1`] = `
+Array [
+  Object {
+    "default": Object {
+      "kind": "primitive",
+      "type": "string",
+    },
+    "name": "T",
+    "raw": Object {
+      "nodeFullText": "T = string",
+      "nodeText": "T = string",
+      "typeText": "T",
+    },
+  },
+]
+`;

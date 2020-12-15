@@ -30,7 +30,7 @@ Object {
             "name": "CommonOptions",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).CommonOptions<EncodingType>",
+              "link": "(index).CommonOptions",
             },
           },
           Object {
@@ -40,7 +40,7 @@ Object {
             "name": "Options",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).Options<EncodingType>",
+              "link": "(index).Options",
             },
           },
           Object {
@@ -50,7 +50,7 @@ Object {
             "name": "SyncOptions",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).SyncOptions<EncodingType>",
+              "link": "(index).SyncOptions",
             },
           },
           Object {
@@ -60,7 +60,7 @@ Object {
             "name": "NodeOptions",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).NodeOptions<EncodingType>",
+              "link": "(index).NodeOptions",
             },
           },
           Object {
@@ -70,7 +70,7 @@ Object {
             "name": "ExecaReturnBase",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).ExecaReturnBase<StdoutStderrType>",
+              "link": "(index).ExecaReturnBase",
             },
           },
           Object {
@@ -80,7 +80,7 @@ Object {
             "name": "ExecaSyncReturnValue",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).ExecaSyncReturnValue<StdoutErrorType>",
+              "link": "(index).ExecaSyncReturnValue",
             },
           },
           Object {
@@ -90,7 +90,7 @@ Object {
             "name": "ExecaReturnValue",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).ExecaReturnValue<StdoutErrorType>",
+              "link": "(index).ExecaReturnValue",
             },
           },
           Object {
@@ -100,7 +100,7 @@ Object {
             "name": "ExecaSyncError",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).ExecaSyncError<StdoutErrorType>",
+              "link": "(index).ExecaSyncError",
             },
           },
           Object {
@@ -110,7 +110,7 @@ Object {
             "name": "ExecaError",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).ExecaError<StdoutErrorType>",
+              "link": "(index).ExecaError",
             },
           },
           Object {
@@ -130,7 +130,7 @@ Object {
             "name": "ExecaChildPromise",
             "type": Object {
               "kind": "typeIndexRef",
-              "link": "(index).ExecaChildPromise<StdoutErrorType>",
+              "link": "(index).ExecaChildPromise",
             },
           },
           Object {
@@ -149,7 +149,7 @@ Object {
       },
     ],
     "typeIndex": Object {
-      "(index).CommonOptions<EncodingType>": Object {
+      "(index).CommonOptions": Object {
         "kind": "interface",
         "name": "CommonOptions",
         "props": Array [
@@ -1141,6 +1141,17 @@ interface ReadonlyArray<T> {
           "typeText": "CommonOptions<EncodingType>",
         },
         "tsdoc": null,
+        "typeParameters": Array [
+          Object {
+            "default": null,
+            "name": "EncodingType",
+            "raw": Object {
+              "nodeFullText": "EncodingType",
+              "nodeText": "EncodingType",
+              "typeText": "EncodingType",
+            },
+          },
+        ],
       },
       "(index).ExecaChildProcess": Object {
         "kind": "alias",
@@ -2045,8 +2056,22 @@ interface Promise<T> {
             },
           ],
         },
+        "typeParameters": Array [
+          Object {
+            "default": Object {
+              "kind": "primitive",
+              "type": "string",
+            },
+            "name": "StdoutErrorType",
+            "raw": Object {
+              "nodeFullText": "StdoutErrorType = string",
+              "nodeText": "StdoutErrorType = string",
+              "typeText": "StdoutErrorType",
+            },
+          },
+        ],
       },
-      "(index).ExecaChildPromise<StdoutErrorType>": Object {
+      "(index).ExecaChildPromise": Object {
         "kind": "interface",
         "name": "ExecaChildPromise",
         "props": Array [
@@ -2718,8 +2743,19 @@ interface Promise<T> {
           "typeText": "ExecaChildPromise<StdoutErrorType>",
         },
         "tsdoc": null,
+        "typeParameters": Array [
+          Object {
+            "default": null,
+            "name": "StdoutErrorType",
+            "raw": Object {
+              "nodeFullText": "StdoutErrorType",
+              "nodeText": "StdoutErrorType",
+              "typeText": "StdoutErrorType",
+            },
+          },
+        ],
       },
-      "(index).ExecaError<StdoutErrorType>": Object {
+      "(index).ExecaError": Object {
         "kind": "interface",
         "name": "ExecaError",
         "props": Array [
@@ -2903,8 +2939,22 @@ interface Promise<T> {
           "typeText": "ExecaError<StdoutErrorType>",
         },
         "tsdoc": null,
+        "typeParameters": Array [
+          Object {
+            "default": Object {
+              "kind": "primitive",
+              "type": "string",
+            },
+            "name": "StdoutErrorType",
+            "raw": Object {
+              "nodeFullText": "StdoutErrorType = string",
+              "nodeText": "StdoutErrorType = string",
+              "typeText": "StdoutErrorType",
+            },
+          },
+        ],
       },
-      "(index).ExecaReturnBase<StdoutStderrType>": Object {
+      "(index).ExecaReturnBase": Object {
         "kind": "interface",
         "name": "ExecaReturnBase",
         "props": Array [
@@ -3095,8 +3145,19 @@ interface Promise<T> {
           "typeText": "ExecaReturnBase<StdoutStderrType>",
         },
         "tsdoc": null,
+        "typeParameters": Array [
+          Object {
+            "default": null,
+            "name": "StdoutStderrType",
+            "raw": Object {
+              "nodeFullText": "StdoutStderrType",
+              "nodeText": "StdoutStderrType",
+              "typeText": "StdoutStderrType",
+            },
+          },
+        ],
       },
-      "(index).ExecaReturnValue<StdoutErrorType>": Object {
+      "(index).ExecaReturnValue": Object {
         "kind": "interface",
         "name": "ExecaReturnValue",
         "props": Array [
@@ -3271,8 +3332,22 @@ interface Promise<T> {
 	- being canceled
 	- there's not enough memory or there are already too many child processes",
         },
+        "typeParameters": Array [
+          Object {
+            "default": Object {
+              "kind": "primitive",
+              "type": "string",
+            },
+            "name": "StdoutErrorType",
+            "raw": Object {
+              "nodeFullText": "StdoutErrorType = string",
+              "nodeText": "StdoutErrorType = string",
+              "typeText": "StdoutErrorType",
+            },
+          },
+        ],
       },
-      "(index).ExecaSyncError<StdoutErrorType>": Object {
+      "(index).ExecaSyncError": Object {
         "kind": "interface",
         "name": "ExecaSyncError",
         "props": Array [
@@ -3447,8 +3522,22 @@ interface Promise<T> {
           "typeText": "ExecaSyncError<StdoutErrorType>",
         },
         "tsdoc": null,
+        "typeParameters": Array [
+          Object {
+            "default": Object {
+              "kind": "primitive",
+              "type": "string",
+            },
+            "name": "StdoutErrorType",
+            "raw": Object {
+              "nodeFullText": "StdoutErrorType = string",
+              "nodeText": "StdoutErrorType = string",
+              "typeText": "StdoutErrorType",
+            },
+          },
+        ],
       },
-      "(index).ExecaSyncReturnValue<StdoutErrorType>": Object {
+      "(index).ExecaSyncReturnValue": Object {
         "kind": "interface",
         "name": "ExecaSyncReturnValue",
         "props": Array [
@@ -3545,6 +3634,20 @@ interface Promise<T> {
           "typeText": "ExecaSyncReturnValue<StdoutErrorType>",
         },
         "tsdoc": null,
+        "typeParameters": Array [
+          Object {
+            "default": Object {
+              "kind": "primitive",
+              "type": "string",
+            },
+            "name": "StdoutErrorType",
+            "raw": Object {
+              "nodeFullText": "StdoutErrorType = string",
+              "nodeText": "StdoutErrorType = string",
+              "typeText": "StdoutErrorType",
+            },
+          },
+        ],
       },
       "(index).KillOptions": Object {
         "kind": "interface",
@@ -3600,8 +3703,9 @@ interface Promise<T> {
           "typeText": "KillOptions",
         },
         "tsdoc": null,
+        "typeParameters": Array [],
       },
-      "(index).NodeOptions<EncodingType>": Object {
+      "(index).NodeOptions": Object {
         "kind": "interface",
         "name": "NodeOptions",
         "props": Array [
@@ -4947,8 +5051,22 @@ interface ReadonlyArray<T> {
           "typeText": "NodeOptions<EncodingType>",
         },
         "tsdoc": null,
+        "typeParameters": Array [
+          Object {
+            "default": Object {
+              "kind": "primitive",
+              "type": "string",
+            },
+            "name": "EncodingType",
+            "raw": Object {
+              "nodeFullText": "EncodingType = string",
+              "nodeText": "EncodingType = string",
+              "typeText": "EncodingType",
+            },
+          },
+        ],
       },
-      "(index).Options<EncodingType>": Object {
+      "(index).Options": Object {
         "kind": "interface",
         "name": "Options",
         "props": Array [
@@ -6257,6 +6375,20 @@ interface ReadonlyArray<T> {
           "typeText": "Options<EncodingType>",
         },
         "tsdoc": null,
+        "typeParameters": Array [
+          Object {
+            "default": Object {
+              "kind": "primitive",
+              "type": "string",
+            },
+            "name": "EncodingType",
+            "raw": Object {
+              "nodeFullText": "EncodingType = string",
+              "nodeText": "EncodingType = string",
+              "typeText": "EncodingType",
+            },
+          },
+        ],
       },
       "(index).StdioOption": Object {
         "kind": "alias",
@@ -6344,8 +6476,9 @@ interface ReadonlyArray<T> {
             },
           ],
         },
+        "typeParameters": Array [],
       },
-      "(index).SyncOptions<EncodingType>": Object {
+      "(index).SyncOptions": Object {
         "kind": "interface",
         "name": "SyncOptions",
         "props": Array [
@@ -7439,6 +7572,20 @@ interface ReadonlyArray<T> {
           "typeText": "SyncOptions<EncodingType>",
         },
         "tsdoc": null,
+        "typeParameters": Array [
+          Object {
+            "default": Object {
+              "kind": "primitive",
+              "type": "string",
+            },
+            "name": "EncodingType",
+            "raw": Object {
+              "nodeFullText": "EncodingType = string",
+              "nodeText": "EncodingType = string",
+              "typeText": "EncodingType",
+            },
+          },
+        ],
       },
     },
   },
@@ -13414,6 +13561,7 @@ export default class Sponsors {
             "typeText": "SponsorsOptions",
           },
         },
+        "typeParameters": Array [],
       },
       "(dist/index).Sponsorship": Object {
         "kind": "alias",
@@ -13534,6 +13682,7 @@ export default class Sponsors {
             "typeText": "Sponsorship",
           },
         },
+        "typeParameters": Array [],
       },
       "(dist/index).SponsorshipSponsor": Object {
         "kind": "alias",
@@ -13606,6 +13755,7 @@ export default class Sponsors {
             "typeText": "SponsorshipSponsor",
           },
         },
+        "typeParameters": Array [],
       },
       "(dist/index).SponsorshipTier": Object {
         "kind": "alias",
@@ -13714,6 +13864,7 @@ export default class Sponsors {
             "typeText": "SponsorshipTier",
           },
         },
+        "typeParameters": Array [],
       },
     },
   },

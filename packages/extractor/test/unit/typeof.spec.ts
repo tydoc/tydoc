@@ -87,6 +87,7 @@ it('inlines the type extracted from the term', () => {
             "typeText": "A",
           },
           "tsdoc": null,
+          "typeParameters": Array [],
         },
         "(a).B": Object {
           "kind": "interface",
@@ -98,6 +99,7 @@ it('inlines the type extracted from the term', () => {
             "typeText": "B",
           },
           "tsdoc": null,
+          "typeParameters": Array [],
         },
       },
     }

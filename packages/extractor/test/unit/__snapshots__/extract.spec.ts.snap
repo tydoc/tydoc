@@ -48,6 +48,7 @@ Object {
         "typeText": "A",
       },
       "tsdoc": null,
+      "typeParameters": Array [],
     },
     "(a).B1": Object {
       "kind": "interface",
@@ -72,6 +73,7 @@ Object {
         "typeText": "B1",
       },
       "tsdoc": null,
+      "typeParameters": Array [],
     },
     "(a).B2": Object {
       "kind": "interface",
@@ -83,6 +85,7 @@ Object {
         "typeText": "B2",
       },
       "tsdoc": null,
+      "typeParameters": Array [],
     },
   },
 }

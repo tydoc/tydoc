@@ -74,3 +74,15 @@ describe('can be a named export', () => {
     ])
   })
 })
+
+// describe('bugs', () => {
+//   it('interface with generic method returning interface does not infinitely loop', () => {
+//     expect(
+//       ctx.extract(/* ts */ `
+//         export interface Foo<T> {
+//           bar: Foo<1>
+//         }
+//       `)
+//     ).toMatchInlineSnapshot(`[Function]`)
+//   })
+// })

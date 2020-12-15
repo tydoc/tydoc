@@ -86,6 +86,7 @@ it('gets each member of the intersection', () => {
               },
             ],
           },
+          "typeParameters": Array [],
         },
       },
     }
@@ -197,6 +198,7 @@ it('gets each member of the intersection when inside a union', () => {
               },
             ],
           },
+          "typeParameters": Array [],
         },
       },
     }

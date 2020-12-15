@@ -45,6 +45,7 @@ Object {
         },
         "kind": "array",
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -95,6 +96,7 @@ export type A = typeof a;",
         },
         "kind": "array",
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -141,6 +143,7 @@ Object {
         "kind": "primitive",
         "type": "boolean",
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -188,6 +191,7 @@ export type A = typeof a;",
         "kind": "primitive",
         "type": "boolean",
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -256,6 +260,7 @@ Object {
           },
         ],
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -320,6 +325,7 @@ export type A = typeof a;",
           },
         ],
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -381,6 +387,7 @@ Object {
           "typeText": "A",
         },
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -442,6 +449,7 @@ export type A = typeof a;",
           "typeText": "{ b: number; }",
         },
       },
+      "typeParameters": Array [],
     },
   },
 }

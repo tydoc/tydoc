@@ -188,6 +188,15 @@ export function getFirstDeclarationOrThrow(symbol: tsm.Symbol): tsm.Node {
 }
 
 /**
+ * A variant of getTargetType method that only returns if the gotten type is
+ * different than the given type. Works around https://github.com/dsherret/ts-morph/issues/904.
+ */
+export function getTargetType(t: tsm.Type) {
+  const targetType = t.getTargetType()
+  return targetType === t ? undefined : targetType
+}
+
+/**
  * Get the module path of the given source file. The difference from a file path
  * is that a module path does not have a file extension and is always in posix format.
  */

@@ -1,5 +1,5 @@
 import { TSDocParser } from '@microsoft/tsdoc'
-import Debug from 'debug'
+import createDebug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { getFirstDeclarationOrThrow, getSourceFileModulePath } from './lib/ts-helpers'
@@ -22,7 +22,7 @@ registerDumper((...args) => {
   return false
 })
 
-const debug = Debug('tydoc:doc')
+const debug = createDebug('tydoc:doc')
 
 export interface Settings {
   projectDir: string
@@ -54,16 +54,20 @@ export class Manager {
 
   tsdocParser: TSDocParser = new TSDocParser()
 
+  i = 0
   isIndexable(t: tsm.Type): boolean {
+    // debug('checking if is indexable', renderDumpType(t))
+    // this.i++
+    // if (this.i == 5) {
+    //   throw new Error()
+    // }
     if (t.isLiteral()) return false
     if (isPrimitive(t)) return false
     // something without a symbol must be inline since it means it is nameless
     if (!t.getSymbol() && !t.getAliasSymbol()) return false
     // an object with no alias means it must be inline
     // note that interfaces are considered objects so we filter these out
-    if (!t.isInterface()) {
-      if (!hasAlias(t) && t.isObject()) return false
-    }
+    if (!t.isInterface() && !hasAlias(t) && t.isObject()) return false
     return true
   }
 
@@ -171,18 +175,19 @@ export function getFQTNFromTypeAliasNode(sourceRoot: string, n: tsm.TypeAliasDec
 export function getFQTNFromType(sourceRoot: string, t: tsm.Type): string {
   // It can happen that a type has no symbol but does have alias symbol, for
   // example union types.
-  const s = t.getSymbol()
-  const as = t.getAliasSymbol()
+  const sym = t.getSymbol()
+  const asym = t.getAliasSymbol()
   let typeName: string
   let sourceFile: tsm.SourceFile
-  if (as) {
-    typeName = as.getName()
-    sourceFile = getFirstDeclarationOrThrow(as).getSourceFile()
-  } else if (s) {
-    // todo what would get name be here then...?
-    // typeName = sym.getName()
-    sourceFile = getFirstDeclarationOrThrow(s).getSourceFile()
-    typeName = t.getText(undefined, tsm.ts.TypeFormatFlags.None)
+  if (asym) {
+    typeName = asym.getName()
+    sourceFile = getFirstDeclarationOrThrow(asym).getSourceFile()
+  } else if (sym) {
+    sourceFile = getFirstDeclarationOrThrow(sym).getSourceFile()
+    // todo this way of getting name was being used but...
+    // no tests seem to need this! Remove for good?
+    // typeName = t.getText(undefined, tsm.ts.TypeFormatFlags.None)
+    typeName = sym.getName()
   } else {
     throw new Error(`Given type ${t.getText()} has neither symbol nor alias symbol`)
   }
@@ -207,13 +212,13 @@ export type Node =
   | DocTypeUnion
   | DocTypePrimitive
   | DocTypeLiteral
-  | DocTypeAlias
-  | DocTypeInterface
+  | Alias
+  | Interface
   | DocTypeCallable
   | DocTypeArray
   | DocTypeObject
-  | DocTypeIndexRef
-  | DocUnsupported
+  | IndexRef
+  | Unsupported
   | DocTypeIntersection
 // todo unused?
 // | { kind: 'function'; signatures: DocSig[] }
@@ -222,19 +227,39 @@ export type Node =
 
 // prettier-ignore
 export type IndexableNode =
-  | DocTypeAlias
-  | DocTypeInterface
+  | Alias
+  | Interface
 
 export type TypeNode =
   | DocTypeUnion
   | DocTypeIntersection
   | DocTypePrimitive
   | DocTypeLiteral
-  | DocTypeAlias
-  | DocTypeInterface
+  | Alias
+  | Interface
   | DocTypeCallable
   | DocTypeArray
   | DocTypeObject
+
+/**
+ * Any type that can be nameless.
+ *
+ * For example in the following the "bar" param type is nameless.
+ *
+ * ```ts
+ * function foo(x: { bar: string, qux: boolean }): void {}
+ * ```
+ */
+export type InlinableType =
+  | DocTypeUnion
+  | DocTypePrimitive
+  | DocTypeLiteral
+  | DocTypeCallable // const a: {():void} = ...
+  | DocTypeArray
+  | DocTypeObject
+  | DocTypeIntersection
+
+export type InlineTypeOrIndexRef = InlinableType | IndexRef
 
 //
 // Node Features
@@ -517,7 +542,7 @@ export function prim(type: string): DocTypePrimitive {
  * reference to the type index is created.
  *
  */
-export type DocTypeIndexRef = {
+export type IndexRef = {
   kind: 'typeIndexRef'
   /**
    * An identifier that can be used to lookup the type in the type index.
@@ -531,23 +556,95 @@ export type DocTypeIndexRef = {
   link: string
 }
 
-export function typeIndexRef(link: string): DocTypeIndexRef {
+export function typeIndexRef(link: string): IndexRef {
   return { kind: 'typeIndexRef', link }
 }
-// prettier-ignore
-export type DocTypeAlias = { kind: 'alias'; name: string, type: Node  } & RawFrag & TSDocFrag
-type AliasInput = Omit<DocTypeAlias, 'kind'>
-// prettier-ignore
-export function alias(input: AliasInput): DocTypeAlias {
+
+export type Alias = {
+  kind: 'alias'
+  name: string
+  type: Node
+  /**
+   * Type parameters for this alias
+   *
+   * @example
+   * type Foo<A> = {}
+   * type Foo<A = string> = {}
+   * // todo
+   * type Foo<A extends string> = {}
+   * type Foo<A extends string = "hello"> = {}
+   */
+  typeParameters: TypeParameter[]
+} & RawFrag &
+  TSDocFrag
+
+type AliasInput = Omit<Alias, 'kind'>
+
+export function alias(input: AliasInput): Alias {
   return { kind: 'alias', ...input }
 }
-// prettier-ignore
-export type DocTypeInterface = { kind: 'interface'; name: string; props: DocProp[] } & RawFrag & TSDocFrag
-// prettier-ignore
-type InterInput = Omit<DocTypeInterface, 'kind'>
-// prettier-ignore
-export function inter(input: InterInput): DocTypeInterface {
-  return { kind: 'interface', ...input}
+export type Interface = {
+  kind: 'interface'
+  name: string
+  props: DocProp[]
+  /**
+   * Type parameters for this interface
+   *
+   * @example
+   * interface Foo<A> {}
+   * interface Foo<A = string> {}
+   * // todo
+   * interface Foo<A extends string> {}
+   * interface Foo<A extends string = "hello"> {}
+   */
+  typeParameters: TypeParameter[]
+} & RawFrag &
+  TSDocFrag
+
+/**
+ * A type parameter, aka. generic, type variable.
+ *
+ * @example
+ * // aliases
+ * type Foo<A> = {}
+ * type Foo<A = string> = {}
+ * // todo
+ * type Foo<A extends string> = {}
+ * type Foo<A extends string = "hello"> = {}
+ * // interfaces
+ * interface Foo<A> {}
+ * interface Foo<A = string> {}
+ * // todo
+ * interface Foo<A extends string> {}
+ * interface Foo<A extends string = "hello"> {}
+ * // todo functions
+ * function foo<A>(){}
+ * function foo<A = string>(){}
+ * function foo<A extends string>(){}
+ * function foo<A extends string = "hello">(){}
+ * // todo methods
+ * // ...
+ */
+export type TypeParameter = {
+  /**
+   * The name of the type parameter.
+   *
+   * For example in "type A<B> = {}" the name of the first type parameter is "B".
+   */
+  name: string
+  /**
+   * @example
+   * type Foo<A = string> = {}
+   */
+  default: null | Unsupported | InlineTypeOrIndexRef
+  // todo: interface A<B extends C> {}
+  // constraints
+} & RawFrag
+
+type InterInput = Omit<Interface, 'kind'>
+
+export function inter(input: InterInput): Interface {
+  return { kind: 'interface', ...input }
 }
 // prettier-ignore
 export function prop(input: { name: string, type: Node }): DocProp {
@@ -596,9 +693,9 @@ export function sigParam(input: { name: string; type: Node }): DocSigParam {
   return { kind: 'sigParam', ...input }
 }
 // prettier-ignore
-export type DocUnsupported = { kind:'unsupported', reason: string, } & RawFrag
+export type Unsupported = { kind:'unsupported', reason: string, } & RawFrag
 // prettier-ignorp
-export function unsupported(raw: RawFrag, reason: string): DocUnsupported {
+export function unsupported(raw: RawFrag, reason: string): Unsupported {
   return { kind: 'unsupported', reason, ...raw }
 }
 
