@@ -633,7 +633,10 @@ export type TypeParameter = {
    */
   name: string
   /**
+   * The default type for this parameter.
+   *
    * @example
+   * // The default type is string
    * type Foo<A = string> = {}
    */
   default: null | Unsupported | InlineTypeOrIndexRef
