@@ -191,7 +191,7 @@ export function getFirstDeclarationOrThrow(symbol: tsm.Symbol): tsm.Node {
  * A variant of getTargetType method that only returns if the gotten type is
  * different than the given type. Works around https://github.com/dsherret/ts-morph/issues/904.
  */
-export function getTargetType(t: tsm.Type) {
+export function getGenericType(t: tsm.Type) {
   const targetType = t.getTargetType()
   return targetType === t ? undefined : targetType
 }

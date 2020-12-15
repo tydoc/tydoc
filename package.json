@@ -15,6 +15,7 @@
   },
   "scripts": {
     "tydoc": "ts-node packages/tydoc/source/cli/tydoc",
+    "g:tydoc": "ts-node packages/tydoc/source/cli/tydoc",
     "g:tsc": "cd $INIT_CWD && tsc",
     "g:jest": "cd $INIT_CWD && jest",
     "g:prettier": "cd $INIT_CWD && prettier",

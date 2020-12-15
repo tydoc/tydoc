@@ -54,13 +54,7 @@ export class Manager {
 
   tsdocParser: TSDocParser = new TSDocParser()
 
-  i = 0
   isIndexable(t: tsm.Type): boolean {
-    // debug('checking if is indexable', renderDumpType(t))
-    // this.i++
-    // if (this.i == 5) {
-    //   throw new Error()
-    // }
     if (t.isLiteral()) return false
     if (isPrimitive(t)) return false
     // something without a symbol must be inline since it means it is nameless
@@ -220,6 +214,7 @@ export type Node =
   | IndexRef
   | Unsupported
   | DocTypeIntersection
+  | GenericInstance
 // todo unused?
 // | { kind: 'function'; signatures: DocSig[] }
 // | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & RawFrag
@@ -258,6 +253,7 @@ export type InlinableType =
   | DocTypeArray
   | DocTypeObject
   | DocTypeIntersection
+  | GenericInstance
 
 export type InlineTypeOrIndexRef = InlinableType | IndexRef
 
@@ -513,6 +509,20 @@ export type Package = {
    * will inline the type info of type A rather than be a type index reference.
    */
   typeIndex: TypeIndex
+}
+
+export type GenericInstance = {
+  kind: 'generic_instance'
+  target: IndexRef
+} & RawFrag
+
+type GenericInstanceInput = Omit<GenericInstance, 'kind'>
+
+export function genericInstance(input: GenericInstanceInput): GenericInstance {
+  return {
+    kind: 'generic_instance',
+    ...input,
+  }
 }
 
 // prettier-ignore
