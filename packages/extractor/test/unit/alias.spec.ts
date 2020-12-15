@@ -66,6 +66,7 @@ it('raw is based on type alias declaration node', () => {
               "typeText": "A",
             },
           },
+          "typeParameters": Array [],
         },
       },
     }
@@ -119,6 +120,7 @@ it('exported type alias of number is added to type index', () => {
             "kind": "literal",
             "name": "1",
           },
+          "typeParameters": Array [],
         },
       },
     }
@@ -174,6 +176,7 @@ it('exported type alias of number via typeof is added to type index', () => {
             "kind": "literal",
             "name": "1",
           },
+          "typeParameters": Array [],
         },
       },
     }

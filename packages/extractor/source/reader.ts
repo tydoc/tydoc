@@ -1,0 +1,73 @@
+import { inspect } from 'util'
+import * as Doc from './doc'
+
+/**
+ * A fluent (aka. chaining) API for navigating the EPD.
+ */
+type Reader = {
+  get(name: string): Doc.IndexableNode
+  getInterface(name: string): Doc.Interface
+  getAlias(name: string): Doc.Alias
+  dump(): void
+}
+
+/**
+ * Create a reader. A fluent (aka. chaining) API for navigating the EPD.
+ */
+export function create(edd: Doc.Package): Reader {
+  return {
+    getInterface: getInterface.bind(null, edd),
+    getAlias: getAlias.bind(null, edd),
+    get: get.bind(null, edd),
+    dump() {
+      console.error(inspect(edd, { depth: null }))
+    },
+  }
+}
+
+/**
+ * Lookup an interface type in the type index.
+ *
+ * Throws if searched type is not in the type index.
+ * Throws if the found type is not an interface.
+ */
+export function getInterface(edd: Doc.Package, name: string): Doc.Interface {
+  const t = get(edd, name)
+
+  if (t.kind !== 'interface') {
+    throw new Error(`Expected the indexed type "${name}" to be an interface but it was actually an ${t.kind}`)
+  }
+
+  return t
+}
+
+/**
+ * Lookup an alias type in the type index.
+ *
+ * Throws if searched type is not in the type index.
+ * Throws if the found type is not an alias.
+ */
+export function getAlias(edd: Doc.Package, name: string): Doc.Alias {
+  const t = get(edd, name)
+
+  if (t.kind !== 'alias') {
+    throw new Error(`Expected the indexed type "${name}" to be an alias but it was actually an ${t.kind}`)
+  }
+
+  return t
+}
+
+/**
+ * Lookup a type in the type index.
+ *
+ * Throws if searched type is not in the type index.
+ */
+export function get(edd: Doc.Package, name: string): Doc.IndexableNode {
+  const t = edd.typeIndex[name]
+
+  if (!t) {
+    throw new Error(`Could not find type "${name}" in the type index.`)
+  }
+
+  return t
+}

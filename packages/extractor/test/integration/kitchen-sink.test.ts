@@ -325,6 +325,7 @@ it('tydoc can extract data', () => {
             "typeText": "A",
           },
           "tsdoc": null,
+          "typeParameters": Array [],
         },
         "(a).C": Object {
           "kind": "interface",
@@ -359,6 +360,7 @@ it('tydoc can extract data', () => {
             "typeText": "C",
           },
           "tsdoc": null,
+          "typeParameters": Array [],
         },
         "(b).D": Object {
           "kind": "interface",
@@ -393,6 +395,7 @@ it('tydoc can extract data', () => {
             "typeText": "D",
           },
           "tsdoc": null,
+          "typeParameters": Array [],
         },
       },
     }

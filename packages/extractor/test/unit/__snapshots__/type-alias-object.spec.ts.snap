@@ -86,6 +86,7 @@ Object {
           "typeText": "A",
         },
       },
+      "typeParameters": Array [],
     },
     "(a).B": Object {
       "kind": "alias",
@@ -114,6 +115,7 @@ Object {
           "typeText": "B",
         },
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -198,6 +200,7 @@ Object {
           "typeText": "A",
         },
       },
+      "typeParameters": Array [],
     },
     "(a).B": Object {
       "kind": "alias",
@@ -240,6 +243,7 @@ Object {
           "typeText": "B",
         },
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -300,6 +304,7 @@ Object {
           "typeText": "A",
         },
       },
+      "typeParameters": Array [],
     },
   },
 }

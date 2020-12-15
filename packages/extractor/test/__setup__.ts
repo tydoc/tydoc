@@ -1,7 +1,7 @@
 import * as Path from 'path'
 import * as Prettier from 'prettier'
 import * as tsm from 'ts-morph'
-import * as jsde from '../source'
+import * as TyDoc from '../source'
 
 interface ModuleSpec {
   /**
@@ -60,7 +60,7 @@ function createContextt() {
           overwrite: true,
         })
       }
-      return jsde.fromProject({
+      return TyDoc.fromProject({
         entrypoints: entrypoints,
         layout: {
           tsMorphProject,
@@ -73,6 +73,10 @@ function createContextt() {
           },
         },
       })
+    },
+    extract2(...modules: (string | ModuleSpec)[]) {
+      const edd = api.extract(...modules)
+      return TyDoc.Reader.create(edd)
     },
   }
 

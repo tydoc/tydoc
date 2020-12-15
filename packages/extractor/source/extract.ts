@@ -121,7 +121,7 @@ export type FromPublishedParams = {
   downloadDir?: string
 }
 
-type ExtractedPackageData = {
+export type ExtractedPackageData = {
   docs: Doc.Package
   metadata: Package.Metadata
 }
@@ -302,8 +302,9 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
             nodeText: n.getText(),
             typeText: t.getText(),
           },
+          typeParameters: typeParametersDocsFromType(manager, t),
           // todo getTSDocFromNode()
-          ...getTSDoc(manager, n.getType()),
+          ...getTSDoc(manager, t),
           type: fromType(manager, t),
         })
       )
@@ -404,10 +405,11 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   }
   if (t.isInterface()) {
     debugVisible('-> type is interface')
-    const s = t.getSymbolOrThrow()
+    const sym = t.getSymbolOrThrow()
     return manager.indexTypeIfApplicable(t, () =>
       Doc.inter({
-        name: s.getName(),
+        name: sym.getName(),
+        typeParameters: typeParametersDocsFromType(manager, t),
         props: propertyDocsFromType(manager, t),
         ...getTSDoc(manager, t),
         ...getRaw(t),
@@ -467,6 +469,35 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   }
   debugWarn('unsupported kind of type %s', t.getText())
   return Doc.unsupported(getRaw(t), `This kind of type is not supported: "${t.getText()}"`)
+}
+
+/**
+ * Get the docs for the type parameters of the given type
+ */
+function typeParametersDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.TypeParameter[] {
+  // todo why does ts-moprh separate type arg access?
+  const params = t.isInterface() ? t.getTypeArguments() : t.getAliasTypeArguments()
+  return params.map((param) => {
+    const sym = param.getSymbolOrThrow()
+    const defaultType = param.getDefault()
+    const defaultTypeDocs = defaultType ? fromType(docs, defaultType) : null
+
+    // todo use a better function than fromType that is for extracting inline or indexed types
+    if (defaultTypeDocs) {
+      if (defaultTypeDocs.kind === 'interface') {
+        throw new Error(`Type parameters cannot be an inline interface`)
+      }
+      if (defaultTypeDocs.kind === 'alias') {
+        throw new Error(`Type parameters cannot be an inline alias`)
+      }
+    }
+
+    return {
+      name: sym.getName(),
+      default: defaultTypeDocs,
+      ...getRaw(param),
+    }
+  })
 }
 
 /**
@@ -533,11 +564,12 @@ function extractAliasIfOne(manager: Doc.Manager, t: tsm.Type, doc: Doc.Node): Do
   if (!hasAlias(t)) {
     return doc
   }
-  const as = t.getAliasSymbol()!
-  debug('-> type had alias %s (extracting a doc node for it)', as.getName())
+  const asym = t.getAliasSymbol()!
+  debug('-> type had alias %s (extracting a doc node for it)', asym.getName())
   return Doc.alias({
-    name: as.getName(),
+    name: asym.getName(),
     type: doc,
+    typeParameters: typeParametersDocsFromType(manager, t),
     ...getRaw(t),
     ...getTSDoc(manager, t),
   })

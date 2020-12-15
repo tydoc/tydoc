@@ -1,5 +1,7 @@
 import * as tsdoc from '@microsoft/tsdoc'
+import dedent from 'dedent'
 import * as tsm from 'ts-morph'
+import { getTargetType } from './lib/ts-helpers'
 
 export function isCallable(t: tsm.Type): boolean {
   return t.getCallSignatures().length > 0
@@ -85,14 +87,35 @@ export function getLocationKind(t: tsm.Type): LocationKind {
 }
 
 export function dumpType(t: tsm.Type): void {
+  console.error(renderDumpType(t))
+}
+
+export function renderDumpType(t: tsm.Type): string {
   // prettier-ignore
-  console.error(`
+  return dedent`
     t.getText()                                          = ${t.getText()}
     t.getSymbol()?.getName()                             = ${t.getSymbol()?.getName()}
+    t.compilerType.getFlags()                            = ${t.compilerType.getFlags()}
+    (t.compilerType as tsm.ts.ObjectType)?.objectFlags   = ${(t.compilerType as tsm.ts.ObjectType)?.objectFlags}
     t.getAliasSymbol()?.getName()                        = ${t.getAliasSymbol()?.getName()}
     t.getApparentType().getText()                        = ${t.getApparentType().getText()}
     t.getSymbol()?.getDeclarations()?.[0]?.getKindName() = ${t.getSymbol()?.getDeclarations()?.[0]?.getKindName()}
-    t.getSymbol()?.getDeclarations()?.[0]?.getText()     = ${t.getSymbol()?.getDeclarations()?.[0]?.getText()}
+    t.getSymbol()?.getDeclarations()?.[0]?.getText()     = ${indentBlockTail(59, t.getSymbol()?.getDeclarations()?.[0]?.getText() ?? 'undefined')}
+
+    t.isAnonymous()                                      = ${t.isAnonymous()}
+    t.isAny()                                            = ${t.isAny()}
+    t.isInterface()                                      = ${t.isInterface()}
+    t.isObject()                                         = ${t.isObject()}
+    t.isArray()                                          = ${t.isArray()}
+    t.isBoolean()                                        = ${t.isBoolean()}
+    t.isBooleanLiteral()                                 = ${t.isBooleanLiteral()}
+    t.isClass()                                          = ${t.isClass()}
+    t.isClassOrInterface()                               = ${t.isClassOrInterface()}
+    t.isEnum()                                           = ${t.isEnum()}
+
+    t.getAliasTypeArguments().length}                    = ${t.getAliasTypeArguments().length}
+    Boolean(t.getTargetType())                           = ${Boolean(t.getTargetType())}
+    t.getTargetType() === t                              = ${t.getTargetType() === t}
 
     t.getText(undefined, tsm.ts.TypeFormatFlags.InTypeAlias)                           = ${t.getText(undefined, tsm.ts.TypeFormatFlags.InTypeAlias)}
     t.getText(undefined, tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope)    = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope)}
@@ -100,7 +123,30 @@ export function dumpType(t: tsm.Type): void {
     t.getText(undefined, tsm.ts.TypeFormatFlags.UseFullyQualifiedType)                 = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseFullyQualifiedType)}
     t.getText(undefined, tsm.ts.TypeFormatFlags.NoTruncation)                          = ${t.getText(undefined, tsm.ts.TypeFormatFlags.NoTruncation)}
     t.getText(undefined, tsm.ts.TypeFormatFlags.UseStructuralFallback)                 = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseStructuralFallback)}
-  `)
+
+    Target Type?
+    ------------
+  ` + ((getTargetType(t)) ? '\n\n' + indentBlock(4, renderDumpType(getTargetType(t)!)) : '\n\n' + 'N/A')
+}
+
+function indentBlockTail(spaces: number, block: string) {
+  return block.split('\n').join('\n' + createSpace(spaces))
+}
+
+function indentBlock(spaces: number, block: string) {
+  if (spaces === 0) return block
+  if (block.length === 0) return ''
+  return createSpace(spaces) + indentBlockTail(spaces, block)
+}
+
+function createSpace(size: number): string {
+  if (size === 0) return ''
+
+  let space = ''
+  while (space.length < size) {
+    space += ' '
+  }
+  return space
 }
 
 export function dumpNode(n: tsm.Node): void {

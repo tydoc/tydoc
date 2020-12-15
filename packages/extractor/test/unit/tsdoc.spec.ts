@@ -73,6 +73,7 @@ it('interfaces can have tsdoc', () => {
      */",
             "summary": "...",
           },
+          "typeParameters": Array [],
         },
       },
     }
@@ -146,6 +147,7 @@ it('exported type aliases can have tsdoc', () => {
               "typeText": "A",
             },
           },
+          "typeParameters": Array [],
         },
       },
     }
@@ -217,6 +219,7 @@ it('type aliases can have tsdoc', () => {
               "typeText": "A",
             },
           },
+          "typeParameters": Array [],
         },
         "(a).B": Object {
           "kind": "alias",
@@ -249,6 +252,7 @@ it('type aliases can have tsdoc', () => {
               "typeText": "B",
             },
           },
+          "typeParameters": Array [],
         },
       },
     }

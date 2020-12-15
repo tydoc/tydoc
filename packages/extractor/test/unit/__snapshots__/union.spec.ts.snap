@@ -62,6 +62,7 @@ Object {
               "kind": "typeIndexRef",
               "link": "(a).B",
             },
+            "typeParameters": Array [],
           },
           Object {
             "kind": "alias",
@@ -76,9 +77,11 @@ Object {
               "kind": "typeIndexRef",
               "link": "(a).C",
             },
+            "typeParameters": Array [],
           },
         ],
       },
+      "typeParameters": Array [],
     },
     "(a).B": Object {
       "kind": "alias",
@@ -117,6 +120,7 @@ Object {
           "typeText": "B",
         },
       },
+      "typeParameters": Array [],
     },
     "(a).C": Object {
       "kind": "alias",
@@ -155,6 +159,7 @@ Object {
           "typeText": "C",
         },
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -219,6 +224,7 @@ Object {
           },
         ],
       },
+      "typeParameters": Array [],
     },
     "(a).B": Object {
       "kind": "interface",
@@ -255,6 +261,7 @@ Object {
         "typeText": "B",
       },
       "tsdoc": null,
+      "typeParameters": Array [],
     },
     "(a).C": Object {
       "kind": "interface",
@@ -291,6 +298,7 @@ Object {
         "typeText": "C",
       },
       "tsdoc": null,
+      "typeParameters": Array [],
     },
   },
 }
@@ -359,6 +367,7 @@ Object {
               "kind": "typeIndexRef",
               "link": "(a).B",
             },
+            "typeParameters": Array [],
           },
           Object {
             "kind": "alias",
@@ -373,9 +382,11 @@ Object {
               "kind": "typeIndexRef",
               "link": "(a).C",
             },
+            "typeParameters": Array [],
           },
         ],
       },
+      "typeParameters": Array [],
     },
     "(a).B": Object {
       "kind": "alias",
@@ -423,6 +434,7 @@ Object {
           "typeText": "B",
         },
       },
+      "typeParameters": Array [],
     },
     "(a).C": Object {
       "kind": "alias",
@@ -470,6 +482,7 @@ Object {
           "typeText": "C",
         },
       },
+      "typeParameters": Array [],
     },
   },
 }
@@ -535,6 +548,7 @@ Object {
           },
         ],
       },
+      "typeParameters": Array [],
     },
     "(a).B": Object {
       "kind": "interface",
@@ -582,6 +596,7 @@ Object {
         "typeText": "B",
       },
       "tsdoc": null,
+      "typeParameters": Array [],
     },
     "(a).C": Object {
       "kind": "interface",
@@ -629,6 +644,7 @@ Object {
         "typeText": "C",
       },
       "tsdoc": null,
+      "typeParameters": Array [],
     },
   },
 }
@@ -693,6 +709,7 @@ Object {
           },
         ],
       },
+      "typeParameters": Array [],
     },
   },
 }

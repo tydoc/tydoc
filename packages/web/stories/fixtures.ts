@@ -1,6 +1,11 @@
-import { Doc } from '@tydoc/extractor/types'
+// todo:
+// Restore this once we're able to extract graphql request
+// docs again with extractor (current hitting infinite loop)
+//
+// import { Doc } from '@tydoc/extractor/types'
+// export const graphQLRequestTypes: Doc.Package = {
 
-export const graphQLRequestTypes: Doc.Package = {
+export const graphQLRequestTypes: any = {
   modules: [
     {
       kind: 'module',

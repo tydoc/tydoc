@@ -264,6 +264,7 @@ it('passes smoke test', () => {
             "typeText": "D",
           },
           "tsdoc": null,
+          "typeParameters": Array [],
         },
         "(a).E": Object {
           "kind": "interface",
@@ -331,6 +332,7 @@ it('passes smoke test', () => {
             "typeText": "E",
           },
           "tsdoc": null,
+          "typeParameters": Array [],
         },
         "(a).F": Object {
           "kind": "alias",
@@ -350,6 +352,7 @@ it('passes smoke test', () => {
               "typeText": "F",
             },
           },
+          "typeParameters": Array [],
         },
         "(a).F5": Object {
           "kind": "alias",
@@ -378,6 +381,7 @@ it('passes smoke test', () => {
               "typeText": "F5",
             },
           },
+          "typeParameters": Array [],
         },
         "(a).G": Object {
           "kind": "alias",
@@ -441,6 +445,7 @@ it('passes smoke test', () => {
               "typeText": "G",
             },
           },
+          "typeParameters": Array [],
         },
         "(a).H": Object {
           "kind": "alias",
@@ -472,6 +477,7 @@ it('passes smoke test', () => {
               "typeText": "H",
             },
           },
+          "typeParameters": Array [],
         },
         "(a).H2": Object {
           "kind": "interface",
@@ -483,6 +489,7 @@ it('passes smoke test', () => {
             "typeText": "H2",
           },
           "tsdoc": null,
+          "typeParameters": Array [],
         },
         "(a).I": Object {
           "kind": "alias",
@@ -519,6 +526,7 @@ it('passes smoke test', () => {
               },
             ],
           },
+          "typeParameters": Array [],
         },
         "(a).K": Object {
           "kind": "alias",
@@ -570,6 +578,7 @@ it('passes smoke test', () => {
               },
             ],
           },
+          "typeParameters": Array [],
         },
         "(a).L": Object {
           "kind": "alias",
@@ -667,6 +676,7 @@ it('passes smoke test', () => {
               },
             ],
           },
+          "typeParameters": Array [],
         },
         "(a).M": Object {
           "kind": "alias",
@@ -686,6 +696,7 @@ it('passes smoke test', () => {
               "typeText": "M",
             },
           },
+          "typeParameters": Array [],
         },
         "(a).N1": Object {
           "kind": "alias",
@@ -714,6 +725,7 @@ it('passes smoke test', () => {
               "typeText": "N1",
             },
           },
+          "typeParameters": Array [],
         },
         "(a).N2": Object {
           "kind": "alias",
@@ -731,6 +743,7 @@ it('passes smoke test', () => {
             },
             "kind": "array",
           },
+          "typeParameters": Array [],
         },
         "(a).N3": Object {
           "kind": "alias",
@@ -776,6 +789,7 @@ it('passes smoke test', () => {
               },
             ],
           },
+          "typeParameters": Array [],
         },
       },
     }
