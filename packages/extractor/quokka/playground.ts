@@ -7,19 +7,22 @@ const project = new tsm.Project({
 })
 const sourceFile = project.createSourceFile(
   'playground.ts',
-  `
+  /* ts */ `
+    interface foo {
+      bar: string
+    }
   `
 )
 
 const nodes = sourceFile.getChildren()
-nodes.length //?
-const node = nodes[0]
-node.getKindName() //?
+const node = nodes[0]!
+
 node.getText() //?
-node.getLeadingCommentRanges().map((cr) => cr.getText())[0] //?
-node.getChildren().length //?
-node.getChildren()[0].getKindName() //?
-node.getChildren()[1].getKindName() //?
+// node.getKindName() //?
+// node.getLeadingCommentRanges().map((cr) => cr.getText())[0] //?
+// node.getChildren().length //?
+// node.getChildren()[0]?.getKindName() //?
+// node.getChildren()[1]?.getKindName() //?
 
 // sourceFile.getChildren().forEach(n => {
 //   n.getKindName() //?
