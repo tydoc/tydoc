@@ -18,6 +18,7 @@
     "g:tsc": "cd $INIT_CWD && tsc",
     "g:jest": "cd $INIT_CWD && jest",
     "g:prettier": "cd $INIT_CWD && prettier",
-    "g:ts-node": "cd $INIT_CWD && ts-node"
+    "g:ts-node": "cd $INIT_CWD && ts-node",
+    "g:tsn": "cd $INIT_CWD && ts-node"
   }
 }
