@@ -105,12 +105,13 @@ const argv = yargs(process.argv.slice(2))
    */
 
   .command(
-    'fromSource <filePath>',
+    'fromSource [filePath]',
     'EPD from local package source',
     (yargs) => {
       return yargs
         .positional('filePath', {
-          description: 'Entrypoint path(s) into the package',
+          description:
+            'Entrypoint path(s) into the package. The main module will always be considered an entrypoint so there is no need to manually specify it here.',
         })
         .options({
           markdown: {
@@ -174,7 +175,7 @@ const argv = yargs(process.argv.slice(2))
       }
 
       const FromSourceParams: FromSourceParams = {
-        entrypoints: arrayify(input.filePath as string | string[]),
+        entrypoints: input.filePath ? arrayify(input.filePath as string | string[]) : undefined,
         readSettingsFromJSON: true,
         layout: {
           validateTypeScriptDiagnostics,

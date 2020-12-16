@@ -2,7 +2,7 @@ import makeDebug from 'debug'
 import dedent from 'dedent'
 import * as fs from 'fs-jetpack'
 import * as lo from 'lodash'
-import { isEmpty } from 'lodash'
+import { isEmpty, uniq } from 'lodash'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
 import { PackageJson } from 'type-fest'
@@ -36,8 +36,11 @@ const debugWarn = makeDebug('tydoc:warn')
 export interface FromSourceParams {
   /**
    * Paths to modules in project, relative to source root or absolute.
+   *
+   * The main module will always be considered an entrypoint so there is
+   * no need to manually specify it here.
    */
-  entrypoints: string[]
+  entrypoints?: string[]
   /**
    * Should Tydoc settings be read from from the package file.
    */
@@ -202,29 +205,27 @@ export function fromSource(options: FromSourceParams): Doc.Package {
    * Find the corresponding source files for the given entrypoints
    */
 
-  const sourceFileEntrypoints = options.entrypoints.map((givenEntryPoint) => {
-    let givenEntryPointAbs = absolutify(layout.sourceDir, givenEntryPoint)
+  const entrypoints = uniq(
+    [layout.sourceMainModulePath]
+      .concat(options.entrypoints ?? [])
+      .map((entrypoint) => absolutify(layout.sourceDir, entrypoint))
+      .map(pathToModulePath)
+  )
 
-    /**
-     * If given entrypoint is a folder then infer that to mean looking for
-     * an index within it (just like how node module resolution works).
-     *
-     * In case user is working with in-memory ts-morph project do not care if the directory
-     * does not actually exist.
-     */
-    if (fs.exists(givenEntryPointAbs) === 'dir') {
-      givenEntryPointAbs = path.join(givenEntryPointAbs, 'index.ts')
-    }
+  debug('entrypoints: %j', entrypoints)
 
-    debug('givenEntryPointAbs is %s', givenEntryPointAbs)
+  /**
+   * validate entrypoints
+   */
 
+  const sourceFileEntrypoints = entrypoints.map((givenEntryPoint) => {
     const sourceFileEntryPoint = sourceFiles.find((sf) => {
-      return getSourceFileModulePath(sf) === pathToModulePath(givenEntryPointAbs)
+      return getSourceFileModulePath(sf) === givenEntryPoint
     })
 
     if (!sourceFileEntryPoint) {
       throw new Error(
-        `Given entrypoint not found in project: "${givenEntryPointAbs}". Source files were:\n\n${sourceFiles
+        `Given entrypoint not found in project: "${givenEntryPoint}". Source files were:\n\n${sourceFiles
           .map(getSourceFileModulePath)
           .join('\n')}`
       )
@@ -256,8 +257,8 @@ export function fromSource(options: FromSourceParams): Doc.Package {
    * Get EDD
    */
 
-  sourceFileEntrypoints.forEach((sf) => {
-    fromModule(manager, sf)
+  sourceFileEntrypoints.forEach((sourceFile) => {
+    fromModule(manager, sourceFile)
   })
 
   return manager.EDD
