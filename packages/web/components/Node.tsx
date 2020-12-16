@@ -237,5 +237,9 @@ function getDocumentationOfNode(node: Doc.Node): string | null {
     case 'intersection': {
       return null
     }
+
+    case 'generic_instance': {
+      return node.raw.nodeFullText
+    }
   }
 }
