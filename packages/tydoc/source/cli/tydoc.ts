@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { FromProjectParams } from '@tydoc/extractor/dist/extract'
+import { FromSourceParams } from '@tydoc/extractor/dist/extract'
 import { DiagnosticFilter } from '@tydoc/extractor/dist/lib/ts-helpers'
 import debug from 'debug'
 import dedent from 'dedent'
@@ -35,6 +35,10 @@ const argv = yargs(process.argv.slice(2))
       // exclusive: ['markdown'],
     },
   })
+
+  /**
+   * fromPublished command
+   */
 
   .command(
     'fromPublished <packageName>',
@@ -96,8 +100,12 @@ const argv = yargs(process.argv.slice(2))
     }
   )
 
+  /**
+   * fromSource command
+   */
+
   .command(
-    'project <filePath>',
+    'fromSource <filePath>',
     'EPD from local package source',
     (yargs) => {
       return yargs
@@ -152,7 +160,7 @@ const argv = yargs(process.argv.slice(2))
       }
 
       /**
-       * Map arv and flags to FromProjectParams
+       * Map input to FromProjectParams
        */
 
       let validateTypeScriptDiagnostics
@@ -165,7 +173,7 @@ const argv = yargs(process.argv.slice(2))
         validateTypeScriptDiagnostics = !input.ignoreDiagnostics
       }
 
-      const FromProjectParams: FromProjectParams = {
+      const FromSourceParams: FromSourceParams = {
         entrypoints: arrayify(input.filePath as string | string[]),
         readSettingsFromJSON: true,
         layout: {
@@ -179,10 +187,10 @@ const argv = yargs(process.argv.slice(2))
        * Get EDD
        */
 
-      const docs = TyDoc.fromProject(FromProjectParams)
+      const edd = TyDoc.fromSource(FromSourceParams)
 
       if (input.json) {
-        process.stdout.write(JSON.stringify(docs, null, 2) + '\n')
+        process.stdout.write(JSON.stringify(edd, null, 2) + '\n')
         return
       }
 
@@ -190,11 +198,15 @@ const argv = yargs(process.argv.slice(2))
         const options = {
           flatTermsSection: input.flatTermsSection,
         }
-        process.stdout.write(TyDoc.Renderers.Markdown.render(docs, options) + '\n')
+        process.stdout.write(TyDoc.Renderers.Markdown.render(edd, options) + '\n')
         return
       }
     }
   ).argv
+
+/**
+ * Help by default
+ */
 
 if (!argv._[0]) {
   yargs.showHelp()

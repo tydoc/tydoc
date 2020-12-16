@@ -2,9 +2,9 @@ import * as tydocMarkdownRender from '@tydoc/renderer-markdown'
 import * as fs from 'fs-jetpack'
 import * as path from 'path'
 import { inspect } from 'util'
-import { fromProject } from '../source'
+import { fromSource } from '../source'
 
-const docsData = fromProject({
+const docsData = fromSource({
   entrypoints: ['index'],
   readSettingsFromJSON: true,
 })

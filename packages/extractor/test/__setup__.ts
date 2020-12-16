@@ -60,7 +60,7 @@ function createContextt() {
           overwrite: true,
         })
       }
-      return TyDoc.fromProject({
+      return TyDoc.fromSource({
         entrypoints: entrypoints,
         layout: {
           tsMorphProject,

@@ -33,7 +33,7 @@ const debugExport = makeDebug('tydoc:extract:export')
 const debugVisible = makeDebug('tydoc:extract:visible')
 const debugWarn = makeDebug('tydoc:warn')
 
-export interface FromProjectParams {
+export interface FromSourceParams {
   /**
    * Paths to modules in project, relative to source root or absolute.
    */
@@ -184,7 +184,7 @@ export async function fromPublished(options: FromPublishedParams): Promise<Extra
  * the given list of entrypoint modules. Everything that is reachable from the
  * exports will be considered part of the API.
  */
-export function fromProject(options: FromProjectParams): Doc.Package {
+export function fromSource(options: FromSourceParams): Doc.Package {
   const layout = scan(options.layout)
 
   const sourceFiles = layout.tsMorphPoject.getSourceFiles()

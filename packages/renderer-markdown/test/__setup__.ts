@@ -64,7 +64,7 @@ function createContextt() {
           overwrite: true,
         })
       }
-      return tydocExtractor.fromProject({
+      return tydocExtractor.fromSource({
         entrypoints: entrypoints,
         layout: {
           tsMorphProject,
