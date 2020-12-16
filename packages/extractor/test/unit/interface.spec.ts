@@ -75,14 +75,91 @@ describe('can be a named export', () => {
   })
 })
 
-// describe('bugs', () => {
-//   it('interface with generic method returning interface does not infinitely loop', () => {
-//     expect(
-//       ctx.extract(/* ts */ `
-//         export interface Foo<T> {
-//           bar: Foo<1>
-//         }
-//       `)
-//     ).toMatchInlineSnapshot(`[Function]`)
-//   })
-// })
+describe('bugs', () => {
+  it('interface with generic method returning interface does not infinitely loop', () => {
+    expect(
+      ctx.extract(/* ts */ `
+        export interface Foo<T> {
+          bar: Foo<1>
+        }
+      `)
+    ).toMatchInlineSnapshot(`
+      Object {
+        "modules": Array [
+          Object {
+            "isMain": true,
+            "kind": "module",
+            "location": Object {
+              "filePath": "src/a.ts",
+            },
+            "mainExport": null,
+            "name": "a",
+            "namedExports": Array [
+              Object {
+                "isTerm": false,
+                "isType": true,
+                "kind": "export",
+                "name": "Foo",
+                "type": Object {
+                  "kind": "typeIndexRef",
+                  "link": "(a).Foo",
+                },
+              },
+            ],
+            "path": "/",
+            "tsdoc": null,
+          },
+        ],
+        "typeIndex": Object {
+          "(a).Foo": Object {
+            "kind": "interface",
+            "name": "Foo",
+            "props": Array [
+              Object {
+                "kind": "prop",
+                "name": "bar",
+                "type": Object {
+                  "kind": "generic_instance",
+                  "raw": Object {
+                    "nodeFullText": "export interface Foo<T> {
+        bar: Foo<1>;
+      }",
+                    "nodeText": "export interface Foo<T> {
+        bar: Foo<1>;
+      }",
+                    "typeText": "Foo<1>",
+                  },
+                  "target": Object {
+                    "kind": "typeIndexRef",
+                    "link": "(a).Foo",
+                  },
+                },
+              },
+            ],
+            "raw": Object {
+              "nodeFullText": "export interface Foo<T> {
+        bar: Foo<1>;
+      }",
+              "nodeText": "export interface Foo<T> {
+        bar: Foo<1>;
+      }",
+              "typeText": "Foo<T>",
+            },
+            "tsdoc": null,
+            "typeParameters": Array [
+              Object {
+                "default": null,
+                "name": "T",
+                "raw": Object {
+                  "nodeFullText": "T",
+                  "nodeText": "T",
+                  "typeText": "T",
+                },
+              },
+            ],
+          },
+        },
+      }
+    `)
+  })
+})

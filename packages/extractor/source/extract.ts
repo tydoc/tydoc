@@ -22,6 +22,7 @@ import {
   DiagnosticFilter,
   getDiscriminantPropertiesOfUnionMembers,
   getFirstDeclarationOrThrow,
+  getGenericType,
   getProperties,
   getSourceFileModulePath,
 } from './lib/ts-helpers'
@@ -353,6 +354,25 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     )
     return Doc.unsupported(getRaw(t), 'We do not support extracting from types whose loation is unknown.')
   }
+
+  if (t.isArray()) {
+    debugVisible('-> type is array')
+    const innerType = t.getArrayElementTypeOrThrow()
+    debugVisible('-> handle array inner type %s', innerType.getText())
+    return manager.indexTypeIfApplicable(t, () =>
+      extractAliasIfOne(manager, t, Doc.array(fromType(manager, innerType)))
+    )
+  }
+
+  const tt = getGenericType(t)
+  if (tt) {
+    debugVisible('-> type is an instance of a generic type: %s', tt.getText())
+    return Doc.genericInstance({
+      target: fromType(manager, tt) as any,
+      ...getRaw(t),
+    })
+  }
+
   if (manager.isIndexable(t)) {
     debugVisible('-> type is indexable')
     const fqtn = manager.getFQTN(t)
@@ -375,14 +395,7 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     debugVisible('-> type is primitive')
     return Doc.prim(t.getText())
   }
-  if (t.isArray()) {
-    debugVisible('-> type is array')
-    const innerType = t.getArrayElementTypeOrThrow()
-    debugVisible('-> handle array inner type %s', innerType.getText())
-    return manager.indexTypeIfApplicable(t, () =>
-      extractAliasIfOne(manager, t, Doc.array(fromType(manager, innerType)))
-    )
-  }
+
   if (t.isTuple()) {
     debugVisible('-> type is tuple')
     return Doc.unsupported(getRaw(t), 'Tuples not yet implemented')

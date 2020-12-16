@@ -1,7 +1,7 @@
 import * as tsdoc from '@microsoft/tsdoc'
 import dedent from 'dedent'
 import * as tsm from 'ts-morph'
-import { getTargetType } from './lib/ts-helpers'
+import { getGenericType } from './lib/ts-helpers'
 
 export function isCallable(t: tsm.Type): boolean {
   return t.getCallSignatures().length > 0
@@ -126,7 +126,7 @@ export function renderDumpType(t: tsm.Type): string {
 
     Target Type?
     ------------
-  ` + ((getTargetType(t)) ? '\n\n' + indentBlock(4, renderDumpType(getTargetType(t)!)) : '\n\n' + 'N/A')
+  ` + ((getGenericType(t)) ? '\n\n' + indentBlock(4, renderDumpType(getGenericType(t)!)) : '\n\n' + 'N/A')
 }
 
 function indentBlockTail(spaces: number, block: string) {
