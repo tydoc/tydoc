@@ -3,14 +3,18 @@ import * as Doc from './doc'
 import { ExtractedPackageData } from './extract'
 
 /**
- * A fluent (aka. chaining) API for navigating the EPD.
+ * Methods for easily exploring the given EPD.
  */
 type Reader = {
   edd: ExtractedPackageData['docs']
-  get(name: string): Doc.IndexableNode
-  getInterface(name: string): Doc.Interface
-  getAlias(name: string): Doc.Alias
-  firstExportOrThrow(name: string): Doc.Expor
+  types: {
+    get(name: string): Doc.IndexableNode
+    getInterface(name: string): Doc.Interface
+    getAlias(name: string): Doc.Alias
+  }
+  exports: {
+    first(name: string): Doc.Expor
+  }
   dump(): void
 }
 
@@ -20,10 +24,14 @@ type Reader = {
 export function create(edd: Doc.Package): Reader {
   return {
     edd,
-    getInterface: getInterface.bind(null, edd),
-    getAlias: getAlias.bind(null, edd),
-    get: get.bind(null, edd),
-    firstExportOrThrow: firstExportOrThrow.bind(null, edd),
+    types: {
+      getInterface: getInterface.bind(null, edd),
+      getAlias: getAlias.bind(null, edd),
+      get: get.bind(null, edd),
+    },
+    exports: {
+      first: firstExport.bind(null, edd),
+    },
     dump() {
       console.error(inspect(edd, { depth: null }))
     },
@@ -80,7 +88,7 @@ export function get(edd: Doc.Package, name: string): Doc.IndexableNode {
 /**
  * Look through all modules for a named export and return it. If none found, then throw.
  */
-export function firstExportOrThrow(edd: Doc.Package, name: string): Doc.Expor {
+export function firstExport(edd: Doc.Package, name: string): Doc.Expor {
   let ex
 
   for (const mod of edd.modules) {

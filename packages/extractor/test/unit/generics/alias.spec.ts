@@ -3,14 +3,14 @@ describe('first type parameter', () => {
     const edd = ctx.extract2(/* ts */ `
       export type Foo<T> = {}
     `)
-    expect(edd.getAlias('(a).Foo').typeParameters).toMatchSnapshot()
+    expect(edd.types.getAlias('(a).Foo').typeParameters).toMatchSnapshot()
   })
 
   it('the primitive type default', () => {
     const edd = ctx.extract2(/* ts */ `
       export type Foo<T = string> = {}
     `)
-    expect(edd.getAlias('(a).Foo').typeParameters).toMatchSnapshot()
+    expect(edd.types.getAlias('(a).Foo').typeParameters).toMatchSnapshot()
   })
 
   it('the alias object type default is added to the type index and refererenced', () => {
@@ -18,8 +18,8 @@ describe('first type parameter', () => {
       export type Bar = { a: 1 }
       export type Foo<T = Bar> = {}
     `)
-    expect(edd.getAlias('(a).Foo').typeParameters).toMatchSnapshot()
-    expect(edd.getAlias('(a).Bar')).toMatchSnapshot()
+    expect(edd.types.getAlias('(a).Foo').typeParameters).toMatchSnapshot()
+    expect(edd.types.getAlias('(a).Bar')).toMatchSnapshot()
   })
 
   it('the interface object type default is added to the type index and refererenced', () => {
@@ -27,8 +27,8 @@ describe('first type parameter', () => {
       export interface Bar { a: 1 }
       export type Foo<T = Bar> = {}
     `)
-    expect(edd.getAlias('(a).Foo').typeParameters).toMatchSnapshot()
-    expect(edd.getInterface('(a).Bar')).toMatchSnapshot()
+    expect(edd.types.getAlias('(a).Foo').typeParameters).toMatchSnapshot()
+    expect(edd.types.getInterface('(a).Bar')).toMatchSnapshot()
   })
 })
 
@@ -37,7 +37,7 @@ describe('standard library generic instances have type arguments captured and ge
     const edd = ctx.extract2(/*ts*/ `
       export type A = Record<string,number>
     `)
-    expect(edd.firstExportOrThrow('A')).toMatchSnapshot()
+    expect(edd.exports.first('A')).toMatchSnapshot()
   })
 })
 
@@ -46,6 +46,6 @@ describe('bugs', () => {
     const edd = ctx.extract2(/*ts*/ `
       export type A = 1 | Record<string, 2>
     `)
-    expect(edd.getAlias('(a).A')).toMatchSnapshot()
+    expect(edd.types.getAlias('(a).A')).toMatchSnapshot()
   })
 })
