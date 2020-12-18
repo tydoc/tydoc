@@ -2,9 +2,16 @@ import { TSDocParser } from '@microsoft/tsdoc'
 import createDebug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
-import { getFirstDeclarationOrThrow, getSourceFileModulePath } from './lib/ts-helpers'
+import {
+  getNameOrThrow,
+  getSourceFileModulePath,
+  getSourceFileOrThrow,
+  hasAlias,
+  isPrimitive,
+  isTypeLevelNode,
+} from './lib/ts-helpers'
 import { Index, Thunk } from './lib/utils'
-import { dumpNode, dumpType, hasAlias, isPrimitive, isTypeLevelNode, renderTSDocNode } from './utils'
+import { dumpNode, dumpType, renderTSDocNode } from './utils'
 
 registerDumper((...args) => {
   if (args[0] instanceof tsm.Node) {
@@ -167,24 +174,8 @@ export function getFQTNFromTypeAliasNode(sourceRoot: string, n: tsm.TypeAliasDec
 }
 
 export function getFQTNFromType(sourceRoot: string, t: tsm.Type): string {
-  // It can happen that a type has no symbol but does have alias symbol, for
-  // example union types.
-  const sym = t.getSymbol()
-  const asym = t.getAliasSymbol()
-  let typeName: string
-  let sourceFile: tsm.SourceFile
-  if (asym) {
-    typeName = asym.getName()
-    sourceFile = getFirstDeclarationOrThrow(asym).getSourceFile()
-  } else if (sym) {
-    sourceFile = getFirstDeclarationOrThrow(sym).getSourceFile()
-    // todo this way of getting name was being used but...
-    // no tests seem to need this! Remove for good?
-    // typeName = t.getText(undefined, tsm.ts.TypeFormatFlags.None)
-    typeName = sym.getName()
-  } else {
-    throw new Error(`Given type ${t.getText()} has neither symbol nor alias symbol`)
-  }
+  let typeName = getNameOrThrow(t)
+  let sourceFile = getSourceFileOrThrow(t)
   const typePath = getPathFromSourceRoot(sourceRoot, sourceFile)
   const fqtn = formatFQTN(typePath, typeName)
   return fqtn
@@ -197,11 +188,11 @@ function formatFQTN(typePath: string, typeName: string): string {
 function getPathFromSourceRoot(sourceRoot: string, sourceFile: tsm.SourceFile): string {
   const filePath = sourceFile.getFilePath()
   const fileDirPath = path.dirname(filePath)
+  //todo file path to module path helper
   const modulePath = path.join(fileDirPath, sourceFile.getBaseNameWithoutExtension())
   return path.relative(sourceRoot, modulePath)
 }
 
-// prettier-ignore
 export type Node =
   | DocTypeUnion
   | DocTypePrimitive
@@ -215,15 +206,9 @@ export type Node =
   | Unsupported
   | DocTypeIntersection
   | GenericInstance
-// todo unused?
-// | { kind: 'function'; signatures: DocSig[] }
-// | { kind: 'callable_object'; signatures: DocSig[]; properties: DocProp[] } & RawFrag
-// | { kind: 'callable_interface'; properties: DocProp[]; signatures: DocSig[] } & RawFrag
+  | StandardLibrary
 
-// prettier-ignore
-export type IndexableNode =
-  | Alias
-  | Interface
+export type IndexableNode = Alias | Interface
 
 export type TypeNode =
   | DocTypeUnion
@@ -235,6 +220,7 @@ export type TypeNode =
   | DocTypeCallable
   | DocTypeArray
   | DocTypeObject
+  | StandardLibrary
 
 /**
  * Any type that can be nameless.
@@ -514,6 +500,7 @@ export type Package = {
 export type GenericInstance = {
   kind: 'generic_instance'
   target: IndexRef
+  arguments: InlinableType[]
 } & RawFrag
 
 type GenericInstanceInput = Omit<GenericInstance, 'kind'>
@@ -742,5 +729,22 @@ export function union(input: UnionInput): DocTypeUnion {
     ...input,
     isDiscriminated: input.discriminantProperties.length > 0,
     discriminantProperties: input.discriminantProperties.length > 0 ? input.discriminantProperties : null,
+  }
+}
+
+export type StandardLibrary = {
+  kind: 'standard_library'
+  name: string
+  location: {
+    modulePath: string
+  }
+} & RawFrag
+
+type StandardLibraryInput = Omit<StandardLibrary, 'kind'>
+
+export function standardlibrary(input: StandardLibraryInput): StandardLibrary {
+  return {
+    kind: 'standard_library',
+    ...input,
   }
 }

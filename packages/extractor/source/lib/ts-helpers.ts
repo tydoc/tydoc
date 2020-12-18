@@ -1,6 +1,7 @@
 import createDebug from 'debug'
 import * as path from 'path'
 import * as tsm from 'ts-morph'
+import { renderDumpType } from '../utils'
 import { casesHandled, Index, indexBy } from './utils'
 
 /**
@@ -208,4 +209,187 @@ export function getSourceFileModulePath(sf: tsm.SourceFile): string {
   const moduleNameForPath = moduleName === 'index' ? '' : moduleName
 
   return path.posix.join(path.dirname(sf.getFilePath()), moduleNameForPath)
+}
+
+/**
+ * Get the name of the type (or throw).
+ *
+ * First consider the alias symbol, if any. Then consider the symbol.
+ *
+ * If None present, then throw.
+ */
+export function getNameOrThrow(t: tsm.Type): string {
+  const aliasSymbol = t.getAliasSymbol()
+
+  if (aliasSymbol) return aliasSymbol.getName()
+
+  const symbol = t.getSymbol()
+
+  if (symbol) return symbol.getName()
+
+  throw new Error(`The given type has no name:\n\n${renderDumpType(t)}`)
+}
+
+/**
+ * Get the source file of the type (or throw).
+ *
+ * Type must have a symbol and at least one declaration.
+ *
+ * If not, throws.
+ */
+export function getSourceFileOrThrow(t: tsm.Type) {
+  const symbol = getSymbolOrThrow(t)
+  return getFirstDeclarationOrThrow(symbol).getSourceFile()
+}
+
+/**
+ * Get the symbol of the type (or throw).
+ *
+ * First consider the alias symbol, if any. Then consider the symbol.
+ *
+ * If None present, then throw.
+ */
+export function getSymbolOrThrow(t: tsm.Type) {
+  const symbol = getSymbol(t)
+
+  if (symbol) return symbol
+
+  throw new Error(`The given type has no symbol:\n\n${renderDumpType(t)}`)
+}
+
+/**
+ * Get the symbol of the type.
+ *
+ * First consider the alias symbol, if any. Then consider the symbol.
+ */
+export function getSymbol(t: tsm.Type): null | tsm.Symbol {
+  // It can happen that a type has no symbol but does have alias symbol, for
+  // example union types.
+  const aliasSymbol = t.getAliasSymbol()
+
+  if (aliasSymbol) return aliasSymbol
+
+  const symbol = t.getSymbol()
+
+  if (symbol) return symbol
+
+  return null
+}
+
+type LocationKind = 'typeScriptCore' | 'typeScriptStandardLibrary' | 'dep' | 'app' | 'inline' | 'unknown'
+
+export function getLocationKind(t: tsm.Type): LocationKind {
+  if (isPrimitive(t)) {
+    return 'typeScriptCore'
+  }
+
+  if (t.isLiteral()) {
+    return 'inline'
+  }
+
+  // todo does the order of symbol we choose matter in case of both being present?
+  const filePath = (t.getSymbol() ?? t.getAliasSymbol())?.getDeclarations()[0]?.getSourceFile().getFilePath()
+
+  if (filePath) {
+    if (filePath.includes('/node_modules/typescript/lib/')) return 'typeScriptStandardLibrary'
+    if (filePath.includes('/node_modules/')) return 'dep'
+    return 'app'
+  }
+
+  // todo is ok to consider all other cases as "inline" ?
+  // example of valid case here is type of "{}" as return type from function like `() => {}`
+  return 'inline'
+}
+
+export function isTypeFromDependencies(t: tsm.Type): boolean {
+  return getLocationKind(t) === 'dep'
+}
+
+export function isTypeFromApp(t: tsm.Type): boolean {
+  return getLocationKind(t) === 'app'
+}
+
+export function isTypeFromInline(t: tsm.Type): boolean {
+  return getLocationKind(t) === 'inline'
+}
+
+export function isTypeFromStandardLibrary(t: tsm.Type): boolean {
+  return getLocationKind(t) === 'typeScriptStandardLibrary'
+}
+
+export function isTypeFromTypeScriptCore(t: tsm.Type): boolean {
+  return getLocationKind(t) === 'typeScriptCore'
+}
+
+export function isTypeFromUnknown(t: tsm.Type): boolean {
+  return getLocationKind(t) === 'unknown'
+}
+
+export function isCallable(t: tsm.Type): boolean {
+  return t.getCallSignatures().length > 0
+}
+
+export function hasAlias(t: tsm.Type): boolean {
+  return t.getAliasSymbol() !== undefined
+}
+
+/**
+ * Get the type arguemnts this type passed to its generic, if any.
+ *
+ * If the type is an alias then looks for alias type arguments.
+ *
+ * Otherwise looks for interface/class type arguments.
+ */
+export function getTypeArguments(t: tsm.Type) {
+  if (hasAlias(t)) {
+    return t.getAliasTypeArguments()
+  }
+
+  return t.getTypeArguments()
+}
+
+/**
+ * Tell if the given type is primitive or not.
+ */
+export function isPrimitive(t: tsm.Type): boolean {
+  return (
+    t.getText() === 'never' ||
+    t.getText() === 'void' ||
+    t.isNull() ||
+    t.isNumber() ||
+    t.isString() ||
+    t.isBoolean() ||
+    t.isUndefined() ||
+    t.isUnknown() ||
+    t.isAny()
+  )
+}
+
+export function isTypeLevelNode(node: tsm.Node): boolean {
+  return (
+    tsm.Node.isTypeAliasDeclaration(node) ||
+    tsm.Node.isInterfaceDeclaration(node) ||
+    tsm.Node.isPropertySignature(node)
+  )
+}
+
+export function getNodeFromTypePreferingAlias(t: tsm.Type): null | tsm.Node {
+  const as = t.getAliasSymbol()
+
+  if (as) {
+    const declarations = as.getDeclarations()
+    if (declarations[0]) {
+      return declarations[0]
+    }
+  }
+
+  const s = t.getSymbol()
+  if (s) {
+    const declarations = s.getDeclarations()
+    if (declarations[0]) {
+      return declarations[0]
+    }
+  }
+
+  return null
 }

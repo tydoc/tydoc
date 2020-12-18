@@ -23,10 +23,17 @@ import {
   getDiscriminantPropertiesOfUnionMembers,
   getFirstDeclarationOrThrow,
   getGenericType,
+  getLocationKind,
+  getNameOrThrow,
+  getNodeFromTypePreferingAlias,
   getProperties,
   getSourceFileModulePath,
+  getSourceFileOrThrow,
+  getTypeArguments,
+  hasAlias,
+  isCallable,
+  isPrimitive,
 } from './lib/ts-helpers'
-import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 
 const debug = makeDebug('tydoc:extract')
 const debugExport = makeDebug('tydoc:extract:export')
@@ -338,24 +345,6 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   const locationKind = getLocationKind(t)
   debugVisible('-> type location is %s', locationKind)
 
-  if (locationKind === 'dep') {
-    debugVisible('-> location is a dependency, stopping here')
-    return Doc.unsupported(getRaw(t), 'We do not support extracting from dependencies.')
-  }
-  if (locationKind === 'typeScriptStandardLibrary') {
-    // we handle arrays specially below
-    if (!t.isArray()) {
-      debugVisible('-> location is standard lib and not array, stopping here')
-      return Doc.unsupported(getRaw(t), 'We do not support extracting from the standard library.')
-    }
-  }
-  if (locationKind === 'unknown') {
-    debugWarn(
-      '-> location is unknown, stopping here to be safe (code needs to be updated to handle this case)'
-    )
-    return Doc.unsupported(getRaw(t), 'We do not support extracting from types whose loation is unknown.')
-  }
-
   if (t.isArray()) {
     debugVisible('-> type is array')
     const innerType = t.getArrayElementTypeOrThrow()
@@ -370,8 +359,32 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
     debugVisible('-> type is an instance of a generic type: %s', tt.getText())
     return Doc.genericInstance({
       target: fromType(manager, tt) as any,
+      arguments: getTypeArguments(t).map((typeArg) => fromType(manager, typeArg)) as any,
       ...getRaw(t),
     })
+  }
+
+  if (locationKind === 'dep') {
+    debugVisible('-> location is a dependency, stopping here')
+    return Doc.unsupported(getRaw(t), 'We do not support extracting from dependencies.')
+  }
+  if (locationKind === 'typeScriptStandardLibrary') {
+    debugVisible('-> location is standard lib and not array, stopping here')
+    return Doc.standardlibrary({
+      name: getNameOrThrow(t),
+      location: {
+        modulePath: getSourceFileOrThrow(t)
+          .getFilePath()
+          .replace(/.*(typescript\/.*$)/, '$1'),
+      },
+      ...getRaw(t),
+    })
+  }
+  if (locationKind === 'unknown') {
+    debugWarn(
+      '-> location is unknown, stopping here to be safe (code needs to be updated to handle this case)'
+    )
+    return Doc.unsupported(getRaw(t), 'We do not support extracting from types whose loation is unknown.')
   }
 
   if (manager.isIndexable(t)) {
@@ -503,6 +516,10 @@ function typeParametersDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.TypePar
       }
       if (defaultTypeDocs.kind === 'alias') {
         throw new Error(`Type parameters cannot be an inline alias`)
+      }
+      if (defaultTypeDocs.kind === 'standard_library') {
+        // todo... but it can?
+        throw new Error(`Type parameters cannot be a standard library item.`)
       }
     }
 

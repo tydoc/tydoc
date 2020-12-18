@@ -17,6 +17,7 @@
     "dev": " yarn clean && yarn g:tsc --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "test": "yarn g:jest",
+    "test:unit": "yarn g:jest --testPathIgnorePatterns 'system'",
     "test:debug": "DEBUG='*' DEBUG_COLORS=true yarn g:jest --watch",
     "format": "yarn g:prettier --write .",
     "prepublishOnly": "yarn build"

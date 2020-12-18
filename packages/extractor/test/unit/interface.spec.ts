@@ -119,6 +119,13 @@ describe('bugs', () => {
                 "kind": "prop",
                 "name": "bar",
                 "type": Object {
+                  "arguments": Array [
+                    Object {
+                      "base": "number",
+                      "kind": "literal",
+                      "name": "1",
+                    },
+                  ],
                   "kind": "generic_instance",
                   "raw": Object {
                     "nodeFullText": "export interface Foo<T> {

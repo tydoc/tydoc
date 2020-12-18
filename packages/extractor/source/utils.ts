@@ -1,90 +1,7 @@
 import * as tsdoc from '@microsoft/tsdoc'
 import dedent from 'dedent'
 import * as tsm from 'ts-morph'
-import { getGenericType } from './lib/ts-helpers'
-
-export function isCallable(t: tsm.Type): boolean {
-  return t.getCallSignatures().length > 0
-}
-
-export function hasAlias(t: tsm.Type): boolean {
-  return t.getAliasSymbol() !== undefined
-}
-
-/**
- * Tell if the given type is primitive or not.
- */
-export function isPrimitive(t: tsm.Type): boolean {
-  return (
-    t.getText() === 'never' ||
-    t.getText() === 'void' ||
-    t.isNull() ||
-    t.isNumber() ||
-    t.isString() ||
-    t.isBoolean() ||
-    t.isUndefined() ||
-    t.isUnknown() ||
-    t.isAny()
-  )
-}
-
-export function isTypeLevelNode(node: tsm.Node): boolean {
-  return (
-    tsm.Node.isTypeAliasDeclaration(node) ||
-    tsm.Node.isInterfaceDeclaration(node) ||
-    tsm.Node.isPropertySignature(node)
-  )
-}
-
-export function getNodeFromTypePreferingAlias(t: tsm.Type): null | tsm.Node {
-  const as = t.getAliasSymbol()
-
-  if (as) {
-    const declarations = as.getDeclarations()
-    if (declarations[0]) {
-      return declarations[0]
-    }
-  }
-
-  const s = t.getSymbol()
-  if (s) {
-    const declarations = s.getDeclarations()
-    if (declarations[0]) {
-      return declarations[0]
-    }
-  }
-
-  return null
-}
-
-export function isTypeFromDependencies(t: tsm.Type): boolean {
-  return getLocationKind(t) === 'dep'
-}
-
-type LocationKind = 'typeScriptCore' | 'typeScriptStandardLibrary' | 'dep' | 'app' | 'inline' | 'unknown'
-
-export function getLocationKind(t: tsm.Type): LocationKind {
-  if (isPrimitive(t)) {
-    return 'typeScriptCore'
-  }
-
-  if (t.isLiteral()) {
-    return 'inline'
-  }
-
-  // todo does the order of symbol we choose matter in case of both being present?
-  const filePath = (t.getSymbol() ?? t.getAliasSymbol())?.getDeclarations()[0]?.getSourceFile().getFilePath()
-
-  if (filePath) {
-    if (filePath.includes('/node_modules/typescript/lib/')) return 'typeScriptStandardLibrary'
-    if (filePath.includes('/node_modules/')) return 'dep'
-    return 'app'
-  }
-
-  // todo is ok to consider all other cases as "inline" ?
-  // example of valid case here is type of "{}" as return type from function like `() => {}`
-  return 'inline'
-}
+import { getGenericType, getLocationKind, getSymbol } from './lib/ts-helpers'
 
 export function dumpType(t: tsm.Type): void {
   console.error(renderDumpType(t))
@@ -102,6 +19,10 @@ export function renderDumpType(t: tsm.Type): string {
     t.getSymbol()?.getDeclarations()?.[0]?.getKindName() = ${t.getSymbol()?.getDeclarations()?.[0]?.getKindName()}
     t.getSymbol()?.getDeclarations()?.[0]?.getText()     = ${indentBlockTail(59, t.getSymbol()?.getDeclarations()?.[0]?.getText() ?? 'undefined')}
 
+    getLocationKind(t)                                                        = ${getLocationKind(t)}
+    t.getSymbol()?.getDeclarations()?.[0]?.getSourceFile().getFilePath()      = ${getSymbol(t)?.getDeclarations()?.[0]?.getSourceFile().getFilePath()}
+    t.getAliasSymbol()?.getDeclarations()?.[0]?.getSourceFile().getFilePath() = ${t.getAliasSymbol()?.getDeclarations()?.[0]?.getSourceFile().getFilePath()}
+
     t.isAnonymous()                                      = ${t.isAnonymous()}
     t.isAny()                                            = ${t.isAny()}
     t.isInterface()                                      = ${t.isInterface()}
@@ -113,10 +34,8 @@ export function renderDumpType(t: tsm.Type): string {
     t.isClassOrInterface()                               = ${t.isClassOrInterface()}
     t.isEnum()                                           = ${t.isEnum()}
 
-    t.getAliasTypeArguments().length}                    = ${t.getAliasTypeArguments().length}
-    Boolean(t.getTargetType())                           = ${Boolean(t.getTargetType())}
-    t.getTargetType() === t                              = ${t.getTargetType() === t}
-
+    Exotic getText()
+    ----------------
     t.getText(undefined, tsm.ts.TypeFormatFlags.InTypeAlias)                           = ${t.getText(undefined, tsm.ts.TypeFormatFlags.InTypeAlias)}
     t.getText(undefined, tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope)    = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope)}
     t.getText(undefined, tsm.ts.TypeFormatFlags.UseTypeOfFunction)                     = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseTypeOfFunction)}
@@ -124,8 +43,20 @@ export function renderDumpType(t: tsm.Type): string {
     t.getText(undefined, tsm.ts.TypeFormatFlags.NoTruncation)                          = ${t.getText(undefined, tsm.ts.TypeFormatFlags.NoTruncation)}
     t.getText(undefined, tsm.ts.TypeFormatFlags.UseStructuralFallback)                 = ${t.getText(undefined, tsm.ts.TypeFormatFlags.UseStructuralFallback)}
 
-    Target Type?
-    ------------
+    Generic?
+    --------
+    Boolean(t.getTargetType())                                        = ${Boolean(t.getTargetType())}
+    t.getTargetType() === t                                           = ${t.getTargetType() === t}
+
+    Type Arguments?
+    ---------------
+    t.getTypeArguments().length}                                      = ${t.getTypeArguments().length}
+    t.getTypeArguments().map(arg => arg.getText()).join(', ')         = ${t.getTypeArguments().map(arg => arg.getText()).join(', ')}
+    t.getAliasTypeArguments().length}                                 = ${t.getAliasTypeArguments().length}
+    t.getAliasTypeArguments().map(arg => arg.getText()).join(', ')    = ${t.getAliasTypeArguments().map(arg => arg.getText()).join(', ')}
+
+    Generic Target?
+    ---------------
   ` + ((getGenericType(t)) ? '\n\n' + indentBlock(4, renderDumpType(getGenericType(t)!)) : '\n\n' + 'N/A')
 }
 
