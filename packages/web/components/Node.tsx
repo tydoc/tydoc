@@ -241,5 +241,9 @@ function getDocumentationOfNode(node: Doc.Node): string | null {
     case 'generic_instance': {
       return node.raw.nodeFullText
     }
+
+    case 'standard_library': {
+      return node.raw.nodeFullText
+    }
   }
 }

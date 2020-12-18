@@ -50,34 +50,12 @@ Object {
         },
         "types": Array [
           Object {
-            "kind": "alias",
-            "name": "B",
-            "raw": Object {
-              "nodeFullText": "type B = { b: 2; kind: \\"B\\" };",
-              "nodeText": "type B = { b: 2; kind: \\"B\\" };",
-              "typeText": "B",
-            },
-            "tsdoc": null,
-            "type": Object {
-              "kind": "typeIndexRef",
-              "link": "(a).B",
-            },
-            "typeParameters": Array [],
+            "kind": "typeIndexRef",
+            "link": "(a).B",
           },
           Object {
-            "kind": "alias",
-            "name": "C",
-            "raw": Object {
-              "nodeFullText": "type C = { c: 3; kind: \\"C\\" };",
-              "nodeText": "type C = { c: 3; kind: \\"C\\" };",
-              "typeText": "C",
-            },
-            "tsdoc": null,
-            "type": Object {
-              "kind": "typeIndexRef",
-              "link": "(a).C",
-            },
-            "typeParameters": Array [],
+            "kind": "typeIndexRef",
+            "link": "(a).C",
           },
         ],
       },
@@ -355,34 +333,12 @@ Object {
         },
         "types": Array [
           Object {
-            "kind": "alias",
-            "name": "B",
-            "raw": Object {
-              "nodeFullText": "type B = { b: 2; kind1: \\"B1\\"; kind2: \\"B2\\" };",
-              "nodeText": "type B = { b: 2; kind1: \\"B1\\"; kind2: \\"B2\\" };",
-              "typeText": "B",
-            },
-            "tsdoc": null,
-            "type": Object {
-              "kind": "typeIndexRef",
-              "link": "(a).B",
-            },
-            "typeParameters": Array [],
+            "kind": "typeIndexRef",
+            "link": "(a).B",
           },
           Object {
-            "kind": "alias",
-            "name": "C",
-            "raw": Object {
-              "nodeFullText": "type C = { c: 3; kind1: \\"C1\\"; kind2: \\"C2\\" };",
-              "nodeText": "type C = { c: 3; kind1: \\"C1\\"; kind2: \\"C2\\" };",
-              "typeText": "C",
-            },
-            "tsdoc": null,
-            "type": Object {
-              "kind": "typeIndexRef",
-              "link": "(a).C",
-            },
-            "typeParameters": Array [],
+            "kind": "typeIndexRef",
+            "link": "(a).C",
           },
         ],
       },

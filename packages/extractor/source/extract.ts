@@ -23,10 +23,17 @@ import {
   getDiscriminantPropertiesOfUnionMembers,
   getFirstDeclarationOrThrow,
   getGenericType,
+  getLocationKind,
+  getNameOrThrow,
+  getNodeFromTypePreferingAlias,
   getProperties,
   getSourceFileModulePath,
+  getSourceFileOrThrow,
+  getTypeArgs,
+  hasAlias,
+  isCallable,
+  isPrimitive,
 } from './lib/ts-helpers'
-import { getLocationKind, getNodeFromTypePreferingAlias, hasAlias, isCallable, isPrimitive } from './utils'
 
 const debug = makeDebug('tydoc:extract')
 const debugExport = makeDebug('tydoc:extract:export')
@@ -296,20 +303,21 @@ export function fromModule(manager: Doc.Manager, sourceFile: tsm.SourceFile): Do
     let doc
     if (tsm.Node.isTypeAliasDeclaration(n) && !hasAlias(t)) {
       debugExport('type alias pointing to type that cannot back reference to the type alias %s', n.getText())
-      doc = manager.indexTypeAliasNode(n, () =>
-        Doc.alias({
+      doc = manager.indexTypeAliasNode(n, () => {
+        const typeParameters = typeParametersDocsFromType(manager, t)
+        return Doc.alias({
           name: n.getName(),
           raw: {
             nodeFullText: n.getFullText(),
             nodeText: n.getText(),
             typeText: t.getText(),
           },
-          typeParameters: typeParametersDocsFromType(manager, t),
+          typeParameters,
           // todo getTSDocFromNode()
           ...getTSDoc(manager, t),
           type: fromType(manager, t),
         })
-      )
+      })
     } else {
       doc = fromType(manager, t)
     }
@@ -338,24 +346,6 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   const locationKind = getLocationKind(t)
   debugVisible('-> type location is %s', locationKind)
 
-  if (locationKind === 'dep') {
-    debugVisible('-> location is a dependency, stopping here')
-    return Doc.unsupported(getRaw(t), 'We do not support extracting from dependencies.')
-  }
-  if (locationKind === 'typeScriptStandardLibrary') {
-    // we handle arrays specially below
-    if (!t.isArray()) {
-      debugVisible('-> location is standard lib and not array, stopping here')
-      return Doc.unsupported(getRaw(t), 'We do not support extracting from the standard library.')
-    }
-  }
-  if (locationKind === 'unknown') {
-    debugWarn(
-      '-> location is unknown, stopping here to be safe (code needs to be updated to handle this case)'
-    )
-    return Doc.unsupported(getRaw(t), 'We do not support extracting from types whose loation is unknown.')
-  }
-
   if (t.isArray()) {
     debugVisible('-> type is array')
     const innerType = t.getArrayElementTypeOrThrow()
@@ -368,10 +358,40 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
   const tt = getGenericType(t)
   if (tt) {
     debugVisible('-> type is an instance of a generic type: %s', tt.getText())
+    debugVisible('handle generic: %s', tt.getText())
+    const target = fromType(manager, tt) as any
+    const args = getTypeArgs(t).map((typeArg) => {
+      debugVisible('handle type argument: %s', typeArg.getText())
+      return fromType(manager, typeArg)
+    }) as any
     return Doc.genericInstance({
-      target: fromType(manager, tt) as any,
+      target,
+      args,
       ...getRaw(t),
     })
+  }
+
+  if (locationKind === 'dep') {
+    debugVisible('-> location is a dependency, stopping here')
+    return Doc.unsupported(getRaw(t), 'We do not support extracting from dependencies.')
+  }
+  if (locationKind === 'typeScriptStandardLibrary') {
+    debugVisible('-> location is standard lib and not array, stopping here')
+    return Doc.standardlibrary({
+      name: getNameOrThrow(t),
+      location: {
+        modulePath: getSourceFileOrThrow(t)
+          .getFilePath()
+          .replace(/.*(typescript\/.*$)/, '$1'),
+      },
+      ...getRaw(t),
+    })
+  }
+  if (locationKind === 'unknown') {
+    debugWarn(
+      '-> location is unknown, stopping here to be safe (code needs to be updated to handle this case)'
+    )
+    return Doc.unsupported(getRaw(t), 'We do not support extracting from types whose loation is unknown.')
   }
 
   if (manager.isIndexable(t)) {
@@ -458,8 +478,7 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
           discriminantProperties: discriminantProperties.map((p) => p.getName()),
           types: members.map((tm) => {
             debugVisible('-> handle union member %s', tm.getText())
-            // todo no extract alias here ...
-            return extractAliasIfOne(manager, tm, fromType(manager, tm))
+            return fromType(manager, tm)
           }),
         })
       )
@@ -491,10 +510,13 @@ export function fromType(manager: Doc.Manager, t: tsm.Type): Doc.Node {
 function typeParametersDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.TypeParameter[] {
   // todo why does ts-moprh separate type arg access?
   const params = t.isInterface() ? t.getTypeArguments() : t.getAliasTypeArguments()
-  return params.map((param) => {
-    const sym = param.getSymbolOrThrow()
-    const defaultType = param.getDefault()
-    const defaultTypeDocs = defaultType ? fromType(docs, defaultType) : null
+  return params.map((paramType) => {
+    const sym = paramType.getSymbolOrThrow()
+    const defaultType = paramType.getDefault()
+    const defaultTypeDocs = defaultType
+      ? (debugVisible('handle default type for type paramter %s', defaultType.getText()),
+        fromType(docs, defaultType))
+      : null
 
     // todo use a better function than fromType that is for extracting inline or indexed types
     if (defaultTypeDocs) {
@@ -504,12 +526,16 @@ function typeParametersDocsFromType(docs: Doc.Manager, t: tsm.Type): Doc.TypePar
       if (defaultTypeDocs.kind === 'alias') {
         throw new Error(`Type parameters cannot be an inline alias`)
       }
+      if (defaultTypeDocs.kind === 'standard_library') {
+        // todo... but it can?
+        throw new Error(`Type parameters cannot be a standard library item.`)
+      }
     }
 
     return {
       name: sym.getName(),
       default: defaultTypeDocs,
-      ...getRaw(param),
+      ...getRaw(paramType),
     }
   })
 }
@@ -579,7 +605,7 @@ function extractAliasIfOne(manager: Doc.Manager, t: tsm.Type, doc: Doc.Node): Do
     return doc
   }
   const asym = t.getAliasSymbol()!
-  debug('-> type had alias %s (extracting a doc node for it)', asym.getName())
+  debug('-> type had alias "%s" so extracting a doc node for it', asym.getName())
   return Doc.alias({
     name: asym.getName(),
     type: doc,
