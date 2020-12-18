@@ -500,7 +500,7 @@ export type Package = {
 export type GenericInstance = {
   kind: 'generic_instance'
   target: IndexRef
-  arguments: InlinableType[]
+  args: InlinableType[]
 } & RawFrag
 
 type GenericInstanceInput = Omit<GenericInstance, 'kind'>

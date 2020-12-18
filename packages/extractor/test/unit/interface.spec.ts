@@ -119,7 +119,7 @@ describe('bugs', () => {
                 "kind": "prop",
                 "name": "bar",
                 "type": Object {
-                  "arguments": Array [
+                  "args": Array [
                     Object {
                       "base": "number",
                       "kind": "literal",

@@ -308,7 +308,7 @@ Object {
                   "name": "\\"inherit\\"",
                 },
                 Object {
-                  "arguments": Array [
+                  "args": Array [
                     Object {
                       "kind": "typeIndexRef",
                       "link": "(index).StdioOption",
@@ -1613,7 +1613,7 @@ interface ReadonlyArray<T> {
               "reason": "We do not support extracting from dependencies.",
             },
             Object {
-              "arguments": Array [
+              "args": Array [
                 Object {
                   "kind": "unsupported",
                   "raw": Object {
@@ -1682,9 +1682,9 @@ interface ReadonlyArray<T> {
               },
             },
             Object {
-              "arguments": Array [
+              "args": Array [
                 Object {
-                  "arguments": Array [
+                  "args": Array [
                     Object {
                       "kind": "unsupported",
                       "raw": Object {
@@ -1895,7 +1895,7 @@ interface Promise<T> {
                                 "kind": "sigParam",
                                 "name": "reason",
                                 "type": Object {
-                                  "arguments": Array [
+                                  "args": Array [
                                     Object {
                                       "kind": "unsupported",
                                       "raw": Object {
@@ -1969,7 +1969,7 @@ interface Promise<T> {
                                   "reason": "This kind of type is not supported: \\"ResultType\\"",
                                 },
                                 Object {
-                                  "arguments": Array [
+                                  "args": Array [
                                     Object {
                                       "kind": "unsupported",
                                       "raw": Object {
@@ -2039,7 +2039,7 @@ interface Promise<T> {
                     },
                   ],
                   "return": Object {
-                    "arguments": Array [
+                    "args": Array [
                       Object {
                         "discriminantProperties": null,
                         "isDiscriminated": false,
@@ -2060,7 +2060,7 @@ interface Promise<T> {
                             "reason": "This kind of type is not supported: \\"ResultType\\"",
                           },
                           Object {
-                            "arguments": Array [
+                            "args": Array [
                               Object {
                                 "kind": "unsupported",
                                 "raw": Object {
@@ -4418,7 +4418,7 @@ declare class Buffer extends Uint8Array {
                   "name": "\\"inherit\\"",
                 },
                 Object {
-                  "arguments": Array [
+                  "args": Array [
                     Object {
                       "kind": "typeIndexRef",
                       "link": "(index).StdioOption",
@@ -6031,7 +6031,7 @@ declare class Buffer extends Uint8Array {
                   "name": "\\"inherit\\"",
                 },
                 Object {
-                  "arguments": Array [
+                  "args": Array [
                     Object {
                       "kind": "typeIndexRef",
                       "link": "(index).StdioOption",
@@ -7499,7 +7499,7 @@ declare class Buffer extends Uint8Array {
                   "name": "\\"inherit\\"",
                 },
                 Object {
-                  "arguments": Array [
+                  "args": Array [
                     Object {
                       "kind": "typeIndexRef",
                       "link": "(index).StdioOption",
@@ -13780,7 +13780,7 @@ Object {
                       },
                     ],
                     "return": Object {
-                      "arguments": Array [
+                      "args": Array [
                         Object {
                           "kind": "typeIndexRef",
                           "link": "(dist/index).Sponsorship",
@@ -13910,7 +13910,7 @@ interface Promise<T> {
                       },
                     ],
                     "return": Object {
-                      "arguments": Array [
+                      "args": Array [
                         Object {
                           "kind": "primitive",
                           "type": "boolean",

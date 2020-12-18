@@ -340,7 +340,7 @@ export function hasAlias(t: tsm.Type): boolean {
  *
  * Otherwise looks for interface/class type arguments.
  */
-export function getTypeArguments(t: tsm.Type) {
+export function getTypeArgs(t: tsm.Type) {
   if (hasAlias(t)) {
     return t.getAliasTypeArguments()
   }
