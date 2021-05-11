@@ -23,7 +23,7 @@
     "@tydoc/renderer-markdown": "workspace:packages/renderer-markdown",
     "debug": "^4.3.1",
     "dedent": "^0.7.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "yargs": "^16.2.0"
   },
   "devDependencies": {
